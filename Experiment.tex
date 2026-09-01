@@ -136,7 +136,14 @@ $n^{-2/5}$ line.}
     이 때, $w_i(s) =  \frac{K_{h}(s, s_i)}{\sum_{j} K_{h}(s,s_j)}$이다.
 \end{itemize}
 
-\subsection{}
+\subsection{Objective function}
+\begin{itemize}
+    \item 이 때, 최적화하는 objective function은 다음과 같다.
+    \begin{equation*}
+        \mathcal{L}(\phi, \psi) = \frac{1}{n} \sum_{i=1}^{n} l(f_\psi(\tilde{\mathbf{z}}_i), y_i) + \lambda \widehat{\mathrm{SupIPM}}_{\mathcal{F}_{\mathbf{ReLU}}} (\mathbf{\tilde{Z}} ; S) 
+    \end{equation*}
+\end{itemize}
+
 
 \subsection{Algorithm}
 \begin{itemize}
