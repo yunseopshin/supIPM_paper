@@ -105,7 +105,7 @@ $n^{-2/5}$ line.}
 \begin{itemize}
     \item 다음과 같은 discriminator class $\mathcal{F}_{\mathbf{ReLU}}$를 생각하자.
     \begin{equation*}
-        \mathcal{F}_{\mathbf{ReLU}} := \{f: \mathbb{R}^{d} \rightarrow \mathbb{R} | f(\mathbf{z}) = (\theta^{\top} \mathbf{z} + \mu)_{+},\, \mu \in [-1,1], \, \theta \in \mathbb{S}^{d-1}\}
+        \mathcal{F}_{\mathbf{ReLU}} := \{f: \mathbb{B}^{d} \rightarrow \mathbb{R} | f(\mathbf{z}) = (\theta^{\top} \mathbf{z} + \mu)_{+},\, \mu \in [-1,1], \, \theta \in \mathbb{S}^{d-1}\}
         ,
     \end{equation*}
     where $\mathbb{S}^{d-1} = \{\mathbf{z} \in \mathbb{R}^{d} : || \mathbf{z} ||_{2} =1 \}$.
@@ -176,5 +176,12 @@ $n^{-2/5}$ line.}
     \item 이렇게 구한 $s^\star$와 $\mathbf{v}$를 목적함수에 대입하여 $\phi$와 $\psi$를 최적화한다.
     \item 그렇게 구한 enconder, head로 다시  $s^\star$와 $\mathbf{v}$를 최적화한다.
     \item 이것을 전체 epoch (기본 200회)만큼 반복한다.
+\end{itemize}
+
+\section{Problem}
+\begin{itemize}
+    \item 지금 실제로 문제가 되는 부분은 2가지가 있다.
+    \item 실제 코드를 구현할 때 S의 domain의 양극단은 잘라내고 안쪽에서만 s를 최적화 시킴. $s$가 극단에 있을시에 조건부분포가 점분포가 될수있어서.
+    \item 지금 처럼 구현할수에 critic step이 2번일시에 수렴하지 않음. 20번 이상 반복해야 수렴하는데 이럴 시 계산량이 너무 많아지는 문제.
 \end{itemize}
 \end{document}
