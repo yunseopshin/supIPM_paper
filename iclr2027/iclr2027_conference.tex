@@ -80,8 +80,100 @@ We estimate supIPM on a trimmed domain that omits a neighborhood of the boundary
   \item We derive fairness bounds for prediction functions of bounded H\"older norm and prove that the empirical supIPM, with its supremum taken over an expanding trimmed domain, converges to its population counterpart uniformly over a growing sieve of ReLU encoders.
 \end{itemize}
 
+\section{Preliminaries}
+\label{sec:preliminaries}
+
+\subsection{Fair representation using EIPM}
+\label{sec:frem}
+
+Assume that we observe an input $X\in\mathcal{X}$, an outcome $Y\in\mathcal{Y}$, and a continuous sensitive attribute $S\in\mathcal{S}\subset\mathbb{R}$.  An encoder $h:\mathcal{X}\to\mathcal{Z}$ maps $X$ to a representation $Z=h(X)$, and a prediction head $f:\mathcal{Z}\to\mathcal{Y}$ produces the downstream prediction $f(Z)$, while fair representation learning seeks an encoder for which the conditional distribution $P_{Z\mid S=s}$ is close to the marginal distribution $P_Z$ across the support of $S$.  Once these distributions agree, $Z$ is independent of $S$, and every measurable prediction constructed from $Z$ inherits this independence.
+
+For a class $\mathcal{V}$ of real-valued discriminators on $\mathcal{Z}$, the integral probability metric (IPM) between probability measures $P$ and $Q$ is
+\begin{equation}
+  \operatorname{IPM}_{\mathcal{V}}(P,Q)
+  :=\sup_{v\in\mathcal{V}}
+  \left|\int v(z)\,\mathrm{d}P(z)-\int v(z)\,\mathrm{d}Q(z)\right|.
+  \label{eq:prelim-ipm}
+\end{equation}
+For continuous $S$, the conditional distribution changes with the evaluation point $s$ and yields a different IPM at each value, so \citet{kong2025fair} measure representation-level dependence by averaging this conditional-to-marginal discrepancy over the sensitive attribute.  Their expectation of IPMs (EIPM) is
+\begin{equation}
+  \operatorname{EIPM}_{\mathcal{V}}(Z;S)
+  :=\mathbb{E}_{S}\!\left[
+    \operatorname{IPM}_{\mathcal{V}}(P_{Z\mid S},P_Z)
+  \right].
+  \label{eq:eipm}
+\end{equation}
+If $\operatorname{IPM}_{\mathcal{V}}$ separates probability measures, a zero EIPM implies $P_{Z\mid S=s}=P_Z$ for $P_S$-almost every $s$.  More generally, the EIPM controls generalized demographic parity for prediction heads that belong to, or can be uniformly approximated by, the discriminator class \citep{kong2025fair}.
+
+The conditional distribution in Equation~\eqref{eq:eipm} cannot be estimated by collecting observations with $S_i=s$, since a continuously distributed sensitive attribute has no repeated values with probability one.  FREM instead uses kernel smoothing.  Given observations $\{(X_i,S_i,Y_i)\}_{i=1}^n$ and $Z_i=h(X_i)$, it assigns larger weights to representations whose sensitive attributes lie near $S_i$:
+\begin{equation}
+  \widehat{P}^{(-i),\gamma}_{Z\mid S=S_i}
+  :=\sum_{j\ne i}\widehat{w}_{\gamma}(j;i)\,\delta_{Z_j},
+  \qquad
+  \widehat{w}_{\gamma}(j;i)
+  :=\frac{K_{\gamma}(S_j,S_i)}{\sum_{\ell\ne i}K_{\gamma}(S_\ell,S_i)}.
+  \label{eq:frem-conditional}
+\end{equation}
+Here, $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma$, and the leave-one-out marginal empirical distribution is $\widehat{P}^{(-i)}_Z=(n-1)^{-1}\sum_{j\ne i}\delta_{Z_j}$.  The resulting estimator is
+\begin{equation}
+  \widehat{\operatorname{EIPM}}^{\gamma}_{\mathcal{V}}(Z;S)
+  :=\frac{1}{n}\sum_{i=1}^n
+  \operatorname{IPM}_{\mathcal{V}}
+  \left(\widehat{P}^{(-i),\gamma}_{Z\mid S=S_i},
+        \widehat{P}^{(-i)}_Z\right).
+  \label{eq:eipm-estimator}
+\end{equation}
+FREM takes $\mathcal{V}$ to be the unit ball of a reproducing kernel Hilbert space, so each IPM in Equation~\eqref{eq:eipm-estimator} is an MMD with a closed-form kernel expression \citep{gretton2012kernel,kong2025fair}.  For a supervised loss $\mathcal{L}_{\mathrm{sup}}$, the encoder and prediction head are trained by minimizing
+\begin{equation}
+  \mathcal{L}_{\mathrm{sup}}(f\circ h)
+  +\lambda\widehat{\operatorname{EIPM}}^{\gamma}_{\mathcal{V}}(h(X);S),
+  \label{eq:frem-objective}
+\end{equation}
+where $\lambda\ge 0$ controls the accuracy--fairness trade-off.  Thus, FREM supplies both a representation-level criterion for a continuous sensitive attribute and a kernel estimator that avoids binning $S$.
+
+\subsection{ReLU-IPM}
+\label{sec:relu-ipm}
+
+The choice of $\mathcal{V}$ determines which downstream prediction heads receive a fairness guarantee, and MMD fixes this class through its kernel, making the metric convenient to compute but limiting the functions being compared.  In particular, the RKHS of a Gaussian kernel contains only infinitely differentiable functions, whereas many prediction heads of interest are only H\"older smooth \citep{park2025relu}.  ReLU-IPM uses a finite-dimensional discriminator family while retaining control over these larger H\"older classes.
+
+Let $\mathbb{B}^d:=\{z\in\mathbb{R}^d:\lVert z\rVert_2\le 1\}$ and $\mathbb{S}^{d-1}:=\{\theta\in\mathbb{R}^d:\lVert\theta\rVert_2=1\}$.  \citet{park2025relu} define the ReLU discriminator class on $\mathbb{B}^d$ by
+\begin{equation}
+  \mathcal{V}_{\mathrm{R}}
+  :=\left\{
+    v_{\theta,\mu}(z)=(\theta^\top z+\mu)_+:
+    \theta\in\mathbb{S}^{d-1},\ \mu\in[-1,1]
+  \right\},
+  \label{eq:relu-class}
+\end{equation}
+where $(a)_+:=\max\{a,0\}$.  For probability measures $P$ and $Q$ on $\mathbb{B}^d$, the ReLU-IPM is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(P,Q)$ as defined in Equation~\eqref{eq:prelim-ipm}.  Despite the parametric form of $\mathcal{V}_{\mathrm{R}}$, this metric separates probability measures: $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(P,Q)=0$ if and only if $P=Q$ \citep{park2025relu}.
+
+A second property concerns H\"older functions.  Let $\mathcal{H}^{\beta}_d$ be the unit ball of the $\beta$-H\"older class on $\mathbb{B}^d$.  For a constant $C$ depending only on $d$ and $\beta$, \citet{park2025relu} establish two regimes according to the position of $\beta$ relative to $(d+3)/2$:
+\begin{equation}
+  \operatorname{IPM}_{\mathcal{H}^{\beta}_d}(P,Q)
+  \le C
+  \begin{cases}
+    \operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(P,Q)^{\frac{2\beta}{d+3}},
+      & \beta<\frac{d+3}{2},\\[2mm]
+    \operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(P,Q),
+      & \beta>\frac{d+3}{2}.
+  \end{cases}
+  \label{eq:relu-holder}
+\end{equation}
+The boundary case $\beta=(d+3)/2$ requires a separate distinction and is omitted here, following their statement.  Equation~\eqref{eq:relu-holder} allows a small ReLU-IPM to bound the expectation gap for every function in the corresponding H\"older ball, even though the ReLU discriminators themselves are indexed only by $(\theta,\mu)$.
+
+For empirical measures $\widehat{P}_n=n^{-1}\sum_{i=1}^n\delta_{Z_i}$ and $\widehat{Q}_m=m^{-1}\sum_{j=1}^m\delta_{Z'_j}$, the ReLU-IPM reduces to
+\begin{equation}
+  \sup_{\theta\in\mathbb{S}^{d-1},\,\mu\in[-1,1]}
+  \left|
+    \frac{1}{n}\sum_{i=1}^n(\theta^\top Z_i+\mu)_+
+    -\frac{1}{m}\sum_{j=1}^m(\theta^\top Z'_j+\mu)_+
+  \right|.
+  \label{eq:empirical-relu-ipm}
+\end{equation}
+This objective can be optimized over $(\theta,\mu)$ by projected gradient ascent, with multiple initializations used to reduce sensitivity to local optima \citep{park2025relu}.  Our supIPM construction uses this finite-dimensional maximization inside its outer optimization over $s$.
+
 \bibliographystyle{iclr2027_conference}
-\bibliography{bibliography}
+\bibliography{../bibliography}
 
 \end{document}
 
