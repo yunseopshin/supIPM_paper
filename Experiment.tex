@@ -30,19 +30,19 @@ $\supIPM$.
     \item 지금은 discriminator가 holder space여서 IPM이 closed form으로 나오는 경우로 해놨는데 이걸 똑같이 relu discriminator로 바꾸는게 맞지 않을까?? 라는 생각
 \end{itemize}
 
-\begin{proposition}
-For a joint law $P$ of $(S,Z)$ with $S$ absolutely continuous, let
-$\Delta_P(s) = \sup_{f \in \mathrm{Lip}_1} \big| \mathbb E_P[f(Z) \mid S{=}s] - \mathbb E_P[f(Z)] \big|$.
-For every $\varepsilon, M > 0$ there is such a $P$, with $S \sim N(0,1)$ and
-$\operatorname{Var}_P(Z) = 1$, satisfying
-\[
-\mathbb E_P\big[\Delta_P(S)\big] \;\le\; \varepsilon
-\qquad\text{and}\qquad
-\operatorname*{sup}_{s} \Delta_P(s) \;\ge\; M .
-\]
-\end{proposition}
+% \begin{proposition}
+% For a joint law $P$ of $(S,Z)$ with $S$ absolutely continuous, let
+% $\Delta_P(s) = \sup_{f \in \mathrm{Lip}_1} \big| \mathbb E_P[f(Z) \mid S{=}s] - \mathbb E_P[f(Z)] \big|$.
+% For every $\varepsilon, M > 0$ there is such a $P$, with $S \sim N(0,1)$ and
+% $\operatorname{Var}_P(Z) = 1$, satisfying
+% \[
+% \mathbb E_P\big[\Delta_P(S)\big] \;\le\; \varepsilon
+% \qquad\text{and}\qquad
+% \operatorname*{sup}_{s} \Delta_P(s) \;\ge\; M .
+% \]
+% \end{proposition}
 
-\noindent The converse inequality is trivial, so $\supIPM$ is a strictly stronger guarantee.
+% \noindent The converse inequality is trivial, so $\supIPM$ is a strictly stronger guarantee.
 
 
 \paragraph{Data.}
@@ -184,4 +184,16 @@ $n^{-2/5}$ line.}
     \item 실제 코드를 구현할 때 S의 domain의 양극단은 잘라내고 안쪽에서만 s를 최적화 시킴. $s$가 극단에 있을시에 조건부분포가 점분포가 될수있어서.
     \item 지금 처럼 구현할수에 critic step이 2번일시에 수렴하지 않음. 20번 이상 반복해야 수렴하는데 이럴 시 계산량이 너무 많아지는 문제.
 \end{itemize}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{figures/tradeoff_acc_supipm.png}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{figures/tradeoff_mae_supipm.png}
+\end{figure}
+
+
 \end{document}
