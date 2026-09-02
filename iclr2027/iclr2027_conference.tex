@@ -177,7 +177,7 @@ Let $\mathbf{Z}'_1,\ldots,\mathbf{Z}'_{n'}$ be a second sample of size $n'$.  Fo
 \subsection{From GDP to supIPM}
 \label{sec:supipm-criterion}
 
-We begin with the prediction-level criterion that motivates supIPM.  \citet{jiang2022gdp} define GDP for a continuous sensitive attribute as the $\mathbb{P}_S$-average of the absolute difference between the conditional and the marginal mean prediction, and \citet{kong2025fair} state the same criterion with the prediction replaced by a measurable transformation $\varphi$ of it.  For the composed prediction model $g=f\circ h$ and a measurable $\varphi:\mathbb{R}\to\mathbb{R}$, GDP is defined as
+We begin with the prediction-level criterion.  \citet{jiang2022gdp} define GDP for a continuous sensitive attribute as the $\mathbb{P}_S$-average of the absolute difference between the conditional and the marginal mean prediction, and \citet{kong2025fair} state the same criterion for a measurable transformation $\varphi:\mathbb{R}\to\mathbb{R}$ of the prediction.  For the composed prediction model $g=f\circ h$,
 \begin{equation}
   \operatorname{GDP}_{\varphi}(g)
   :=\mathbb{E}_{S}\!\left[
@@ -188,9 +188,9 @@ We begin with the prediction-level criterion that motivates supIPM.  \citet{jian
   \right].
   \label{eq:gdp}
 \end{equation}
-The choice of $\varphi$ determines which functional of the prediction is compared.  The identity function compares conditional and marginal mean predictions, whereas a threshold indicator compares positive prediction rates.  Following FREM, we take $\varphi$ to be the identity function and write $\operatorname{GDP}(g)$.
+The identity $\varphi$ compares conditional and marginal mean predictions, and a threshold indicator compares positive prediction rates.  Following FREM, we take $\varphi$ to be the identity and write $\operatorname{GDP}(g)$.
 
-Because GDP integrates the discrepancy between the conditional and marginal mean predictions against $\mathbb{P}_S$, a large discrepancy confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  To require a uniform bound over all values of the sensitive attribute, we replace the outer expectation by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
+Because GDP integrates the discrepancy against $\mathbb{P}_S$, a large discrepancy confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  To require a uniform bound over all values of the sensitive attribute, we replace the outer expectation by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
 \begin{equation}
   \operatorname{GDP}_{\infty}(g)
   :=\sup_{s\in\mathcal{S}}
@@ -200,21 +200,25 @@ Because GDP integrates the discrepancy between the conditional and marginal mean
   \right|.
   \label{eq:linfty-gdp}
 \end{equation}
+We assume throughout the two conditions that \citet{kong2025fair} impose in their Assumptions 2 and 3.  Under the positive-density condition, $S$ has a density $p_S$ with respect to the Lebesgue measure $\mathrm{Leb}$ on $\mathcal{S}$ with $0<c_S\le p_S(s)\le C_S<\infty$ for every $s\in\mathcal{S}$.  Under the smoothness condition, $(\mathbf{X},S)$ has a joint density $p(\mathbf{x},s)$ with respect to $\nu\otimes\mathrm{Leb}$ for a $\sigma$-finite measure $\nu$ on $\mathcal{X}$, and $p(\mathbf{x},s)$ is twice differentiable in $s$ with a bounded second derivative for every $\mathbf{x}$.  We fix one such $p$ and define the conditional expectation pointwise by
+\begin{equation}
+  \mathbb{E}[g(\mathbf{X})\mid S=s]
+  :=\frac{1}{p_S(s)}\int_{\mathcal{X}} g(\mathbf{x})\,p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
+  \qquad s\in\mathcal{S},
+  \label{eq:pointwise-conditional}
+\end{equation}
+so that the supremum in Equation~\ref{eq:linfty-gdp} is well defined at every $s$ rather than for $\mathbb{P}_S$-almost every $s$.
 
-We assume throughout the two conditions that \citet{kong2025fair} impose in their Assumptions 2 and 3.  Under the positive-density condition, $S$ has a density $p_S$ with respect to the Lebesgue measure $\mathrm{Leb}$ on $\mathcal{S}$, and $0<c_S\le p_S(s)\le C_S<\infty$ for every $s\in\mathcal{S}$.  Under the smoothness condition, $(\mathbf{X},S)$ has a joint density $p(\mathbf{x},s)$ with respect to $\nu\otimes\mathrm{Leb}$ for a $\sigma$-finite measure $\nu$ on $\mathcal{X}$, and $p(\mathbf{x},s)$ is twice differentiable in $s$ with a bounded second derivative for every $\mathbf{x}$.  The supremum in Equation~\ref{eq:linfty-gdp} requires the conditional expectation at every $s\in\mathcal{S}$ rather than for $\mathbb{P}_S$-almost every $s$, so we fix one such joint density $p$ and define the conditional expectation pointwise by $\mathbb{E}[g(\mathbf{X})\mid S=s]:=\int g(\mathbf{x})\,p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})/p_S(s)$.
+\citet{kim2024probable} observe that a maximum disparity over a continuous $S$ is sensitive to outliers and is estimated with large variance where $p_S$ is small.  Their probable demographic parity therefore requires the mean prediction to be equal across the segments of $\mathcal{S}$ that have probability at least $\alpha$, and its violation is the largest difference between these segment means.  Because the prediction is averaged within each segment, a discrepancy confined to a set of probability below $\alpha$ has little effect on the criterion.  We retain the supremum in the population criterion and control the variance of its estimator through the kernel-smoothed conditional distributions of Section~\ref{sec:supipm-estimation}.
 
-\citet{kim2024probable} observe that a maximum disparity over a continuous $S$ is sensitive to outliers and is estimated with large variance where the density of $S$ is small.  They therefore average the prediction within each segment of $\mathcal{S}$ that has probability at least $\alpha$.  Their criterion, probable demographic parity, requires the mean prediction to be equal across all such segments, and its violation is measured by the largest difference between the segment means.  Because the prediction is still averaged within each segment, a discrepancy confined to a set of probability below $\alpha$ has little effect on the criterion.  We retain the supremum in the population criterion, and the kernel-smoothed conditional distributions constructed in Section~\ref{sec:supipm-estimation} control the variance of its estimator.
-
-The value $\operatorname{GDP}_{\infty}(f\circ h)$ depends on the particular head $f$, so we next state a criterion for the representation itself, which controls an entire class of downstream heads at once.
-
-Let $h_{\phi}:\mathcal{X}\to\mathbb{R}^d$ be an encoder parameterized by $\phi$ and write $\mathbf{Z}=h_{\phi}(\mathbf{X})$.  Because the ReLU discriminator class in Equation~\ref{eq:relu-class} is defined on $\mathbb{B}^d$, we map the representation into the unit ball by
+The value $\operatorname{GDP}_{\infty}(f\circ h)$ depends on the particular head $f$, so we next state a criterion for the representation itself, which controls an entire class of downstream heads at once.  Let $h_{\phi}:\mathcal{X}\to\mathbb{R}^d$ be an encoder parameterized by $\phi$ and write $\mathbf{Z}=h_{\phi}(\mathbf{X})$.  Because the ReLU discriminator class in Equation~\ref{eq:relu-class} is defined on $\mathbb{B}^d$, we map the representation into the unit ball by
 \begin{equation}
   \widetilde{\mathbf{Z}}
   :=\frac{\mathbf{Z}}{\sqrt{\lVert\mathbf{Z}\rVert_2^2+1}}
   \in\mathbb{B}^d.
   \label{eq:normalized-representation}
 \end{equation}
-From here on, prediction heads and discriminator classes are taken on $\mathbb{B}^d$ and applied to $\widetilde{\mathbf{Z}}$.  As with $\mathbb{E}[g(\mathbf{X})\mid S=s]$, we define $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ pointwise from the fixed joint density.  For a discriminator class $\mathcal{V}$ on $\mathbb{B}^d$, we define
+Prediction heads and discriminator classes are taken on $\mathbb{B}^d$ from here on and applied to $\widetilde{\mathbf{Z}}$, and $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ is defined pointwise from $p$ as in Equation~\ref{eq:pointwise-conditional}.  For a discriminator class $\mathcal{V}$ on $\mathbb{B}^d$, we define
 \begin{align}
   \operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)
   &:=\sup_{s\in\mathcal{S}}
@@ -227,28 +231,44 @@ From here on, prediction heads and discriminator classes are taken on $\mathbb{B
   \right|.
   \label{eq:supipm}
 \end{align}
-The outer supremum runs over the sensitive values, and the inner supremum runs over the discriminator class.  For $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the inner quantity is the ReLU-IPM of Section~\ref{sec:relu-ipm}.  Equation~\ref{eq:supipm} is the representation-level counterpart of $\operatorname{GDP}_{\infty}$, because it measures the largest discrepancy between the conditional and marginal distributions before a prediction head is chosen.
+For $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the inner IPM is the ReLU-IPM of Section~\ref{sec:relu-ipm}.  Equation~\ref{eq:supipm} is the representation-level counterpart of $\operatorname{GDP}_{\infty}$: it measures the largest discrepancy between the conditional and marginal distributions before a prediction head is chosen.
 
-The supIPM criterion differs from $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$, that is, Equation~\ref{eq:eipm} with $\mathbf{Z}$ replaced by $\widetilde{\mathbf{Z}}$, only in that the expectation over $S$ is replaced by a supremum over $s\in\mathcal{S}$.  The two constraints nevertheless differ at any positive tolerance.  For a tolerance $\rho>0$, a supIPM bound of $\rho$ guarantees that, for every function in the discriminator class, the absolute difference between its conditional expectation given $S=s$ and its marginal expectation is at most $\rho$ at every $s$, whereas an EIPM bound of $\rho$ constrains only the average of that difference over $S$.  Since an average never exceeds a supremum, a supIPM bound implies an EIPM bound at the same level, whereas an EIPM bound does not imply a supIPM bound without further regularity in $s$.
+The supIPM criterion differs from $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$, that is, Equation~\ref{eq:eipm} with $\mathbf{Z}$ replaced by $\widetilde{\mathbf{Z}}$, only in that the expectation over $S$ is replaced by a supremum over $s\in\mathcal{S}$.  The two constraints nevertheless differ at any positive tolerance $\rho$:
+\begin{align}
+  \operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)
+  &\le\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S),
+  \label{eq:supipm-vs-eipm}\\
+  \operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\rho
+  &\;\Longrightarrow\;
+  \sup_{s\in\mathcal{S}}
+  \left|
+    \mathbb{E}\!\left[v(\widetilde{\mathbf{Z}})\mid S=s\right]
+    -\mathbb{E}\!\left[v(\widetilde{\mathbf{Z}})\right]
+  \right|\le\rho
+  \quad\text{for every } v\in\mathcal{V}.
+  \label{eq:supipm-implication}
+\end{align}
+Inequality~\ref{eq:supipm-vs-eipm} holds because an average never exceeds a supremum, so a supIPM bound implies an EIPM bound at the same level, whereas an EIPM bound does not imply a supIPM bound without further regularity in $s$.  Implication~\ref{eq:supipm-implication} shows that a supIPM bound of $\rho$ controls every discriminator at every $s$, whereas an EIPM bound of $\rho$ constrains only the $\mathbb{P}_S$-average of the same difference.
 
 \citet{ni2026joint} also work at the representation level, and they replace the family of conditional distributions by a single discrepancy that compares the joint distribution of the representation and $S$ with the product of their marginal distributions.  This substitution removes the localization bandwidth and admits a closed-form estimator that converges at the parametric rate, but their bound controls a kernel-smoothed version of the discrepancy between the conditional and marginal distributions at each $s$ rather than the discrepancy itself.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
 
-For the sample $\mathcal{D}$ of Section~\ref{sec:frem}, let $\mathbf{Z}_i=h_{\phi}(\mathbf{X}_i)$ and $\widetilde{\mathbf{Z}}_i=\mathbf{Z}_i/\sqrt{\lVert\mathbf{Z}_i\rVert_2^2+1}$.  Estimating supIPM requires an estimate of the conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ at every $s\in\mathcal{S}$, whereas FREM requires it only at the observed values $S_i$.  We therefore adapt the kernel-weighted construction of Equation~\ref{eq:frem-conditional} to an arbitrary $s$.  Because $s$ is no longer tied to an observation, the leave-one-out correction is not needed, and all $n$ observations contribute to both the conditional and the marginal estimates:
+For the sample $\mathcal{D}$ of Section~\ref{sec:frem}, let $\mathbf{Z}_i=h_{\phi}(\mathbf{X}_i)$ and $\widetilde{\mathbf{Z}}_i=\mathbf{Z}_i/\sqrt{\lVert\mathbf{Z}_i\rVert_2^2+1}$.  Estimating supIPM requires the conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ at every $s\in\mathcal{S}$, whereas FREM requires it only at the observed values $S_i$, so we adapt the kernel-weighted construction of Equation~\ref{eq:frem-conditional} to an arbitrary $s$.  Because $s$ is no longer tied to an observation, the leave-one-out correction is not needed, and all $n$ observations enter both the conditional and the marginal estimates:
 \begin{equation}
   \widehat{w}_{\gamma}(i;s)
   :=\frac{K_{\gamma}(S_i,s)}{\sum_{j=1}^n K_{\gamma}(S_j,s)},
   \qquad
   \widehat{\mathbb{P}}^{\gamma}_{\widetilde{\mathbf{Z}}\mid S=s}
   :=\sum_{i=1}^n\widehat{w}_{\gamma}(i;s)\,
-  \delta_{\widetilde{\mathbf{Z}}_i}.
-  \label{eq:supipm-conditional-estimator}
+  \delta_{\widetilde{\mathbf{Z}}_i},
+  \qquad
+  \widehat{\mathbb{P}}_{\widetilde{\mathbf{Z}}}
+  :=\frac{1}{n}\sum_{i=1}^n\delta_{\widetilde{\mathbf{Z}}_i},
+  \label{eq:supipm-estimators}
 \end{equation}
-Here $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$.  Observations whose sensitive values are close to $s$ receive larger weights, and the weights sum to one over $i$, so that $\widehat{\mathbb{P}}^{\gamma}_{\widetilde{\mathbf{Z}}\mid S=s}$ is a probability distribution.  The marginal distribution is estimated by $\widehat{\mathbb{P}}_{\widetilde{\mathbf{Z}}}:=n^{-1}\sum_{i=1}^n\delta_{\widetilde{\mathbf{Z}}_i}$.
-
-Substituting the two empirical distributions into Equation~\ref{eq:supipm} yields
+where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$.  Observations whose sensitive values are close to $s$ receive larger weights, and the weights sum to one over $i$, so that $\widehat{\mathbb{P}}^{\gamma}_{\widetilde{\mathbf{Z}}\mid S=s}$ is a probability distribution.  Substituting the two empirical distributions into Equation~\ref{eq:supipm} yields
 \begin{align}
   \widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}
   (\widetilde{\mathbf{Z}};S)
@@ -265,7 +285,7 @@ Substituting the two empirical distributions into Equation~\ref{eq:supipm} yield
   \right|.
   \label{eq:empirical-supipm}
 \end{align}
-The EIPM estimator in Equation~\ref{eq:eipm-estimator} evaluates the discrepancy at the observed sensitive values and averages it.  The estimator in Equation~\ref{eq:empirical-supipm} instead keeps the continuous scale of $S$ and takes the largest estimated discrepancy over $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the kernel weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy, and Section~\ref{sec:supipm-objective} performs this search during training.
+Whereas the EIPM estimator in Equation~\ref{eq:eipm-estimator} averages the discrepancy at the observed sensitive values, Equation~\ref{eq:empirical-supipm} keeps the continuous scale of $S$ and takes the largest estimated discrepancy over $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy, and Section~\ref{sec:supipm-objective} performs this search during training.
 
 \subsection{Learning with the supIPM regularizer}
 \label{sec:supipm-objective}
@@ -280,9 +300,9 @@ We use the empirical supIPM as a regularizer and train the encoder $h_{\phi}$ an
   (\widetilde{\mathbf{Z}};S),
   \label{eq:supipm-penalized-objective}
 \end{equation}
-where $\ell$ is the per-sample loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  Fix a fairness level $\rho\ge0$ and consider minimizing the empirical supervised risk $n^{-1}\sum_{i=1}^n\ell(f_{\psi}(\widetilde{\mathbf{Z}}_i),Y_i)$ subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)\le\rho$.  As in FREM, Equation~\ref{eq:supipm-penalized-objective} is the Lagrangian relaxation of this constrained problem.
+where $\ell$ is the per-sample loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  As in FREM, Equation~\ref{eq:supipm-penalized-objective} is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)\le\rho$ for a fairness level $\rho\ge0$.
 
-We approximate the outer supremum in Equation~\ref{eq:empirical-supipm} by a search over $T$ candidate sensitive values in $\mathcal{S}$, and the inner supremum by a search over $M$ ReLU discriminators with parameters $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$.  For each $m\in[M]$, define
+We approximate the outer supremum in Equation~\ref{eq:empirical-supipm} by $T$ candidate sensitive values $s^{(1)},\ldots,s^{(T)}$, initialized at distinct points of $\mathcal{S}$, and the inner supremum by $M$ ReLU discriminators with parameters $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$.  For each $m\in[M]$, define
 \begin{equation}
   \Delta_m(s)
   :=\left|
@@ -292,15 +312,27 @@ We approximate the outer supremum in Equation~\ref{eq:empirical-supipm} by a sea
   \right|.
   \label{eq:discriminator-discrepancy}
 \end{equation}
-With the discriminators held fixed, we initialize $s^{(1)},\ldots,s^{(T)}$ at distinct points of $\mathcal{S}$ and update them by gradient ascent on $\sum_{t=1}^{T}\max_{m\in[M]}\Delta_m(s^{(t)})$, projecting each iterate back onto $\mathcal{S}$ after every step.  Multiple initializations reduce the risk that the search over $s$ terminates at a poor local maximum.  After the ascent steps, we select
+With the discriminators held fixed, each candidate takes projected gradient ascent steps and the best candidate is selected,
 \begin{equation}
-  s^\star\in\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}
-  \max_{m\in[M]} \Delta_m(s).
+\begin{aligned}
+  s^{(t)}&\leftarrow
+  \Pi_{\mathcal{S}}\!\left(
+    s^{(t)}+\eta_s\,\nabla_{s}\max_{m\in[M]}\Delta_m(s^{(t)})
+  \right),\quad t\in[T],\\
+  s^\star&\in\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}
+  \max_{m\in[M]}\Delta_m(s),
+\end{aligned}
   \label{eq:sensitive-candidate}
 \end{equation}
-The selected $s^\star$ is then held fixed while the discriminator parameters are updated by gradient ascent on $\sum_{m=1}^M\Delta_m(s^\star)$, and after each update $\theta_m$ is projected back onto the unit sphere and $\mu_m$ onto $[-1,1]$.  We alternate the sensitive-value update and the discriminator update, performing a prescribed number of discriminator steps in all, and we then search once more over the sensitive values with the updated discriminators.
-
-The resulting value $\max_{m\in[M]}\Delta_m(s^\star)$ approximates the empirical supIPM in Equation~\ref{eq:empirical-supipm} and serves as the penalty term in Equation~\ref{eq:supipm-penalized-objective}.  With this penalty in place, $\phi$ and $\psi$ are updated by gradient descent on $\mathcal{L}(\phi,\psi)$.  Equations~\ref{eq:discriminator-discrepancy} and \ref{eq:supipm-penalized-objective} are built from sample averages over the observations, so the procedure applies without modification when these averages are computed on the current minibatch.
+where $\Pi_{\mathcal{S}}$ is the projection onto $\mathcal{S}$ and $\eta_s>0$ is a step size.  The $T$ initializations reduce the risk that the search terminates at a poor local maximum.  With $s^\star$ held fixed, each discriminator takes projected gradient ascent steps,
+\begin{equation}
+  (\theta_m,\mu_m)\leftarrow
+  \Pi_{\mathbb{S}^{d-1}\times[-1,1]}\!\left(
+    (\theta_m,\mu_m)+\eta_v\,\nabla_{(\theta_m,\mu_m)}\Delta_m(s^\star)
+  \right),\quad m\in[M],
+  \label{eq:discriminator-update}
+\end{equation}
+where $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ projects $\theta_m$ back onto the unit sphere and $\mu_m$ onto $[-1,1]$, and $\eta_v>0$ is a step size.  We alternate the two updates, performing a prescribed number of discriminator steps in all, and then search once more over the sensitive values with the updated discriminators.  The resulting value $\max_{m\in[M]}\Delta_m(s^\star)$ approximates the empirical supIPM in Equation~\ref{eq:empirical-supipm} and serves as the penalty term in Equation~\ref{eq:supipm-penalized-objective}.  With this penalty in place, $\phi$ and $\psi$ are updated by gradient descent on $\mathcal{L}(\phi,\psi)$.  Equations~\ref{eq:discriminator-discrepancy} and \ref{eq:supipm-penalized-objective} are built from sample averages, so the procedure applies unchanged when these averages are computed on the current minibatch.
 \bibliographystyle{iclr2027_conference}
 \bibliography{bibliography}
 
