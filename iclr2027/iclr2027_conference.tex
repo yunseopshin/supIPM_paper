@@ -10,7 +10,7 @@
 \usepackage{url}
 
 
-\title{Fair Representation Learning for Continuous Sensitive Attributes with Supremum Integral Probability Metrics}
+\title{Worst-Case Fair Representations for Continuous Sensitive Attribute with Supremum IPMs}
 
 % Authors must not appear in the submitted version. They should be hidden
 % as long as the \iclrfinalcopy macro remains commented out below.
@@ -54,7 +54,7 @@ Address \\
 \maketitle
 
 \begin{abstract}
-Fair representation learning seeks a representation that is informative for downstream prediction and independent of a sensitive attribute.  For a continuous sensitive attribute, most existing methods compare a conditional quantity with its marginal counterpart at each value of the attribute and average the resulting discrepancy over those values.  Such an average can remain small when a large discrepancy is concentrated in a region of the sensitive domain that has low probability.  We introduce $L_{\infty}$-generalized demographic parity for predictions, which replaces this average by a supremum.  Its representation-level counterpart is the supremum integral probability metric (supIPM), the largest discrepancy over the sensitive domain between the conditional and marginal distributions of the representation.  Our estimator of supIPM requires no binning.  The conditional distribution at each sensitive value is estimated by an empirical distribution with kernel weights normalized to sum to one, and its discrepancy from the marginal distribution is measured by ReLU-IPM, the integral probability metric whose discriminators are single rectified linear units (ReLU) with unit-norm weight vector and bounded bias.  These two choices yield a finite-dimensional adversarial objective that can be optimized with minibatches.  A comparison inequality between ReLU-IPM and the integral probability metric over a H\"older ball extends the fairness guarantee for ReLU discriminators to prediction heads of bounded H\"older norm.  Under smoothness and positive-density conditions, the empirical supIPM converges to the population supIPM uniformly over a class of ReLU network encoders that grows with the sample size, and the fairness level attained on the sample transfers to a population bound that holds uniformly over the sensitive domain and over prediction heads of bounded H\"older norm.
+Fair representation learning seeks a representation that is informative for downstream prediction yet independent of a sensitive attribute. For a continuous sensitive attribute, existing methods measure the discrepancy between conditional and marginal distributions at each attribute value and \emph{average} it over the sensitive domain. Such an average can stay small while a large discrepancy hides in a low-probability region, leaving some subpopulations unprotected. We propose $L_\infty$-generalized demographic parity, which replaces the average by a supremum, and its representation-level counterpart, the supremum integral probability metric (supIPM). Conditional distributions are estimated by kernel-weighted empirical distributions, and discrepancies are measured by ReLU-IPM, whose discriminators are single rectified linear units, yielding a finite-dimensional adversarial objective trainable with minibatches. We prove that the empirical supIPM is a uniformly consistent estimator, so the fairness level achieved on the sample holds for every sensitive value and every prediction head of bounded H\"older norm. Experiments on tabular and graph benchmarks show that, at every fairness level, supIPM-FRL attains prediction performance comparable to existing methods while substantially reducing worst-case disparity.
 \end{abstract}
 
 \section{Introduction}
@@ -235,11 +235,11 @@ For $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the inner IPM is the ReLU-IPM of Sec
 
 The supIPM criterion differs from $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$, that is, Equation~\ref{eq:eipm} with $\mathbf{Z}$ replaced by $\widetilde{\mathbf{Z}}$, only in that the expectation over $S$ is replaced by a supremum over $s\in\mathcal{S}$.  The two constraints nevertheless differ at any positive tolerance $\rho$:
 \begin{align}
-  \operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)
-  &\le\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S),
+  &\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)
+  \le\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S),
   \label{eq:supipm-vs-eipm}\\
-  \operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\rho
-  &\;\Longrightarrow\;
+  &\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\rho
+  \;\Longrightarrow\;
   \sup_{s\in\mathcal{S}}
   \left|
     \mathbb{E}\!\left[v(\widetilde{\mathbf{Z}})\mid S=s\right]
