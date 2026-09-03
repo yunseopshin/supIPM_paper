@@ -1,0 +1,519 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.85in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{kotex}
+\captionsetup{font=small}
+
+\newtheorem{proposition}{Proposition}
+
+\newcommand{\supIPM}{\mathrm{supIPM}}
+\newcommand{\EIPM}{\mathrm{EIPM}}
+\newcommand{\hsupIPM}{\widehat{\supIPM}}
+\newcommand{\Wone}{W_1}
+
+\pagestyle{empty}
+\begin{document}
+
+\begin{center}\vspace{-0.5em}
+{\large\bfseries Experiment}
+\vspace{-0.5em}\end{center}
+
+
+% Paste-ready theoretical-results section for the supIPM-FRL manuscript.
+% Requires amsmath, amssymb, and amsthm, with lemma, theorem, and assumption
+% environments defined in the preamble.
+
+\section{Theoretical Guarantees}
+\label{sec:theoretical-guarantees}
+
+This section establishes two complementary properties of the proposed
+criterion.  First, a small ReLU-supIPM controls the worst-case demographic
+disparity of every downstream prediction head with bounded H\"older norm.
+Second, the kernel estimator in Equation~(17) is uniformly consistent over a
+possibly growing class of encoders.  The latter uniformity is essential: it
+makes the result applicable to the data-dependent encoder returned by the
+training procedure in Section~3.3.
+
+Let
+\[
+  \tau(z):=\frac{z}{\sqrt{1+\lVert z\rVert_2^2}},
+  \qquad \widetilde h:=\tau\circ h,
+\]
+so that \(\widetilde h(x)\in\mathbb B^d\).  Both the prediction head and the
+ReLU discriminators below are applied to this same normalized
+representation, and the representation dimension \(d\) is treated as fixed.
+For an encoder \(h\), write
+\begin{align}
+  D_{\mathrm R}(h)
+  &:=%
+  \operatorname{supIPM}_{\mathcal V_{\mathrm R}}
+  \bigl(\widetilde h(X);S\bigr) \notag\\
+  &=\sup_{s\in\mathcal S}\sup_{v\in\mathcal V_{\mathrm R}}
+  \Bigl|
+    \mathbb E\!\left[v\!\left(\widetilde h(X)\right)\mid S=s\right]
+    \notag\\[-1mm]
+  &\hspace{42mm}
+    -\mathbb E\!\left[v\!\left(\widetilde h(X)\right)\right]
+  \Bigr| .
+  \label{eq:population-relu-supipm}
+\end{align}
+Here and below, the conditional expectations use the pointwise version fixed
+in Equation~(11).  In particular, for every Borel set
+\(A\subseteq\mathbb B^d\),
+\[
+  P_{\widetilde h(X)\mid S=s}(A)
+  :=\frac{1}{p_S(s)}
+    \int_{\mathcal X}
+    \mathbf 1\{\widetilde h(x)\in A\}p(x,s)\,d\nu(x).
+\]
+We denote the exact empirical criterion in Equation~(17),
+viewed as a function of \(h\), by
+\begin{align}
+  \widehat D_{n,\gamma}(h)
+  &:=%
+  \sup_{s\in\mathcal S}\sup_{v\in\mathcal V_{\mathrm R}}
+  \left|
+    \sum_{i=1}^n
+    \left\{\widehat w_\gamma(i;s)-\frac1n\right\}
+    v\!\left(\widetilde h(X_i)\right)
+  \right| .
+  \label{eq:empirical-relu-supipm-theory}
+\end{align}
+For definiteness, a ratio with a zero kernel denominator is assigned the
+value zero.  The event in Theorem~\ref{thm:uniform-supipm} has all kernel
+denominators uniformly bounded away from zero, so this convention does not
+affect any of the conclusions below.
+
+For \(B>0\), let
+\[
+  \mathcal H_d^\beta(B)
+  :=B\mathcal H_d^\beta
+  =\left\{f:\mathbb B^d\to\mathbb R:
+           \lVert f\rVert_{\mathcal H^\beta}\le B\right\}
+\]
+be the H\"older ball of radius \(B\).  For
+\(\beta\ne(d+3)/2\), define
+\[
+  \alpha_{d,\beta}:=
+  \begin{cases}
+    \dfrac{2\beta}{d+3}, & 0<\beta<\dfrac{d+3}{2},\\[2mm]
+    1, & \beta>\dfrac{d+3}{2}.
+  \end{cases}
+\]
+
+\begin{lemma}[Worst-case fairness transfer]
+\label{lem:worst-case-fairness-transfer}
+Let \(h:\mathcal X\to\mathbb R^d\) be measurable and let
+\(\beta>0\), \(\beta\ne(d+3)/2\).  Use the pointwise conditional-law
+version fixed in Equation~(11).  There exists a constant
+\(C_{d,\beta}>0\), depending only on \(d\) and \(\beta\), such that,
+for every \(B>0\),
+\begin{equation}
+  \sup_{f\in\mathcal H_d^\beta(B)}
+  \operatorname{GDP}_\infty(f\circ\widetilde h)
+  \le
+  C_{d,\beta}B\,D_{\mathrm R}(h)^{\alpha_{d,\beta}}.
+  \label{eq:holder-head-fairness-bound}
+\end{equation}
+Consequently, a single bound on \(D_{\mathrm R}(h)\) holds
+simultaneously for every \(s\in\mathcal S\) and every prediction head in
+\(\mathcal H_d^\beta(B)\).  Moreover, if \(D_{\mathrm R}(h)=0\), then
+\[
+  P_{\widetilde h(X)\mid S=s}=P_{\widetilde h(X)}
+  \qquad\text{for every }s\in\mathcal S,
+\]
+and hence perfect demographic parity holds for every bounded measurable
+downstream head.
+\end{lemma}
+
+\begin{proof}
+Fix \(s\in\mathcal S\) and set
+\(P_s=P_{\widetilde h(X)\mid S=s}\) and
+\(P=P_{\widetilde h(X)}\).  The ReLU--H\"older comparison inequality in
+Section~2.2 gives, for every \(f\in\mathcal H_d^\beta(B)\),
+\begin{align*}
+  |P_sf-Pf|
+  &\le B\operatorname{IPM}_{\mathcal H_d^\beta}(P_s,P)\\
+  &\le C_{d,\beta}B
+       \operatorname{IPM}_{\mathcal V_{\mathrm R}}(P_s,P)^%
+       {\alpha_{d,\beta}}.
+\end{align*}
+Taking the supremum first over \(s\) and then over \(f\) proves
+\eqref{eq:holder-head-fairness-bound}.  The final assertion follows because
+ReLU-IPM separates probability measures on \(\mathbb B^d\).
+\end{proof}
+
+We next state conditions under which the sample criterion consistently
+estimates \eqref{eq:population-relu-supipm}.  Let \(\mathcal E_n\) be a
+deterministic encoder class and define the induced score class
+\begin{equation}
+  \mathcal G_n
+  :=\left\{x\mapsto v\!\left(\widetilde h(x)\right):
+      h\in\mathcal E_n,\ v\in\mathcal V_{\mathrm R}\right\}.
+  \label{eq:induced-score-class}
+\end{equation}
+Every member of \(\mathcal G_n\) takes values in \([0,2]\).
+
+\begin{assumption}[Sensitive-variable and kernel regularity]
+\label{ass:kernel-regularity}
+The observations \(\{(X_i,S_i,Y_i)\}_{i=1}^n\) are i.i.d.,
+\(S\) is supported on \(\mathcal S=[a,b]\), and its density satisfies
+\[
+  0<c_S\le p_S(s)\le C_S<\infty,
+  \qquad s\in\mathcal S.
+\]
+For \(g\in\bigcup_n\mathcal G_n\), let
+\(m_g(s):=\mathbb E[g(X)\mid S=s]\), using the fixed pointwise version.
+There is a constant \(L_S<\infty\), independent of \(n\), such that
+\begin{equation}
+  \sup_{g\in\mathcal G_n}|m_g(s)-m_g(t)|
+  \le L_S|s-t|,
+  \qquad s,t\in\mathcal S.
+  \label{eq:uniform-conditional-lipschitz}
+\end{equation}
+The kernel \(K\) is bounded, nonnegative, symmetric, and of bounded
+variation, with
+\begin{align*}
+  \int_{\mathbb R}K(u)\,du&=1,
+  &\int_{\mathbb R}K(u)^2\,du&<\infty,\\
+  &&\int_{\mathbb R}u^2K(u)\,du&<\infty.
+\end{align*}
+Write
+\(K_\gamma(u,s)=\gamma^{-1}K((u-s)/\gamma)\), equivalently
+\(K_\gamma(u-s)=\gamma^{-1}K((u-s)/\gamma)\).  The factor
+\(\gamma^{-1}\) cancels from the normalized weights in Equation~(16).
+Suppose that, for some \(\gamma_0>0\),
+\begin{equation}
+  \inf_{0<\gamma\le\gamma_0}\inf_{s\in\mathcal S}
+  \int_a^b K_\gamma(u,s)\,du>0.
+  \label{eq:one-sided-kernel-mass}
+\end{equation}
+\end{assumption}
+
+Condition~\eqref{eq:uniform-conditional-lipschitz} is implied by the density
+formulation in Equation~(11) if its smoothness assumption is strengthened to
+the integrable-envelope condition
+\begin{equation}
+  \sum_{j=1}^2\int_{\mathcal X}
+  \sup_{s\in\mathcal S}|\partial_s^j p(x,s)|\,d\nu(x)<\infty.
+  \label{eq:density-envelope-condition}
+\end{equation}
+This strengthening is needed because pointwise boundedness in \(x\) alone
+does not justify a uniform bound after integration over \(\mathcal X\).
+
+\begin{assumption}[Complexity of the learned representations]
+\label{ass:encoder-complexity}
+The class \(\mathcal G_n\) is pointwise measurable.  There exist
+\(A_n\ge e\) and \(\mathfrak v_n\ge1\) such that, for every finitely supported
+probability measure \(Q\) and every \(0<\varepsilon\le1\),
+\begin{equation}
+  N\!\left(
+    \varepsilon\lVert G_n\rVert_{Q,2},
+    \mathcal G_n,L_2(Q)
+  \right)
+  \le \left(\frac{A_n}{\varepsilon}\right)^{\mathfrak v_n},
+  \qquad G_n\equiv2.
+  \label{eq:encoder-vc-entropy}
+\end{equation}
+The kernel-translate class
+\(\mathcal K_\gamma:=\{t\mapsto K_\gamma(t,s):s\in\mathcal S\}\)
+is pointwise measurable and is VC-type, uniformly in
+\(0<\gamma\le\gamma_0\), with fixed constants \(A_K\ge e\) and
+\(\mathfrak v_K\ge1\).  In particular, with envelope
+\(K_\gamma^\star\equiv\lVert K\rVert_\infty/\gamma\),
+\begin{equation}
+  \sup_Q N\!\left(
+    \varepsilon\lVert K_\gamma^\star\rVert_{Q,2},
+    \mathcal K_\gamma,L_2(Q)
+  \right)
+  \le\left(\frac{A_K}{\varepsilon}\right)^{\mathfrak v_K}.
+  \label{eq:kernel-vc-entropy}
+\end{equation}
+\end{assumption}
+
+For \(0<\delta<1\), define
+\begin{align}
+  \Gamma_{n,\delta}
+  &:=(\mathfrak v_n+\mathfrak v_K)
+     \log\!\left(\frac{A_nA_Kn}{\gamma_n}\right)
+     +\log\!\left(\frac{8}{\delta}\right),
+  \label{eq:complexity-sequence}\\
+  r_{n,\delta}
+  &:=
+       \gamma_n
+       +\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma_n}}
+       +\frac{\Gamma_{n,\delta}}{n\gamma_n}
+     .
+  \label{eq:uniform-supipm-rate}
+\end{align}
+
+\begin{theorem}[Uniform consistency and a post-training fairness certificate]
+\label{thm:uniform-supipm}
+Suppose Assumptions~\ref{ass:kernel-regularity} and
+\ref{ass:encoder-complexity} hold.  There exist constants \(C,c>0\),
+independent of \(n\), \(\delta\), and \(h\), such that, whenever
+  \(0<\gamma_n\le\gamma_0\wedge1\) and
+\(\Gamma_{n,\delta}\le c n\gamma_n\), with probability at least
+\(1-\delta\),
+\begin{equation}
+  \sup_{h\in\mathcal E_n}
+  \left|\widehat D_{n,\gamma_n}(h)-D_{\mathrm R}(h)\right|
+  \le C r_{n,\delta}.
+  \label{eq:uniform-supipm-convergence}
+\end{equation}
+In particular, if \(\gamma_n\to0\) and there is a sequence
+\(\delta_n\downarrow0\) such that
+\[
+  \frac{(\mathfrak v_n+\mathfrak v_K)\log(A_nA_Kn/\gamma_n)
+        +\log(8/\delta_n)}{n\gamma_n}\to0,
+\]
+then the left-hand side of \eqref{eq:uniform-supipm-convergence} converges
+to zero with probability at least \(1-\delta_n\), and hence is
+\(o_{\mathbb P}(1)\).
+Consequently, on the same event, for every \(\rho\ge C r_{n,\delta}\),
+\begin{equation}
+  \mathcal E_n(\rho-Cr_{n,\delta})
+  \subseteq
+  \widehat{\mathcal E}_{n,\gamma_n}(\rho)
+  \subseteq
+  \mathcal E_n(\rho+Cr_{n,\delta}),
+  \label{eq:constraint-sandwich}
+\end{equation}
+where
+\begin{align*}
+  \mathcal E_n(\rho)
+  &:=\{h\in\mathcal E_n:D_{\mathrm R}(h)\le\rho\},\\
+  \widehat{\mathcal E}_{n,\gamma_n}(\rho)
+  &:=\{h\in\mathcal E_n:
+       \widehat D_{n,\gamma_n}(h)\le\rho\}.
+\end{align*}
+In particular, for any possibly data-dependent
+\(\widehat h_n\in\mathcal E_n\), including an encoder returned by
+Equation~(18) whenever its architecture and parameter constraints are
+contained in \(\mathcal E_n\),
+and every \(B>0\) and
+\(\beta>0\), \(\beta\ne(d+3)/2\),
+write
+\[
+  \Delta_{\beta,B}(h)
+  :=\sup_{f\in\mathcal H_d^\beta(B)}
+    \operatorname{GDP}_\infty(f\circ\tau\circ h).
+\]
+Then
+\begin{align}
+  \Delta_{\beta,B}(\widehat h_n)
+  &\le C_{d,\beta}B\notag\\[-1mm]
+  &\quad\times
+  \left\{
+    \widehat D_{n,\gamma_n}(\widehat h_n)+Cr_{n,\delta}
+  \right\}^{\alpha_{d,\beta}}.
+  \label{eq:post-training-fairness-certificate}
+\end{align}
+Thus, if
+\(\widehat D_{n,\gamma_n}(\widehat h_n)\le\rho_n\), then, simultaneously
+over all heads in \(\mathcal H_d^\beta(B)\),
+\[
+  \Delta_{\beta,B}(\widehat h_n)
+  \le C_{d,\beta}B
+  (\rho_n+Cr_{n,\delta})^{\alpha_{d,\beta}}.
+\]
+\end{theorem}
+
+\begin{proof}
+Let \(\mathbb P_n\) and \(P\) denote empirical and population averaging,
+respectively.  For \(g\in\mathcal G_n\), introduce the population-smoothed
+conditional mean
+\begin{align*}
+  m_{g,\gamma}(s)
+  &:=\frac{\mathbb E[K_\gamma(S,s)g(X)]}
+           {\mathbb E[K_\gamma(S,s)]},\\
+  \widehat m_{g,\gamma}(s)
+  &:=\frac{\mathbb P_n[K_\gamma(S,s)g(X)]}
+           {\mathbb P_nK_\gamma(S,s)}.
+\end{align*}
+Set
+\[
+  \kappa_0:=
+  \inf_{0<\gamma\le\gamma_0}\inf_{s\in\mathcal S}
+  \int_a^bK_\gamma(u,s)\,du>0.
+\]
+For \(q_\gamma(s):=P K_\gamma(S,s)\), the density lower bound gives
+\(q_\gamma(s)\ge c_S\kappa_0\).  Also,
+\begin{align*}
+  m_{g,\gamma}(s)-m_g(s)
+  &=\int_a^b\frac{K_\gamma(u,s)p_S(u)}{q_\gamma(s)}\notag\\[-1mm]
+  &\qquad\times\{m_g(u)-m_g(s)\}\,du.
+\end{align*}
+Consequently, the conditional Lipschitz assumption and the change of
+variables \(t=(u-s)/\gamma\) imply, uniformly over
+\((g,s)\in\mathcal G_n\times\mathcal S\),
+\begin{equation}
+  |m_{g,\gamma}(s)-m_g(s)|
+  \le \frac{L_SC_S}{c_S\kappa_0}\,
+       \gamma\int_{\mathbb R}|t|K(t)\,dt
+  \le C\gamma.
+  \label{eq:uniform-kernel-bias}
+\end{equation}
+Thus the bias bound also holds at the endpoints.
+
+The elementary product-covering inequality applied to
+\eqref{eq:encoder-vc-entropy} and \eqref{eq:kernel-vc-entropy} shows that
+\[
+  \bigl\{(x,u)\mapsto K_{\gamma_n}(u,s)g(x):
+  (g,s)\in\mathcal G_n\times\mathcal S\bigr\}
+\]
+is VC-type with exponent of order
+\(\mathfrak v_n+\mathfrak v_K\), envelope of order
+\(\gamma_n^{-1}\), and second moment bounded by \(C\gamma_n^{-1}\).
+A VC-type Bernstein maximal inequality, applied also to the kernel
+denominator and to \(\mathcal G_n\), followed by a union bound, gives the
+following statements simultaneously with probability at least
+\(1-\delta\).  Uniformly over
+\((g,s)\in\mathcal G_n\times\mathcal S\),
+\begin{align*}
+  \left|
+    (\mathbb P_n-P)
+    \{K_{\gamma_n}(S,s)g(X)\}
+  \right|
+  &\le C\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma_n}}
+       +C\frac{\Gamma_{n,\delta}}{n\gamma_n}.
+\end{align*}
+The same bound holds for
+\(\sup_s|\mathbb P_nK_{\gamma_n}(S,s)-q_{\gamma_n}(s)|\), and
+\begin{equation*}
+  \sup_{g\in\mathcal G_n}|(\mathbb P_n-P)g|
+  \le C\left\{
+    \sqrt{\frac{\Gamma_{n,\delta}}{n}}
+    +\frac{\Gamma_{n,\delta}}{n}
+  \right\}.
+\end{equation*}
+The condition \(\Gamma_{n,\delta}\le cn\gamma_n\), for a sufficiently small
+\(c\), therefore ensures
+\[
+  \inf_{s\in\mathcal S}\mathbb P_nK_{\gamma_n}(S,s)
+  \ge \frac{c_S\kappa_0}{2}.
+\]
+Write
+\(A_{g,s}:=(\mathbb P_n-P)\{K_{\gamma_n}(S,s)g(X)\}\) and
+\(B_s:=(\mathbb P_n-P)K_{\gamma_n}(S,s)\).  Since
+\(0\le m_{g,\gamma_n}(s)\le2\), the identity
+\begin{align*}
+  \widehat m_{g,\gamma_n}(s)-m_{g,\gamma_n}(s)
+  =\frac{A_{g,s}-m_{g,\gamma_n}(s)B_s}
+         {\mathbb P_nK_{\gamma_n}(S,s)}
+\end{align*}
+and \eqref{eq:uniform-kernel-bias} yield
+\begin{equation*}
+  \sup_{g\in\mathcal G_n}\sup_{s\in\mathcal S}
+  \left|\widehat m_{g,\gamma_n}(s)-m_g(s)\right|
+  \le C r_{n,\delta}.
+\end{equation*}
+For \(g_{h,v}(x):=v(\widetilde h(x))\), the inequality
+\(\left|\sup_a|F(a)|-\sup_a|G(a)|\right|
+\le\sup_a|F(a)-G(a)|\) now gives, uniformly in
+\(h\in\mathcal E_n\),
+\begin{align*}
+  |\widehat D_{n,\gamma_n}(h)-D_{\mathrm R}(h)|
+  &\le
+  \sup_{g\in\mathcal G_n}\sup_{s\in\mathcal S}
+  |\widehat m_{g,\gamma_n}(s)-m_g(s)|\\
+  &\quad+
+  \sup_{g\in\mathcal G_n}|(\mathbb P_n-P)g|
+  \le Cr_{n,\delta},
+\end{align*}
+which proves \eqref{eq:uniform-supipm-convergence}.  Its convergence claim
+follows by substituting \(\delta_n\) in the displayed bound.  The two set
+inclusions are immediate from the same uniform event.  Finally,
+\(D_{\mathrm R}(\widehat h_n)\le
+\widehat D_{n,\gamma_n}(\widehat h_n)+Cr_{n,\delta}\); applying
+Lemma~\ref{lem:worst-case-fairness-transfer} proves
+\eqref{eq:post-training-fairness-certificate}.
+\end{proof}
+
+\paragraph{Rate and boundary effect.}
+The term \(\gamma_n\) in \eqref{eq:uniform-supipm-rate} is the uniform bias
+of the normalized local-constant estimator over the entire closed interval
+\([a,b]\).  Thus the theorem genuinely covers every sensitive value in
+\(\mathcal S\).  For a fixed-complexity encoder class, balancing this bias
+with the stochastic term gives
+  \(r_{n,\delta}=O((\log n/n)^{1/3})\), up to constants.  If, in
+addition, \(K\) is supported on \([-1,1]\), the supremum is restricted
+to an interior interval
+\([a+\epsilon_n,b-\epsilon_n]\), with
+\(\gamma_n<\epsilon_n\), and both \(p_S\) and the conditional score
+functions have uniformly bounded first two derivatives, then a symmetric
+second-order kernel gives
+bias \(O(\gamma_n^2)\).  In that case \(\gamma_n\) in
+\eqref{eq:uniform-supipm-rate} can be replaced by \(\gamma_n^2\), yielding
+the familiar \(O((\log n/n)^{2/5})\) rate for a fixed-complexity
+class.
+
+\paragraph{Growing encoder classes.}
+The quantities \(A_n\) and \(\mathfrak v_n\) may increase with \(n\).  Hence
+Theorem~\ref{thm:uniform-supipm} allows a growing class of ReLU encoders
+whenever
+\[
+  \gamma_n\to0,
+  \qquad
+  \frac{(\mathfrak v_n+\mathfrak v_K)
+  \log(A_nA_Kn/\gamma_n)}{n\gamma_n}\to0.
+\]
+Here \(\mathfrak v_n\) may be taken to be any valid VC-subgraph,
+pseudo-dimension, or covering-entropy upper bound for the composed class
+\(\mathcal G_n\), including the entropy contributed by
+\((\theta,\mu)\in\mathbb S^{d-1}\times[-1,1]\).  The radial map \(\tau\)
+and each fixed ReLU discriminator are bounded and Lipschitz on their
+respective domains, so an encoder-class covering bound extends to
+\(\mathcal G_n\) after adding this finite-dimensional parameter entropy.
+
+For example, suppose that
+\(\sup_{x\in\mathcal X}\lVert x\rVert_\infty\le R_X<\infty\) and
+\(\mathcal E_n\) has a fixed affine--ReLU architecture at each \(n\), with
+depth \(L_n\), maximum width \(H_n\), at most \(W_n\) free weights and
+biases, and all parameters bounded entrywise by \(M_n\).  A direct
+parameter-covering argument gives
+\begin{align}
+  A_n^{\mathrm{net}}
+  &:=C(R_X+1)(L_n+1)(W_n+d+1)\notag\\[-1mm]
+  &\quad\times
+  \{(M_n\vee1)(H_n+1)\}^{L_n+1}.
+  \label{eq:network-entropy-constant}
+\end{align}
+Then
+\begin{equation*}
+  \log N(\varepsilon,\mathcal G_n,\lVert\cdot\rVert_\infty)
+  \le C(W_n+d+1)
+  \log\!\left(\frac{A_n^{\mathrm{net}}}{\varepsilon}\right).
+\end{equation*}
+Thus one may take \(\mathfrak v_n\lesssim W_n+d+1\), with
+\(\log A_n\lesssim\log A_n^{\mathrm{net}}\).  In particular, a sufficient
+growth condition is
+\[
+  \frac{(W_n+d+1)
+        \log(A_n^{\mathrm{net}}n/\gamma_n)}{n\gamma_n}
+  \to0.
+\]
+For a finite union of architectures, its log-cardinality is added to the
+covering entropy.
+
+\paragraph{Exact versus numerically approximated suprema.}
+Theorem~\ref{thm:uniform-supipm} concerns the exact full-sample supremum
+\(\widehat D_{n,\gamma_n}\) in Equation~(17); it does not assume that the
+finite-start gradient scheme in Equations~(19)--(21) finds the global
+maximum.  If a computed value \(\widetilde D_{n,\gamma_n}^{\rm alg}\) is
+accompanied by a certified one-sided gap
+\[
+  0\le
+  \widehat D_{n,\gamma_n}(\widehat h_n)
+  -\widetilde D_{n,\gamma_n}^{\rm alg}(\widehat h_n)
+  \le\zeta_n,
+\]
+then \(\widehat D_{n,\gamma_n}(\widehat h_n)\) in
+\eqref{eq:post-training-fairness-certificate} may be replaced by
+\(\widetilde D_{n,\gamma_n}^{\rm alg}(\widehat h_n)+\zeta_n\).  No encoder
+optimization-error assumption is needed when the certificate is stated in
+terms of the exact empirical criterion evaluated at the returned encoder.
+
+\end{document}
