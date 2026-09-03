@@ -21,3 +21,6 @@
 /iclr2027_conference.pdf
 /iclr2027/iclr2027_conference.pdf
 /main.pdf
+
+# Motivation figure: the exported figure is tracked, its build machinery is not
+/figures/motivation/
