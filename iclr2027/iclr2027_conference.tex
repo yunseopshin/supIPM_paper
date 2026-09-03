@@ -381,6 +381,29 @@ Here $s^{\star}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta_m(
 \end{algorithm}
 
 After the last ascent step in $\mathbf{v}$, $s^\star$ is located once more, so that the penalty $\max_{m\in[M]}\Delta_m(s^\star)$ in line~\ref{alg:encoder-step} approximates the empirical supIPM in Equation~\ref{eq:empirical-supipm}, with the outer supremum restricted to $\mathcal{S}_{\epsilon}$ and the inner supremum taken over the $M$ discriminators.  The $T$ initializations reduce the risk that the search terminates at a poor local maximum.  Equations~\ref{eq:supipm-penalized-objective} and \ref{eq:discriminator-discrepancy} are built from sample averages, so the procedure applies unchanged when these averages are computed on the current minibatch.
+
+\section{Theoretical Analysis}
+
+
+\section{Experiments}
+
+
+\subsection{Simulation study}
+
+\subsection{Real data analysis}
+
+
+
+
+
+
+
+
+
+
+
+
+
 \bibliographystyle{iclr2027_conference}
 \bibliography{bibliography}
 
