@@ -75,14 +75,7 @@ A learned representation serves many downstream tasks, including tasks that are 
 
 Previously, most FRL methods have been developed for a categorical $S$.  In this case, demographic parity (DP) requires the prediction to have the same distribution in every group, and these methods enforce it by making the distribution of the representation the same in every group.  One line of work trains an adversary to recover group membership from the representation \citep{edwards2016censoring,madras2018adversarially}.  Another compares the distribution of the representation across groups through the maximum mean discrepancy (MMD) of a fixed kernel \citep{louizos2016variational}, an integral probability metric (IPM) over a prespecified parametric family of discriminators \citep{kim2022parametric}, or the power of an MMD two-sample test with a learned kernel \citep{deka2023mmdbfair}.  This construction does not extend directly to a continuous $S$ such as age or income.  Distinct observations take distinct sensitive values with probability one, so at most one observation is available at any given $s$, and one observation does not suffice to estimate the conditional distribution at $S=s$.  Binning creates such groups artificially, but the resulting criterion depends on the choice of cutpoints \citep{kong2025fair}, and the discretization introduces threshold effects and discards the ordering of the sensitive values \citep{mary2019continuous}.
 
-\begin{figure}[t]
-  \centering
-  \includegraphics[width=\textwidth]{motivation.pdf}
-  \caption{The conditional and marginal distributions of the representation differ at $s^{\star}$, where few observations lie, so the average over $S$ leaves that subpopulation unprotected, whereas the supremum protects it.}
-  \label{fig:motivation}
-\end{figure}
-
-Existing methods for a continuous $S$ have largely focused on the fitted predictor, measuring its dependence on $S$ through maximal correlation or through generalized demographic parity (GDP), the average over $S$ of the absolute difference between the conditional and marginal mean predictions \citep{mary2019continuous,grari2020continuous,jiang2022gdp}.  \citet{kong2025fair} take the same average to the representation level: the expectation of integral probability metrics (EIPM) is the average over $S$ of the IPM between the conditional distribution of the representation given $S=s$ and its marginal distribution.  Both criteria integrate the discrepancy against the distribution of $S$, so a large discrepancy confined to a narrow range of sensitive values contributes little to the average when that range has low probability (Figure~\ref{fig:motivation}).  The average thus departs from categorical DP, which applies the same fairness level to every group regardless of its probability.
+Existing methods for a continuous $S$ have largely focused on the fitted predictor, measuring its dependence on $S$ through maximal correlation or through generalized demographic parity (GDP), the average over $S$ of the absolute difference between the conditional and marginal mean predictions \citep{mary2019continuous,grari2020continuous,jiang2022gdp}.  \citet{kong2025fair} take the same average to the representation level: the expectation of integral probability metrics (EIPM) is the average over $S$ of the IPM between the conditional distribution of the representation given $S=s$ and its marginal distribution.  Both criteria integrate the discrepancy against the distribution of $S$, so a large discrepancy confined to a narrow range of sensitive values contributes little to the average when that range has low probability.  The average thus departs from categorical DP, which applies the same fairness level to every group regardless of its probability.
 
 A criterion for a continuous $S$ should therefore hold at every sensitive value.  For a representation, it should also hold for every prediction head that may later be fitted on it, since a bound for one head does not constrain another.  In this paper we propose criteria that take the supremum over $S$ in place of the average, so that a single bound holds uniformly over the sensitive domain.  GDP then becomes $L_{\infty}$-generalized demographic parity ($L_{\infty}$-GDP) for predictions, and EIPM becomes the supremum integral probability metric (supIPM) for representations.  Our estimator of supIPM requires no binning: it estimates the conditional distribution at an arbitrary $s$ with kernel weights and maximizes its discrepancy from the marginal distribution over the sensitive domain.  The inner discrepancy is the ReLU-IPM of \citet{park2025relu}, whose discriminators are single rectified linear units (ReLU), and the encoder is trained with minibatches by penalizing the resulting estimate.  We prove that the fairness level attained on the sample transfers to the population, uniformly over the sensitive domain and over prediction heads of bounded H\"older norm.
 
@@ -205,6 +198,13 @@ Let $\mathbf{Z}'_1,\ldots,\mathbf{Z}'_{n'}$ be a second sample of size $n'$.  Fo
 \end{equation}
 \citet{park2025relu} compute this supremum by gradient ascent over $(\theta,\mu)$, projecting $\theta$ back onto the unit sphere after each step.  Because the ascent may converge to a local maximum, they repeat it from several random initializations and retain the largest value.  Section~\ref{sec:supipm-objective} uses the same finite-dimensional maximization to evaluate the inner discrepancy in supIPM.
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{motivation.pdf}
+  \caption{The conditional and marginal distributions of the representation differ at $s^{\star}$, where few observations lie, so the average over $S$ leaves that subpopulation unprotected, whereas the supremum protects it.}
+  \label{fig:motivation}
+\end{figure}
+
 \section{supIPM for fair representation learning}
 \label{sec:supipm}
 
@@ -224,7 +224,7 @@ We begin with the prediction-level criterion.  \citet{jiang2022gdp} define GDP f
 \end{equation}
 The identity $\varphi$ compares conditional and marginal mean predictions, and a threshold indicator compares positive prediction rates.  Following FREM, we take $\varphi$ to be the identity and write $\operatorname{GDP}(g)$.
 
-Because GDP integrates the discrepancy against $\mathbb{P}_S$, a large discrepancy confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  To require a uniform bound over all values of the sensitive attribute, we replace the outer expectation by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
+Because GDP integrates the discrepancy against $\mathbb{P}_S$, a large discrepancy confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$ (Figure~\ref{fig:motivation}).  To require a uniform bound over all values of the sensitive attribute, we replace the outer expectation by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
 \begin{equation}
   \operatorname{GDP}_{\infty}(g)
   :=\sup_{s\in\mathcal{S}}
