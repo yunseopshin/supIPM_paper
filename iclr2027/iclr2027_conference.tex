@@ -348,32 +348,39 @@ We approximate the outer supremum in Equation~\ref{eq:empirical-supipm} by $T$ c
   \right|.
   \label{eq:discriminator-discrepancy}
 \end{equation}
-For a trimming level $\epsilon\in[0,1/2)$, let $\mathcal{S}_{\epsilon}\subseteq\mathcal{S}$ be the interval between the $\epsilon$ and $1-\epsilon$ sample quantiles of $S_1,\ldots,S_n$.  The search over sensitive values is restricted to $\mathcal{S}_{\epsilon}$, because near the endpoints of $\mathcal{S}$ the kernel weights concentrate on a small number of observations.  With $\Pi_{A}$ the projection onto a set $A$, Algorithm~\ref{alg:supipm-frl} cycles through the ascent over the sensitive value, the ascent over the discriminators, and the descent over $(\phi,\psi)$.  In particular $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ returns $\theta_m$ to the unit sphere and $\mu_m$ to $[-1,1]$.
+For a trimming level $\epsilon\in[0,1/2)$, let $\mathcal{S}_{\epsilon}\subseteq\mathcal{S}$ be the interval between the $\epsilon$ and $1-\epsilon$ sample quantiles of $S_1,\ldots,S_n$.  The search over sensitive values is restricted to $\mathcal{S}_{\epsilon}$, because near the endpoints of $\mathcal{S}$ the kernel weights concentrate on a small number of observations.  Adapting the ReLU-IPM algorithm of \citet{park2025relu}, we collect the candidates and the discriminator parameters into the vectors $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ and $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$, and ascend the two sums
+\begin{equation}
+  G(\mathbf{s}):=\sum_{t=1}^{T}\max_{m\in[M]}\Delta_m(s^{(t)}),
+  \qquad
+  H(\mathbf{v}):=\sum_{m=1}^{M}\Delta_m(s^{\star}).
+  \label{eq:stacked-objectives}
+\end{equation}
+Here $s^{\star}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta_m(s)$.  Each summand involves one coordinate of its argument alone, so one ascent step on $G$ moves all $T$ candidates and one ascent step on $H$ moves all $M$ discriminators.  Writing $\Pi_{A}$ for the projection onto a set $A$, so that $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ returns each $\theta_m$ to the unit sphere and each $\mu_m$ to $[-1,1]$, Algorithm~\ref{alg:supipm-frl} cycles through the ascent in $\mathbf{s}$, the ascent in $\mathbf{v}$, and the descent in $(\phi,\psi)$.
 
 \begin{algorithm}[H]
 \caption{supIPM-FRL}
 \label{alg:supipm-frl}
 \begin{algorithmic}[1]
-\REQUIRE sample $\mathcal{D}$, penalty parameter $\lambda$, kernel $K_{\gamma}$ with bandwidth $\gamma$, trimming level $\epsilon$, number of discriminators $M$, number of candidates $T$, numbers of ascent steps $J_s$ for the sensitive value and $J_v$ for the discriminators, number of iterations $R$, step sizes $\eta_s$, $\eta_v$, $\eta$
+\REQUIRE sample $\mathcal{D}$, penalty parameter $\lambda$, kernel $K_{\gamma}$ with bandwidth $\gamma$, trimming level $\epsilon$, number of discriminators $M$, number of candidates $T$, numbers of ascent steps $J_s$ for the sensitive value and $J_v$ for the discriminators, number of iterations $R$, step sizes $\eta_s$ and $\eta_v$ for the ascents and $\eta$ for the descent
 \ENSURE encoder $h_{\phi}$ and prediction head $f_{\psi}$
-\STATE Initialize $\phi$, $\psi$, and $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]$, and set $\mathcal{S}_{\epsilon}$ from $S_1,\ldots,S_n$
+\STATE Initialize $\phi$, $\psi$, and $\mathbf{v}$ with $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]$, and set $\mathcal{S}_{\epsilon}$ from $S_1,\ldots,S_n$
 \FOR{$r=1,\ldots,R$}
-  \FOR[discriminator ascent]{$j=1,\ldots,J_v$}
-    \STATE Initialize $s^{(1)},\ldots,s^{(T)}$ at distinct points of $\mathcal{S}_{\epsilon}$ \label{alg:s-init}
-    \FOR[projected ascent over the sensitive value]{$J_s$ steps}
-      \STATE $s^{(t)}\leftarrow\Pi_{\mathcal{S}_{\epsilon}}\!\left(s^{(t)}+\eta_s\,\nabla_{s}\max_{m\in[M]}\Delta_m(s^{(t)})\right)$ for $t\in[T]$
+  \FOR[discriminator step]{$j=1,\ldots,J_v$}
+    \STATE Initialize $\mathbf{s}$ at $T$ distinct points of $\mathcal{S}_{\epsilon}$ \label{alg:s-init}
+    \FOR{$J_s$ steps}
+      \STATE $\mathbf{s}\leftarrow\Pi_{\mathcal{S}_{\epsilon}}\!\left(\mathbf{s}+\eta_s\,\nabla_{\mathbf{s}}G(\mathbf{s})\right)$ \COMMENT{all $T$ candidates at once}
     \ENDFOR
     \STATE $s^\star\leftarrow\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta_m(s)$ \COMMENT{worst-case sensitive value} \label{alg:s-star}
-    \STATE $(\theta_m,\mu_m)\leftarrow\Pi_{\mathbb{S}^{d-1}\times[-1,1]}\!\left((\theta_m,\mu_m)+\eta_v\,\nabla_{(\theta_m,\mu_m)}\Delta_m(s^\star)\right)$ for $m\in[M]$
+    \STATE $\mathbf{v}\leftarrow\Pi_{\mathbb{S}^{d-1}\times[-1,1]}\!\left(\mathbf{v}+\eta_v\,\nabla_{\mathbf{v}}H(\mathbf{v})\right)$ \COMMENT{all $M$ discriminators at once}
   \ENDFOR
-  \STATE Repeat lines~\ref{alg:s-init}--\ref{alg:s-star} with the updated discriminators to recompute $s^\star$
+  \STATE Recompute $s^\star$ by repeating lines~\ref{alg:s-init}--\ref{alg:s-star} with the updated $\mathbf{v}$
   \STATE $(\phi,\psi)\leftarrow(\phi,\psi)-\eta\,\nabla_{(\phi,\psi)}\big[\tfrac{1}{n}\sum_{i=1}^n\ell(f_{\psi}(\widetilde{\mathbf{Z}}_i),Y_i)+\lambda\max_{m\in[M]}\Delta_m(s^\star)\big]$ \COMMENT{descent} \label{alg:encoder-step}
 \ENDFOR
 \RETURN $h_{\phi}$, $f_{\psi}$
 \end{algorithmic}
 \end{algorithm}
 
-Each discriminator step first locates the worst-case sensitive value $s^\star$ for the current discriminators and then takes one ascent step in each $(\theta_m,\mu_m)$ at that value.  After the last discriminator step, $s^\star$ is located once more, so that the penalty $\max_{m\in[M]}\Delta_m(s^\star)$ in line~\ref{alg:encoder-step} approximates the empirical supIPM in Equation~\ref{eq:empirical-supipm} with the supremum restricted to $\mathcal{S}_{\epsilon}$.  The encoder and the prediction head then take one descent step with $s^\star$ and the discriminators held fixed.  The $T$ initializations reduce the risk that the search terminates at a poor local maximum.  Equations~\ref{eq:supipm-penalized-objective} and \ref{eq:discriminator-discrepancy} are built from sample averages, so the procedure applies unchanged when these averages are computed on the current minibatch.
+After the last ascent step in $\mathbf{v}$, $s^\star$ is located once more, so that the penalty $\max_{m\in[M]}\Delta_m(s^\star)$ in line~\ref{alg:encoder-step} approximates the empirical supIPM in Equation~\ref{eq:empirical-supipm}, with the outer supremum restricted to $\mathcal{S}_{\epsilon}$ and the inner supremum taken over the $M$ discriminators.  The $T$ initializations reduce the risk that the search terminates at a poor local maximum.  Equations~\ref{eq:supipm-penalized-objective} and \ref{eq:discriminator-discrepancy} are built from sample averages, so the procedure applies unchanged when these averages are computed on the current minibatch.
 \bibliographystyle{iclr2027_conference}
 \bibliography{bibliography}
 
