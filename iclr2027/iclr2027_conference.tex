@@ -81,13 +81,14 @@ Most existing FRL methods have been developed for a categorical $S$.  In this ca
 
 Existing methods that treat $S$ as continuous have largely focused on the fitted predictor rather than on the representation, measuring its dependence on $S$ through maximal correlation or through generalized demographic parity (GDP) \citep{mary2019continuous,grari2020continuous,jiang2022gdp}.  Of these, GDP is the average over $S$ of the absolute difference between the conditional and marginal mean predictions.  \citet{kong2025fair} apply the same average at the representation level: the expectation of integral probability metrics (EIPM) is the average over $S$ of the IPM between the conditional distribution of the representation given $S=s$ and its marginal distribution.  Both criteria average the discrepancy over the distribution of $S$, so a large discrepancy confined to a low-probability range of sensitive values contributes little to the average.  The average thus departs from categorical DP, which imposes one fairness level on every group regardless of its probability.
 
-A criterion for a continuous $S$ should therefore hold at every sensitive value.  For a representation, the criterion should also hold for every prediction head that may later be fitted on it.  In this paper we propose criteria that take the supremum over $S$ in place of the average, so that a single bound holds uniformly over the sensitive domain.  GDP then becomes $L_{\infty}$-generalized demographic parity ($L_{\infty}$-GDP) for predictions, and EIPM becomes the supremum integral probability metric (supIPM) for representations.  Our estimator of supIPM obtains the conditional distribution at an arbitrary $s$ from kernel weights, without binning, and searches the sensitive domain for the largest discrepancy from the marginal distribution.  The discrepancy is measured by the ReLU-IPM of \citet{park2025relu}, whose discriminators are single rectified linear units (ReLU) and which controls every prediction head of bounded H\"older norm.  We add this supIPM estimate as a penalty to the supervised risk and train the encoder and the prediction head with minibatches.
+A new criterion for a continuous $S$ should therefore hold at every sensitive value.  For a representation, the criterion should also hold for every prediction head that may later be fitted on it.  In this paper we propose criteria that take the supremum over $S$ in place of the average, so that a single bound holds uniformly over the sensitive domain.  GDP then becomes $L_{\infty}$-generalized demographic parity ($L_{\infty}$-GDP) for predictions, and EIPM becomes the supremum integral probability metric (supIPM) for representations.  Our estimator of supIPM obtains the conditional distribution at an arbitrary $s$ from kernel weights, without binning, and searches the sensitive domain for the largest discrepancy from the marginal distribution.  The discrepancy is measured by the ReLU-IPM of \citet{park2025relu}, whose discriminators are single rectified linear units (ReLU) and which controls every prediction head of bounded H\"older norm.  We add this supIPM estimate as a penalty to the supervised risk and train the encoder and the prediction head with minibatches.
 
 \paragraph{Contributions.}
 \begin{itemize}
   \item We introduce $L_{\infty}$-GDP for predictions and supIPM for representations.  Both extend the groupwise requirement of categorical DP to a continuous sensitive attribute by measuring the worst-case discrepancy over the sensitive domain.
-  \item We estimate supIPM without binning, from kernel weights and ReLU-IPM, and obtain supIPM-FRL, an adversarial procedure that is compatible with minibatch training.
-  \item We prove that the empirical supIPM is a uniformly consistent estimator, so that the fairness level attained on the sample transfers to the population, uniformly over the sensitive domain and over prediction heads of bounded H\"older norm.
+  \item We estimate supIPM from kernel weights and ReLU-IPM, and propose supIPM-FRL, an adversarial procedure that is compatible with minibatch training.
+  \item We prove that the empirical supIPM is a uniformly consistent estimator, so that the fairness level attained on the sample transfers to the population.
+  % uniformly over the sensitive domain and over prediction heads of bounded H\"older norm.
 \end{itemize}
 
 \section{Preliminaries}
@@ -96,9 +97,10 @@ A criterion for a continuous $S$ should therefore hold at every sensitive value.
 \subsection{Fair representation using EIPM (FREM)}
 \label{sec:frem}
 
-We observe an input $\mathbf{X}\in\mathcal{X}$, an outcome $Y\in\mathcal{Y}$, and a continuous sensitive attribute $S$ taking values in the sensitive domain $\mathcal{S}$, a compact interval of $\mathbb{R}$.  An encoder $h:\mathcal{X}\to\mathcal{Z}$ maps $\mathbf{X}$ to a representation $\mathbf{Z}=h(\mathbf{X})$ in the representation space $\mathcal{Z}=\mathbb{R}^d$, where $d$ is the representation dimension.  A prediction head $f:\mathcal{Z}\to\mathbb{R}$ maps the representation to a real-valued prediction, and $f\circ h$ denotes the composed prediction model.  When the encoder and the prediction head are parameterized, we write them as $h_{\phi}$ and $f_{\psi}$ with parameters $\phi$ and $\psi$.  We write $\mathbb{P}_S$ for the distribution of $S$, $\mathbb{P}_{\mathbf{Z}}$ for the marginal distribution of $\mathbf{Z}$, and $\mathbb{P}_{\mathbf{Z}\mid S=s}$ for the conditional distribution of $\mathbf{Z}$ given $S=s$.  Equality $\mathbb{P}_{\mathbf{Z}\mid S=s}=\mathbb{P}_{\mathbf{Z}}$ for $\mathbb{P}_S$-almost every $s$ is equivalent to independence of $\mathbf{Z}$ and $S$, and this independence is inherited by every measurable function of $\mathbf{Z}$.
+We observe an input $\mathbf{X}\in\mathcal{X}$, an outcome $Y\in\mathcal{Y}$, and a continuous sensitive attribute $S$ taking values in the sensitive domain $\mathcal{S}$, a compact interval of $\mathbb{R}$.  An encoder $h:\mathcal{X}\to\mathcal{Z}$ maps $\mathbf{X}$ to a representation $\mathbf{Z}=h(\mathbf{X})$ in the representation space $\mathcal{Z}=\mathbb{R}^d$, where $d$ is the representation dimension.  A prediction head $f:\mathcal{Z}\to\mathbb{R}$ maps the representation to a real-valued prediction, and $f\circ h$ denotes the composed prediction model.  When the encoder and the prediction head are parameterized, we write them as $h_{\phi}$ and $f_{\psi}$ with parameters $\phi$ and $\psi$.  We write $\mathbb{P}_S$ for the distribution of $S$, $\mathbb{P}_{\mathbf{Z}}$ for the marginal distribution of $\mathbf{Z}$, and $\mathbb{P}_{\mathbf{Z}\mid S=s}$ for the conditional distribution of $\mathbf{Z}$ given $S=s$.  
+% Equality $\mathbb{P}_{\mathbf{Z}\mid S=s}=\mathbb{P}_{\mathbf{Z}}$ for $\mathbb{P}_S$-almost every $s$ is equivalent to independence of $\mathbf{Z}$ and $S$, and this independence is inherited by every measurable function of $\mathbf{Z}$.
 
-The discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ is measured through a discriminator class $\mathcal{V}$, a class of real-valued functions on $\mathcal{Z}$; each $v\in\mathcal{V}$ is a discriminator.  The IPM associated with $\mathcal{V}$ between two probability measures $\mathbb{P}$ and $\mathbb{Q}$ is defined as
+The discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ is measured through a discriminator class $\mathcal{V}$, a class of real-valued discriminator functions on $\mathcal{Z}$. The IPM associated with $\mathcal{V}$ between two probability measures $\mathbb{P}$ and $\mathbb{Q}$ is defined as
 \begin{equation}
   \operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})
   :=\sup_{v\in\mathcal{V}}
@@ -145,7 +147,7 @@ With a general discriminator class, this estimator requires a separate maximizat
 \subsection{ReLU-IPM}
 \label{sec:relu-ipm}
 
-The RKHS unit ball of Section~\ref{sec:frem} determines the prediction heads that EIPM controls.  The RKHS of the Gaussian kernel, for instance, contains only infinitely differentiable functions \citep{park2025relu}, so a prediction head of lower smoothness lies outside $\mathcal{V}$.  \citet{park2025relu} address this restriction with ReLU-IPM, an IPM whose discriminator class is indexed by a finite-dimensional parameter and which nevertheless controls every prediction head of bounded H\"older norm.
+The RKHS unit ball of Section~\ref{sec:frem} determines the prediction heads that EIPM controls.  The RKHS of the Gaussian kernel, however, contains only infinitely differentiable functions \citep{park2025relu}, so a prediction head of lower smoothness lies outside $\mathcal{V}$.  \citet{park2025relu} address this restriction with ReLU-IPM, an IPM whose discriminator class is indexed by a finite-dimensional parameter and which nevertheless controls every prediction head of bounded H\"older norm.
 
 Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$ be the unit ball and $\mathbb{S}^{d-1}:=\{\theta\in\mathbb{R}^d:\lVert\theta\rVert_2=1\}$ the unit sphere.  \citet{park2025relu} define the ReLU discriminator class on $\mathbb{B}^d$ by
 \begin{equation}
@@ -202,7 +204,7 @@ A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
   \label{fig:motivation}
 \end{figure}
 
-\citet{jiang2022gdp} define GDP for a continuous sensitive attribute as the average over $S$ of the absolute difference between the conditional and the marginal mean prediction.  For a measurable function $g:\mathcal{X}\to\mathbb{R}$, not necessarily of the form $f\circ h$,
+\citet{jiang2022gdp} define GDP for a continuous sensitive attribute as the average over $S$ of the absolute difference between the conditional and the marginal mean prediction.  For a measurable function $g:\mathcal{X}\to\mathbb{R}$,
 \begin{equation}
   \operatorname{GDP}(g)
   :=\mathbb{E}_{S}\!\left[
@@ -214,7 +216,7 @@ A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
   \label{eq:gdp}
 \end{equation}
 
-Because Equation~\ref{eq:gdp} averages this difference over $S$, a large difference confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  Figure~\ref{fig:motivation} shows the same phenomenon for the representation.  The discrepancy between the conditional and the marginal distribution is large at the worst-case value $s^{\star}$, which carries too little probability to affect the average over $S$.  Categorical DP, by contrast, imposes one fairness level on every group regardless of its probability.  An extension to a continuous sensitive attribute should meet the same standard at every sensitive value.  We therefore replace the average by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
+Because Equation~\ref{eq:gdp} averages this difference over $S$, a large difference confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  Figure~\ref{fig:motivation} explains this situation.  The discrepancy between the conditional and the marginal distribution is large at the worst-case value $s^{\star}$, which carries too little probability to affect the average over $S$.  Categorical DP, by contrast, imposes one fairness level on every group regardless of its probability.  An extension to a continuous sensitive attribute should meet the same standard at every sensitive value.  We therefore replace the average by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
 \begin{equation}
   \operatorname{GDP}_{\infty}(g)
   :=\sup_{s\in\mathcal{S}}
@@ -224,7 +226,9 @@ Because Equation~\ref{eq:gdp} averages this difference over $S$, a large differe
   \right|.
   \label{eq:linfty-gdp}
 \end{equation}
-The supremum in Equation~\ref{eq:linfty-gdp} requires the conditional expectation at every $s\in\mathcal{S}$, not only for $\mathbb{P}_S$-almost every $s$.  We impose the following condition on the distribution of $S$.
+The supremum in Equation~\ref{eq:linfty-gdp} requires the conditional expectation at every $s\in\mathcal{S}$.
+% , not only for $\mathbb{P}_S$-almost every $s$.  
+We impose the following condition on the distribution of $S$.
 \begin{assumption}[Positive density]
 \label{as:positive-density}
 $S$ has a density $p_S$ with respect to the Lebesgue measure $\mathrm{Leb}$ on $\mathcal{S}$, and $0<c_S\le p_S(s)\le C_S<\infty$ for every $s\in\mathcal{S}$.
@@ -238,9 +242,9 @@ Assumption~\ref{as:positive-density} is adopted from FREM \citep{kong2025fair} a
 \end{equation}
 so that the quantity inside the supremum in Equation~\ref{eq:linfty-gdp} is defined at every $s$.
 
-The value $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed.  We therefore state a criterion for the representation itself, which controls an entire class of prediction heads at once.  Such a criterion is the IPM of a discriminator class, and the class fixes the prediction heads that the criterion controls.  A guarantee for every head of bounded H\"older norm therefore calls for the H\"older ball $\mathcal{H}^{\beta}_d$.  Its IPM cannot be computed directly, so we use the ReLU discriminator class of Section~\ref{sec:relu-ipm}, whose IPM upper bounds the H\"older-IPM by Equation~\ref{eq:relu-holder} \citep{park2025relu}.
+The value $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed.  We therefore propose a criterion for the representation itself, which controls an entire class of prediction heads at once.  Such a criterion is the IPM of a discriminator class, and the class fixes the prediction heads that the criterion controls.  A guarantee for every head of bounded H\"older norm therefore calls for the H\"older ball $\mathcal{H}^{\beta}_d$.  Its IPM cannot be computed directly, so we use the ReLU discriminator class of Section~\ref{sec:relu-ipm}, whose IPM upper bounds the H\"older-IPM by Equation~\ref{eq:relu-holder} \citep{park2025relu}.
 
-Because the ReLU discriminator class in Equation~\ref{eq:relu-class} is defined on $\mathbb{B}^d$, we map the representation $\mathbf{Z}=h_{\phi}(\mathbf{X})$ of the parameterized encoder $h_{\phi}$ in Section~\ref{sec:frem} into the unit ball by $\widetilde{\mathbf{Z}}:=\mathbf{Z}/\sqrt{\lVert\mathbf{Z}\rVert_2^2+1}\in\mathbb{B}^d$.  From here on, prediction heads and discriminator classes are defined on $\mathbb{B}^d$ and applied to $\widetilde{\mathbf{Z}}$.  The conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ is defined pointwise from $p$ as in Equation~\ref{eq:pointwise-conditional}.  For a discriminator class $\mathcal{V}$ on $\mathbb{B}^d$, we define
+Because the ReLU discriminator class in Equation~\ref{eq:relu-class} is defined on $\mathbb{B}^d$, we map the representation $\mathbf{Z}=h_{\phi}(\mathbf{X})$ of the parameterized encoder $h_{\phi}$ in Section~\ref{sec:frem} into the unit ball by $\widetilde{\mathbf{Z}}:=\mathbf{Z}/\sqrt{\lVert\mathbf{Z}\rVert_2^2+1}\in\mathbb{B}^d$.  From here on, prediction heads and discriminator classes are defined on $\mathbb{B}^d$ and applied to $\widetilde{\mathbf{Z}}$.  The conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ is defined as in Equation~\ref{eq:pointwise-conditional}.  For a discriminator class $\mathcal{V}$ on $\mathbb{B}^d$, we define
 \begin{align}
   \operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)
   &:=\sup_{s\in\mathcal{S}}
@@ -290,7 +294,8 @@ where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$.  Obse
   \right|.
   \label{eq:empirical-supipm}
 \end{align}
-Whereas the EIPM estimator in Equation~\ref{eq:eipm-estimator} averages the discrepancy at the observed sensitive values, Equation~\ref{eq:empirical-supipm} takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy.  Section~\ref{sec:supipm-objective} performs this search during training.
+Whereas the EIPM estimator in Equation~\ref{eq:eipm-estimator} averages the discrepancy at the observed sensitive values, Equation~\ref{eq:empirical-supipm} takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy.  
+% Section~\ref{sec:supipm-objective} performs this search during training.
 
 \subsection{Learning with the supIPM penalty}
 \label{sec:supipm-objective}
