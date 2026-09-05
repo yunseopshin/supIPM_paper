@@ -158,7 +158,7 @@ Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$
   \right\},
   \label{eq:relu-class}
 \end{equation}
-where $(a)_+:=\max\{a,0\}$.  The ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, that is, Equation~\ref{eq:prelim-ipm} with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  Although $\mathcal{V}_{\mathrm{R}}$ is indexed by the finite-dimensional parameter $(\theta,\mu)$ alone, ReLU-IPM separates probability distributions on $\mathbb{B}^d$ \citep{park2025relu}.  The finite dimension of $(\theta,\mu)$ makes this supremum computable: \citet{park2025relu} evaluate ReLU-IPM between empirical distributions by gradient ascent over $(\theta,\mu)$, projecting $\theta$ back onto the unit sphere after each step.
+where $(a)_+:=\max\{a,0\}$.  The ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, that is, Equation~(\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  Although $\mathcal{V}_{\mathrm{R}}$ is indexed by the finite-dimensional parameter $(\theta,\mu)$ alone, ReLU-IPM separates probability distributions on $\mathbb{B}^d$ \citep{park2025relu}.  The finite dimension of $(\theta,\mu)$ makes this supremum computable: \citet{park2025relu} evaluate ReLU-IPM between empirical distributions by gradient ascent over $(\theta,\mu)$, projecting $\theta$ back onto the unit sphere after each step.
 
 To describe the prediction heads that ReLU-IPM controls, fix a smoothness index $\beta>0$ and let $k$ be the largest integer strictly smaller than $\beta$.  Let $\partial^{\mathbf{a}}$ denote the partial derivative indexed by a multi-index $\mathbf{a}\in\mathbb{N}_0^d$ of order $|\mathbf{a}|=a_1+\cdots+a_d$.  Then the $\beta$-H\"older norm of a $k$ times continuously differentiable function $v:\mathbb{B}^d\to\mathbb{R}$ and the $\beta$-H\"older ball on $\mathbb{B}^d$ are
 \begin{equation}
@@ -216,7 +216,7 @@ A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
   \label{eq:gdp}
 \end{equation}
 
-Because Equation~\ref{eq:gdp} averages this discrepancy over $S$, a large discrepancy confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  Figure~\ref{fig:motivation} illustrates such a case: the discrepancy between the conditional and the marginal distribution is large at the worst-case value $s^{\star}$, whose neighborhood carries too little probability to affect the average over $S$.  Categorical DP, by contrast, imposes one fairness level on every group regardless of its probability.  An extension to a continuous sensitive attribute should meet the same standard at every sensitive value.  We therefore replace the average by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
+Because Equation~(\ref{eq:gdp}) averages this discrepancy over $S$, a large discrepancy confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  Figure~\ref{fig:motivation} illustrates such a case: the discrepancy between the conditional and the marginal distribution is large at the worst-case value $s^{\star}$, whose neighborhood carries too little probability to affect the average over $S$.  Categorical DP, by contrast, imposes one fairness level on every group regardless of its probability.  An extension to a continuous sensitive attribute should meet the same standard at every sensitive value.  We therefore replace the average by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
 \begin{equation}
   \operatorname{GDP}_{\infty}(g)
   :=\sup_{s\in\mathcal{S}}
@@ -226,7 +226,7 @@ Because Equation~\ref{eq:gdp} averages this discrepancy over $S$, a large discre
   \right|.
   \label{eq:linfty-gdp}
 \end{equation}
-The supremum in Equation~\ref{eq:linfty-gdp} requires the conditional expectation at every $s\in\mathcal{S}$.
+The supremum in Equation~(\ref{eq:linfty-gdp}) requires the conditional expectation at every $s\in\mathcal{S}$.
 % , not only for $\mathbb{P}_S$-almost every $s$.  
 We impose the following condition on the distribution of $S$.
 \begin{assumption}[Positive density]
@@ -240,11 +240,11 @@ Assumption~\ref{as:positive-density} is adopted from FREM \citep{kong2025fair} a
   \qquad s\in\mathcal{S},
   \label{eq:pointwise-conditional}
 \end{equation}
-and this version is used in what follows, in particular inside the supremum in Equation~\ref{eq:linfty-gdp}.
+and this version is used in what follows, in particular inside the supremum in Equation~(\ref{eq:linfty-gdp}).
 
 The value $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed.  We therefore propose a criterion for the representation itself, which controls an entire class of prediction heads at once.  Such a criterion is the IPM of a discriminator class.
 
-Because the discriminator classes of Section~\ref{sec:relu-ipm} are defined on $\mathbb{B}^d$, we map the representation $\mathbf{Z}=h_{\phi}(\mathbf{X})$ of the parameterized encoder $h_{\phi}$ in Section~\ref{sec:frem} into the unit ball by $\widetilde{\mathbf{Z}}:=\mathbf{Z}/\sqrt{\lVert\mathbf{Z}\rVert_2^2+1}\in\mathbb{B}^d$.  From here on, prediction heads and discriminator classes are defined on $\mathbb{B}^d$ and applied to $\widetilde{\mathbf{Z}}$.  The conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ is defined as in Equation~\ref{eq:pointwise-conditional}.  For a discriminator class $\mathcal{V}$ on $\mathbb{B}^d$, we define
+Because the discriminator classes of Section~\ref{sec:relu-ipm} are defined on $\mathbb{B}^d$, we map the representation $\mathbf{Z}=h_{\phi}(\mathbf{X})$ of the parameterized encoder $h_{\phi}$ in Section~\ref{sec:frem} into the unit ball by $\widetilde{\mathbf{Z}}:=\mathbf{Z}/\sqrt{\lVert\mathbf{Z}\rVert_2^2+1}\in\mathbb{B}^d$.  From here on, prediction heads and discriminator classes are defined on $\mathbb{B}^d$ and applied to $\widetilde{\mathbf{Z}}$.  The conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ is defined as in Equation~(\ref{eq:pointwise-conditional}).  For a discriminator class $\mathcal{V}$ on $\mathbb{B}^d$, we define
 \begin{align}
   \operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)
   &:=\sup_{s\in\mathcal{S}}
@@ -257,16 +257,16 @@ Because the discriminator classes of Section~\ref{sec:relu-ipm} are defined on $
   \right|.
   \label{eq:supipm}
 \end{align}
-Equation~\ref{eq:supipm} is the representation-level counterpart of $\operatorname{GDP}_{\infty}$: it measures the largest discrepancy between the conditional and marginal distributions before a prediction head is chosen.
+Equation~(\ref{eq:supipm}) is the representation-level counterpart of $\operatorname{GDP}_{\infty}$: it measures the largest discrepancy between the conditional and marginal distributions before a prediction head is chosen.
 
-By Equation~\ref{eq:supipm}, the constraint $\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\rho$ for a fairness level $\rho\ge0$ bounds $\left|\mathbb{E}[v(\widetilde{\mathbf{Z}})\mid S=s]-\mathbb{E}[v(\widetilde{\mathbf{Z}})]\right|$ by $\rho$ for every discriminator $v\in\mathcal{V}$ and every $s\in\mathcal{S}$.  For comparison with EIPM, write $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$ for Equation~\ref{eq:eipm} with $\mathbf{Z}$ replaced by $\widetilde{\mathbf{Z}}$.  Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$, so a supIPM bound of $\rho$ implies an EIPM bound at the same fairness level.  The converse fails without further regularity in $s$.
+By Equation~(\ref{eq:supipm}), the constraint $\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\rho$ for a fairness level $\rho\ge0$ bounds $\left|\mathbb{E}[v(\widetilde{\mathbf{Z}})\mid S=s]-\mathbb{E}[v(\widetilde{\mathbf{Z}})]\right|$ by $\rho$ for every discriminator $v\in\mathcal{V}$ and every $s\in\mathcal{S}$.  For comparison with EIPM, write $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$ for Equation(~\ref{eq:eipm}) with $\mathbf{Z}$ replaced by $\widetilde{\mathbf{Z}}$.  Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$, so a supIPM bound of $\rho$ implies an EIPM bound at the same fairness level.  The converse fails without further regularity in $s$.
 
-It remains to choose the discriminator class $\mathcal{V}$.  Because $\mathcal{V}$ fixes the prediction heads that supIPM controls, a guarantee for every head of bounded H\"older norm calls for the H\"older ball $\mathcal{H}^{\beta}_d$.  The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in Equation~\ref{eq:supipm} is the ReLU-IPM.  The inequality in Equation~\ref{eq:relu-holder} applies to $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ and $\mathbb{P}_{\widetilde{\mathbf{Z}}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\widetilde{\mathbf{Z}};S)$.
+It remains to choose the discriminator class $\mathcal{V}$.  Because $\mathcal{V}$ fixes the prediction heads that supIPM controls, a guarantee for every head of bounded H\"older norm calls for the H\"older ball $\mathcal{H}^{\beta}_d$.  The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in Equation~(\ref{eq:supipm}) is the ReLU-IPM.  The inequality in Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ and $\mathbb{P}_{\widetilde{\mathbf{Z}}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\widetilde{\mathbf{Z}};S)$.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
 
-For the sample $\mathcal{D}$ of Section~\ref{sec:frem}, let $\mathbf{Z}_i=h_{\phi}(\mathbf{X}_i)$ and $\widetilde{\mathbf{Z}}_i=\mathbf{Z}_i/\sqrt{\lVert\mathbf{Z}_i\rVert_2^2+1}$.  Estimating supIPM requires the conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ at every $s\in\mathcal{S}$, whereas FREM requires it only at the observed values $S_i$.  We therefore adapt the kernel-weighted construction of Equation~\ref{eq:frem-conditional} to an arbitrary $s$.  Because $s$ is no longer tied to an observation, the leave-one-out correction is not needed, and all $n$ observations are used in both the conditional and the marginal estimates:
+For the sample $\mathcal{D}$ of Section~\ref{sec:frem}, let $\mathbf{Z}_i=h_{\phi}(\mathbf{X}_i)$ and $\widetilde{\mathbf{Z}}_i=\mathbf{Z}_i/\sqrt{\lVert\mathbf{Z}_i\rVert_2^2+1}$.  Estimating supIPM requires the conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ at every $s\in\mathcal{S}$, whereas FREM requires it only at the observed values $S_i$.  We therefore adapt the kernel-weighted construction of Equation~(\ref{eq:frem-conditional}) to an arbitrary $s$.  Because $s$ is no longer tied to an observation, the leave-one-out correction is not needed, and all $n$ observations are used in both the conditional and the marginal estimates:
 \begin{equation}
   \widehat{w}_{\gamma}(i;s)
   :=\frac{K_{\gamma}(S_i,s)}{\sum_{j=1}^n K_{\gamma}(S_j,s)},
@@ -279,7 +279,7 @@ For the sample $\mathcal{D}$ of Section~\ref{sec:frem}, let $\mathbf{Z}_i=h_{\ph
   :=\frac{1}{n}\sum_{i=1}^n\delta_{\widetilde{\mathbf{Z}}_i},
   \label{eq:supipm-estimators}
 \end{equation}
-where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$.  Observations whose sensitive values are close to $s$ receive larger weights.  The weights sum to one over $i$, so that $\widehat{\mathbb{P}}^{\gamma}_{\widetilde{\mathbf{Z}}\mid S=s}$ is a probability distribution.  Substituting the two empirical distributions into Equation~\ref{eq:supipm} yields
+where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$.  Observations whose sensitive values are close to $s$ receive larger weights.  The weights sum to one over $i$, so that $\widehat{\mathbb{P}}^{\gamma}_{\widetilde{\mathbf{Z}}\mid S=s}$ is a probability distribution.  Substituting the two empirical distributions into Equation~(\ref{eq:supipm}) yields
 \begin{align}
   \widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}
   (\widetilde{\mathbf{Z}};S)
@@ -296,7 +296,7 @@ where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$.  Obse
   \right|.
   \label{eq:empirical-supipm}
 \end{align}
-Whereas the EIPM estimator in Equation~\ref{eq:eipm-estimator} averages the discrepancy at the observed sensitive values, Equation~\ref{eq:empirical-supipm} takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy.  
+Whereas the EIPM estimator in Equation~(\ref{eq:eipm-estimator}) averages the discrepancy at the observed sensitive values, Equation~(\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy.  
 % Section~\ref{sec:supipm-objective} performs this search during training.
 
 \subsection{Learning with the supIPM penalty}
@@ -312,9 +312,9 @@ We use the empirical supIPM as a penalty and train the encoder $h_{\phi}$ and th
   (\widetilde{\mathbf{Z}};S),
   \label{eq:supipm-penalized-objective}
 \end{equation}
-where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  Equation~\ref{eq:supipm-penalized-objective} is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)\le\rho$ for a fairness level $\rho\ge0$, as in Section~\ref{sec:supipm-criterion}.
+where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  Equation~(\ref{eq:supipm-penalized-objective}) is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)\le\rho$ for a fairness level $\rho\ge0$, as in Section~\ref{sec:supipm-criterion}.
 
-Minimizing Equation~\ref{eq:supipm-penalized-objective} requires evaluating the empirical supIPM in Equation~\ref{eq:empirical-supipm}, which contains two suprema: an outer supremum over the sensitive value $s\in\mathcal{S}$ and an inner supremum over the discriminator parameter $(\theta,\mu)$.  For $s\in\mathcal{S}$ and $(\theta,\mu)\in\mathbb{S}^{d-1}\times[-1,1]$, let $\Delta(s;\theta,\mu)$ denote the discrepancy detected at $s$ by the discriminator $v_{\theta,\mu}$:
+Minimizing Equation~(\ref{eq:supipm-penalized-objective}) requires evaluating the empirical supIPM in Equation~(\ref{eq:empirical-supipm}), which contains two suprema: an outer supremum over the sensitive value $s\in\mathcal{S}$ and an inner supremum over the discriminator parameter $(\theta,\mu)$.  For $s\in\mathcal{S}$ and $(\theta,\mu)\in\mathbb{S}^{d-1}\times[-1,1]$, let $\Delta(s;\theta,\mu)$ denote the discrepancy detected at $s$ by the discriminator $v_{\theta,\mu}$:
 \begin{equation}
   \Delta(s;\theta,\mu)
   :=\left|
@@ -324,7 +324,7 @@ Minimizing Equation~\ref{eq:supipm-penalized-objective} requires evaluating the 
   \right|.
   \label{eq:discriminator-discrepancy}
 \end{equation}
-Then $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)=\sup_{s\in\mathcal{S}}\sup_{\theta\in\mathbb{S}^{d-1},\,\mu\in[-1,1]}\Delta(s;\theta,\mu)$, so the minimization of Equation~\ref{eq:supipm-penalized-objective} is a min--max problem, which we solve by alternating gradient descent in $(\phi,\psi)$ with projected gradient ascent in $s$ and in $(\theta,\mu)$.
+Then $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)=\sup_{s\in\mathcal{S}}\sup_{\theta\in\mathbb{S}^{d-1},\,\mu\in[-1,1]}\Delta(s;\theta,\mu)$, so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem, which we solve by alternating gradient descent in $(\phi,\psi)$ with projected gradient ascent in $s$ and in $(\theta,\mu)$.
 
 Because gradient ascent can converge to a local maximum, we follow \citet{park2025relu} and perform the ascent from several initial values in parallel, maintaining $T$ candidate sensitive values $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ and $M$ discriminators $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$, where $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$.  Let $\hat{s}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ be the candidate at which the largest discrepancy is detected.  The candidates and the discriminators are updated by gradient ascent on
 \begin{equation}
@@ -360,7 +360,7 @@ Algorithm~\ref{alg:supipm-frl} assembles these three updates into $R$ iterations
 \end{algorithmic}
 \end{algorithm}
 
-Equations~\ref{eq:supipm-penalized-objective} and \ref{eq:discriminator-discrepancy} are built from sample averages, so the procedure applies unchanged when these averages are computed on the current minibatch.
+Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discrepancy}) are built from sample averages, so the procedure applies unchanged when these averages are computed on the current minibatch.
 
 \section{Theoretical Analysis}
 % DEFERRED FROM SECTION 3.1: the smoothness condition on the joint density.
