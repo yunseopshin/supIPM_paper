@@ -368,9 +368,9 @@ Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discr
 \section{Theoretical Analysis}
 \label{sec:theory}
 
-The empirical supIPM estimates its population counterpart uniformly over a class of encoders (Theorem~\ref{thm:uniform}), and Corollary~\ref{cor:certificate} turns that estimate into a bound on the worst-case discrepancy of every prediction head of bounded H\"older norm.  The proofs are given in Appendix~\ref{app:proofs}.
+The empirical supIPM estimates its population counterpart uniformly over a class of encoders (Theorem~\ref{thm:uniform}), and Corollary~\ref{cor:certificate} turns that estimate into a bound on the worst-case discrepancy of every prediction head of bounded H\"older norm.  The assumptions and the proofs are given in Appendix~\ref{app:proofs}.
 
-Write $\mathcal{S}=[a,b]$, let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$ map $\mathbb{R}^d$ into $\mathbb{B}^d$, and put $\widetilde{h}:=\tau\circ h$ for an encoder $h:\mathcal{X}\to\mathbb{R}^d$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$.  The finite-sample results are stated on an interior region $\mathcal{S}_n$, whose margin from the endpoints of $\mathcal{S}$ vanishes with $n$, in terms of Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) with the supremum over $s$ restricted to $\mathcal{S}_n$:
+Write $\mathcal{S}=[a,b]$, let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$ map $\mathbb{R}^d$ into $\mathbb{B}^d$, and put $\widetilde{h}:=\tau\circ h$ for an encoder $h:\mathcal{X}\to\mathbb{R}^d$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$.  The finite-sample results are stated on an interior region $\mathcal{S}_n$ whose margin from the endpoints of $\mathcal{S}$ vanishes with $n$.  Restricting the supremum over $s$ in Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) to $\mathcal{S}_n$ gives
 \begin{equation}
 \begin{aligned}
   \mathcal{S}_n
@@ -396,30 +396,9 @@ Write $\mathcal{S}=[a,b]$, let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)
 \end{aligned}
   \label{eq:interior}
 \end{equation}
-Here conditional expectations are the versions in Equation~(\ref{eq:pointwise-conditional}), $\gamma_n$ is the bandwidth of the kernel in Equation~(\ref{eq:supipm-estimators}), $0/0:=0$ in $\widehat{w}_{\gamma_n}(i;s)$, and $p(\mathbf{x},s)$ is the joint density fixed in Section~\ref{sec:supipm-criterion}; Assumption~\ref{as:positive-density} is in force throughout.
+Here conditional expectations are the versions in Equation~(\ref{eq:pointwise-conditional}), $\gamma_n$ is the bandwidth of the kernel in Equation~(\ref{eq:supipm-estimators}), $0/0:=0$ in $\widehat{w}_{\gamma_n}(i;s)$, and $p(\mathbf{x},s)$ is the joint density fixed in Section~\ref{sec:supipm-criterion}.
 
-\begin{assumption}[Smooth joint density]
-\label{as:smooth-density}
-The sample $\mathcal{D}$ consists of independent copies of $(\mathbf{X},S,Y)$.  For $\nu$-almost every $\mathbf{x}$ the map $s\mapsto p(\mathbf{x},s)$ is twice continuously differentiable on $\mathcal{S}$, and there exist $M_1,M_2\in L_1(\nu)$ such that $\sup_{s\in\mathcal{S}}\left|\partial_s^{j}p(\mathbf{x},s)\right|\le M_j(\mathbf{x})$ for $j\in\{1,2\}$.
-\end{assumption}
-
-No smoothness in $\mathbf{x}$ is required; the envelopes serve only to differentiate under the integral sign in $s$, uniformly over bounded measurable $g$.
-
-\begin{assumption}[Kernel and bandwidth]
-\label{as:kernel}
-$K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ for a bounded, symmetric and Lipschitz function $K:\mathbb{R}\to[0,\infty)$ with $\int K=1$ and $\int t^2K(t)\,\mathrm{d}t<\infty$.  With $T_K(r):=\int_{|t|>r}K(t)\,\mathrm{d}t$ the tail mass of $K$, the bandwidth satisfies $\gamma_n\to0$, $0<\gamma_n\le\min\{\epsilon_n,1/2\}$ and $T_K(\epsilon_n/\gamma_n)\le\gamma_n^2$.
-\end{assumption}
-
-The last condition keeps the kernel mass beyond $\mathcal{S}$ of the order of the squared bandwidth at every $s\in\mathcal{S}_n$.  It is vacuous for a kernel supported on $[-1,1]$, and holds for the Gaussian kernel whenever $\epsilon_n\asymp1/\log n$ and $\gamma_n$ decays polynomially.
-
-\begin{assumption}[Encoder class]
-\label{as:encoder}
-$\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1996weak} of measurable encoders $h:\mathcal{X}\to\mathbb{R}^d$ such that, with $\lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2$ and $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ the smallest number of $\lVert\cdot\rVert_\infty$-balls of radius $\eta$ covering a class $\mathcal{F}$, there exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ with $N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)\le(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.
-\end{assumption}
-
-On a bounded $\mathcal{X}$ this holds for ReLU networks of depth $L$ and width $H$ with bounded parameters, with $\mathfrak{v}_n$ of the order of the number of parameters and $\log A_n$ of the order of $L\log H$ \citep{schmidthieber2020nonparametric}.
-
-For $B>0$ let $\mathcal{H}^{\beta}_d(B):=\{f\in C^{k}(\mathbb{B}^d):\lVert f\rVert_{\mathcal{H}^{\beta}}\le B\}$ be the H\"older ball of radius $B$ in Equation~(\ref{eq:holder-ball}), let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and the exponent in Equation~(\ref{eq:relu-holder}), so that $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $\alpha_{d,\beta}=1$ for $\beta>(d+3)/2$, and for $0<\delta<1$ set
+Appendix~\ref{app:assumptions} adds Assumptions~\ref{as:smooth-density}--\ref{as:encoder} to Assumption~\ref{as:positive-density}: the sample consists of independent copies of $(\mathbf{X},S,Y)$ and the joint density is twice continuously differentiable in $s$ with integrable envelopes $M_1$ and $M_2$; the profile $K$ in $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ is bounded, symmetric and Lipschitz, and the bandwidth $\gamma_n$ vanishes with $n$ and is tied to the margin $\epsilon_n$; and the encoder class $\mathcal{E}_n$ has $\eta$-covering numbers at most $(A_n/\eta)^{\mathfrak{v}_n}$ in the supremum norm.  For $0<\delta<1$ set
 \begin{equation}
   \Gamma_{n,\delta}
   :=(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma_n}+\log\frac{1}{\delta},
@@ -431,7 +410,7 @@ For $B>0$ let $\mathcal{H}^{\beta}_d(B):=\{f\in C^{k}(\mathbb{B}^d):\lVert f\rVe
 
 \begin{theorem}[Uniform convergence of the empirical supIPM]
 \label{thm:uniform}
-Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist constants $C,c>0$, depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, such that for every $\delta\in(0,1)$ and every $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$,
+Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist constants $C,c>0$, depending only on $c_S$, $C_S$, $K$, $\lVert M_1\rVert_{L_1(\nu)}$ and $\lVert M_2\rVert_{L_1(\nu)}$, such that for every $\delta\in(0,1)$ and every $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$,
 \begin{equation}
   \sup_{h\in\mathcal{E}_n}
   \left|\widehat{D}_n(h)-D_n(h)\right|
@@ -441,6 +420,8 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist c
 \end{theorem}
 
 The two terms of $r_{n,\delta}$ are the squared bandwidth bias of the local constant smoother in Equation~(\ref{eq:supipm-estimators}) and a stochastic error of order $(n\gamma_n)^{-1/2}$ inflated by the entropy of $\mathcal{E}_n$, and the condition $\Gamma_{n,\delta}\le cn\gamma_n$ asks the effective sample size $n\gamma_n$ in a bandwidth window to dominate that entropy.  The supremum over $\mathcal{E}_n$ is what the application needs, since the encoder produced by Algorithm~\ref{alg:supipm-frl} is a function of the sample.  The ReLU discriminator contributes only its $d+1$ parameters to the entropy, so the representation dimension enters $\Gamma_{n,\delta}$ linearly and leaves the order of $r_{n,\delta}$ in $n$ unchanged.
+
+For $B>0$ let $\mathcal{H}^{\beta}_d(B):=\{f\in C^{k}(\mathbb{B}^d):\lVert f\rVert_{\mathcal{H}^{\beta}}\le B\}$ be the H\"older ball of radius $B$ in Equation~(\ref{eq:holder-ball}), and let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and the exponent in Equation~(\ref{eq:relu-holder}), so that $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $\alpha_{d,\beta}=1$ for $\beta>(d+3)/2$.
 
 \begin{corollary}[Fairness certificate]
 \label{cor:certificate}
@@ -482,8 +463,34 @@ The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the se
 
 \appendix
 
-\section{Proofs for Section~\ref{sec:theory}}
+\section{Assumptions and proofs for Section~\ref{sec:theory}}
 \label{app:proofs}
+
+\subsection{Assumptions}
+\label{app:assumptions}
+
+Assumption~\ref{as:positive-density} of Section~\ref{sec:supipm-criterion} is in force throughout, $p(\mathbf{x},s)$ and $\nu$ are the joint density and the dominating measure fixed there, and $\mathcal{S}_n$, $\epsilon_n$ and $\gamma_n$ are as in Section~\ref{sec:theory}.
+
+\begin{assumption}[Smooth joint density]
+\label{as:smooth-density}
+The sample $\mathcal{D}$ consists of independent copies of $(\mathbf{X},S,Y)$.  For $\nu$-almost every $\mathbf{x}$ the map $s\mapsto p(\mathbf{x},s)$ is twice continuously differentiable on $\mathcal{S}$, and there exist $M_1,M_2\in L_1(\nu)$ such that $\sup_{s\in\mathcal{S}}\left|\partial_s^{j}p(\mathbf{x},s)\right|\le M_j(\mathbf{x})$ for $j\in\{1,2\}$.
+\end{assumption}
+
+No smoothness in $\mathbf{x}$ is required; the envelopes serve only to differentiate under the integral sign in $s$, uniformly over bounded measurable $g$.
+
+\begin{assumption}[Kernel and bandwidth]
+\label{as:kernel}
+$K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ for a bounded, symmetric and Lipschitz function $K:\mathbb{R}\to[0,\infty)$ with $\int K=1$ and $\int t^2K(t)\,\mathrm{d}t<\infty$.  With $T_K(r):=\int_{|t|>r}K(t)\,\mathrm{d}t$ the tail mass of $K$, the bandwidth satisfies $\gamma_n\to0$, $0<\gamma_n\le\min\{\epsilon_n,1/2\}$ and $T_K(\epsilon_n/\gamma_n)\le\gamma_n^2$.
+\end{assumption}
+
+The last condition keeps the kernel mass beyond $\mathcal{S}$ of the order of the squared bandwidth at every $s\in\mathcal{S}_n$.  It is vacuous for a kernel supported on $[-1,1]$, and holds for the Gaussian kernel whenever $\epsilon_n\asymp1/\log n$ and $\gamma_n$ decays polynomially.
+
+\begin{assumption}[Encoder class]
+\label{as:encoder}
+$\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1996weak} of measurable encoders $h:\mathcal{X}\to\mathbb{R}^d$ such that, with $\lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2$ and $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ the smallest number of $\lVert\cdot\rVert_\infty$-balls of radius $\eta$ covering a class $\mathcal{F}$, there exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ with $N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)\le(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.
+\end{assumption}
+
+On a bounded $\mathcal{X}$ this holds for ReLU networks of depth $L$ and width $H$ with bounded parameters, with $\mathfrak{v}_n$ of the order of the number of parameters and $\log A_n$ of the order of $L\log H$ \citep{schmidthieber2020nonparametric}.
 
 \subsection{Notation}
 \label{app:notation}
