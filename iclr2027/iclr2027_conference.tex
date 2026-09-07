@@ -15,6 +15,8 @@
 \usepackage{algorithmic}
 
 \newtheorem{assumption}{Assumption}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 \renewcommand{\algorithmiccomment}[1]{\hfill$\triangleright$ #1}
@@ -363,17 +365,112 @@ Algorithm~\ref{alg:supipm-frl} assembles these three updates into $R$ iterations
 Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discrepancy}) are built from sample averages, so the procedure applies unchanged when these averages are computed on the current minibatch.
 
 \section{Theoretical Analysis}
-$[\epsilon_n , 1- \epsilon_n]$에서 증명. 모든 S에 대해서 protect한다는 우리의 주장과 상충되지 않게 하기 위해서 $\epsilon_n \rightarrow 0$을 가정함.
-% DEFERRED FROM SECTION 3.1: the smoothness condition on the joint density.
-% Equation~\ref{eq:pointwise-conditional} does not need it -- Assumptions 1 and 2 suffice to
-% define the conditional expectation pointwise -- but the consistency analysis does.
-% FREM states it as: p(x,s) is twice differentiable in s with a bounded second derivative for
-% every x.  The theory drafts state it as an INTEGRATED bound instead, which is the form the
-% proofs actually use:
-%   iclr2027/theory.tex l.200      : \int \sup_{s\in\mathcal{S}} |\partial_s^j p(x,s)| d\nu(x) < \infty, j=1,2
-%   SupIPM_FRL_Theory.tex l.213-219: s \mapsto p(x,s) twice continuously differentiable, with
-%                                    \int |\partial_s^2 p(x,s)| d\nu(x) \le M_2 < \infty
-% State it here in the form the proofs use, not in FREM's pointwise form.
+\label{sec:theory}
+
+We establish two properties of supIPM with the ReLU discriminator class.  A small population supIPM bounds $\operatorname{GDP}_{\infty}$ of every prediction head of bounded H\"older norm, and the empirical supIPM in Equation~(\ref{eq:empirical-supipm}) converges to the population supIPM uniformly over the encoder class, so that the fairness level attained on the sample transfers to the population.  Proofs are collected in Appendix~\ref{app:proofs}.
+
+\subsection{Trimming and assumptions}
+\label{sec:theory-assumptions}
+
+Write $\mathcal{S}=[a,b]$ and $\tau(\mathbf{z}):=\mathbf{z}/\sqrt{\lVert\mathbf{z}\rVert_2^2+1}\in\mathbb{B}^d$, and for an encoder $h:\mathcal{X}\to\mathbb{R}^d$ let $\widetilde{h}:=\tau\circ h$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$ is the normalized representation of Section~\ref{sec:supipm-criterion}.  Conditional expectations given $S=s$ are the versions in Equation~(\ref{eq:pointwise-conditional}).  The weights $\widehat{w}_{\gamma}(i;s)$ in Equation~(\ref{eq:supipm-estimators}) are those of a local constant smoother.  Within distance $\gamma$ of $a$ or of $b$ such a smoother collects only part of the kernel mass, and its bias there is of first order in $\gamma$ rather than of second order.  We therefore state the finite-sample results on the interior region $\mathcal{S}_n:=[a+\epsilon_n,\,b-\epsilon_n]$, whose trimming width satisfies $0<\epsilon_n<(b-a)/2$ and $\epsilon_n\to0$, and we write
+\begin{align}
+  D_n(h)
+  &:=\sup_{s\in\mathcal{S}_n}\ \sup_{v\in\mathcal{V}_{\mathrm{R}}}
+     \left|\mathbb{E}\!\left[v(\widetilde{h}(\mathbf{X}))\mid S=s\right]
+           -\mathbb{E}\!\left[v(\widetilde{h}(\mathbf{X}))\right]\right|,
+  \label{eq:trimmed-supipm}\\
+  \widehat{D}_n(h)
+  &:=\sup_{s\in\mathcal{S}_n}\ \sup_{v\in\mathcal{V}_{\mathrm{R}}}
+     \left|\sum_{i=1}^n
+       \left(\widehat{w}_{\gamma_n}(i;s)-\frac{1}{n}\right)
+       v(\widetilde{h}(\mathbf{X}_i))\right|,
+  \label{eq:trimmed-empirical-supipm}
+\end{align}
+which are Equations~(\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) evaluated at the encoder $h$, with the supremum over the sensitive domain restricted to $\mathcal{S}_n$ and with the convention $0/0:=0$ in $\widehat{w}_{\gamma_n}(i;s)$.  Since $\epsilon_n\to0$, every $s$ in the interior of $\mathcal{S}$ belongs to $\mathcal{S}_n$ for all large $n$.  Assumption~\ref{as:positive-density} is maintained throughout, and $p(\mathbf{x},s)$ is the joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$ fixed in Section~\ref{sec:supipm-criterion}.
+
+\begin{assumption}[Smooth joint density]
+\label{as:smooth-density}
+The sample $\mathcal{D}$ consists of independent copies of $(\mathbf{X},S,Y)$.  For $\nu$-almost every $\mathbf{x}$ the map $s\mapsto p(\mathbf{x},s)$ is twice continuously differentiable on $\mathcal{S}$, and there exist $M_1,M_2\in L_1(\nu)$ such that $\sup_{s\in\mathcal{S}}\left|\partial_s^{j}p(\mathbf{x},s)\right|\le M_j(\mathbf{x})$ for $j\in\{1,2\}$.
+\end{assumption}
+
+Assumption~\ref{as:smooth-density} is the counterpart of Assumption~3 of \citet{kong2025fair}, with integrable envelopes in place of pointwise bounds.  The envelopes permit differentiation under the integral sign in $s\mapsto\int_{\mathcal{X}}g(\mathbf{x})p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})$ uniformly over bounded $g$, which is the form in which the smoothness is used.  No smoothness in $\mathbf{x}$ is required.
+
+\begin{assumption}[Kernel, bandwidth and trimming width]
+\label{as:kernel}
+$K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ for a bounded, symmetric and Lipschitz function $K:\mathbb{R}\to[0,\infty)$ with $\int K=1$ and $\int t^2K(t)\,\mathrm{d}t<\infty$.  Writing $T_K(r):=\int_{|t|>r}K(t)\,\mathrm{d}t$ for the tail mass of $K$, the bandwidth and the trimming width satisfy $\gamma_n\to0$, $0<\gamma_n\le\min\{\epsilon_n,1/2\}$ and $T_K(\epsilon_n/\gamma_n)\le\gamma_n^2$.
+\end{assumption}
+
+The factor $\gamma^{-1}$ cancels in the weights of Equation~(\ref{eq:supipm-estimators}) and normalizes the kernel for the proofs.  The condition on $T_K$ restricts the kernel mass outside $[s-\epsilon_n,s+\epsilon_n]$ to the order of the squared-bandwidth bias, so that every $s\in\mathcal{S}_n$ behaves as an interior point.  A kernel supported on $[-1,1]$, such as the Epanechnikov or the biweight kernel, satisfies it with $T_K(\epsilon_n/\gamma_n)=0$, and the Gaussian kernel satisfies it for every polynomially decaying bandwidth once $\epsilon_n\asymp1/\log n$.
+
+\begin{assumption}[Encoder class]
+\label{as:encoder}
+$\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1996weak} of measurable encoders $h:\mathcal{X}\to\mathbb{R}^d$ such that, with $\lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2$, there exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ with
+\begin{equation}
+  N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)
+  \le\left(\frac{A_n}{\eta}\right)^{\mathfrak{v}_n},
+  \qquad 0<\eta\le1 .
+  \label{eq:encoder-entropy}
+\end{equation}
+\end{assumption}
+
+The same sup-norm entropy condition enters Theorem~5 of \citet{kong2025fair}.  When $\mathcal{X}$ is bounded, a ReLU network of depth $L$ and width $H$ with bounded parameters satisfies Equation~(\ref{eq:encoder-entropy}) with $\mathfrak{v}_n$ of the order of the number of parameters and $\log A_n$ of the order of $L\log H$ \citep{schmidthieber2020nonparametric}, and both quantities may grow with $n$.  For $0<\delta<1$ we set
+\begin{equation}
+  \Gamma_{n,\delta}
+  :=(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma_n}+\log\frac{1}{\delta},
+  \qquad
+  r_{n,\delta}
+  :=\gamma_n^2+\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma_n}} .
+  \label{eq:rate}
+\end{equation}
+
+\subsection{Worst-case fairness and uniform convergence}
+\label{sec:theory-results}
+
+\begin{theorem}[Fairness of prediction heads]
+\label{thm:transfer}
+Let $d\ge3$ and let $h:\mathcal{X}\to\mathbb{R}^d$ be measurable.  Let $\beta>0$ with $\beta\ne(d+3)/2$, and set $\alpha_{d,\beta}:=2\beta/(d+3)$ if $\beta<(d+3)/2$ and $\alpha_{d,\beta}:=1$ if $\beta>(d+3)/2$.  Write $\mathcal{H}^{\beta}_d(B):=\{f\in C^{k}(\mathbb{B}^d):\lVert f\rVert_{\mathcal{H}^{\beta}}\le B\}$ for the H\"older ball of radius $B>0$ in Equation~(\ref{eq:holder-ball}).  There exists a constant $C_{d,\beta}$, depending only on $d$ and $\beta$, such that for every $B>0$,
+\begin{equation}
+  \sup_{f\in\mathcal{H}^{\beta}_d(B)}
+  \operatorname{GDP}_{\infty}(f\circ\widetilde{h})
+  \le C_{d,\beta}\,B\,
+  \operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}
+  \left(\widetilde{h}(\mathbf{X});S\right)^{\alpha_{d,\beta}} .
+  \label{eq:transfer}
+\end{equation}
+If $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{h}(\mathbf{X});S)=0$, then $\mathbb{P}_{\widetilde{h}(\mathbf{X})\mid S=s}=\mathbb{P}_{\widetilde{h}(\mathbf{X})}$ for every $s\in\mathcal{S}$ and $\operatorname{GDP}_{\infty}(f\circ\widetilde{h})=0$ for every bounded measurable $f$.
+\end{theorem}
+
+Theorem~\ref{thm:transfer} is the worst-case counterpart of Theorems~1 and 2 of \citet{kong2025fair}: the bound holds at each sensitive value separately rather than on average over $S$, and the increasing concave modulus that part~2 of their Theorem~2 assumes is here supplied explicitly by Equation~(\ref{eq:relu-holder}).  For a head smoother than $(d+3)/2$ the exponent $\alpha_{d,\beta}$ equals one, so a supIPM of $\rho$ bounds the worst-case discrepancy by $C_{d,\beta}B\rho$; for a rougher head the bound is $C_{d,\beta}B\rho^{2\beta/(d+3)}$.  Because Equation~(\ref{eq:transfer}) is obtained at each $s$ separately, it remains valid when the two suprema over $s$ are restricted to $\mathcal{S}_n$, with the worst-case discrepancy over $\mathcal{S}_n$ on the left and $D_n(h)$ on the right.
+
+\begin{theorem}[Uniform convergence of the empirical supIPM]
+\label{thm:uniform}
+Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist constants $C,c>0$, depending only on $c_S$, $C_S$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, such that whenever $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$,
+\begin{equation}
+  \sup_{h\in\mathcal{E}_n}
+  \left|\widehat{D}_n(h)-D_n(h)\right|
+  \le C\,r_{n,\delta} .
+  \label{eq:uniform}
+\end{equation}
+On the same event, $\mathcal{E}_n(\rho-Cr_{n,\delta})\subseteq\widehat{\mathcal{E}}_n(\rho)\subseteq\mathcal{E}_n(\rho+Cr_{n,\delta})$ for every fairness level $\rho\ge Cr_{n,\delta}$, where $\mathcal{E}_n(t):=\{h\in\mathcal{E}_n:D_n(h)\le t\}$ and $\widehat{\mathcal{E}}_n(t):=\{h\in\mathcal{E}_n:\widehat{D}_n(h)\le t\}$.
+\end{theorem}
+
+The rate $r_{n,\delta}$ takes the form familiar from kernel smoothing, a squared-bandwidth bias together with a stochastic term of order $(n\gamma_n)^{-1/2}$ inflated by the entropy of the encoder class.  The representation dimension enters only through the $d+1$ parameters of the ReLU discriminator, so the estimate is free of the curse of dimensionality in $\mathcal{Z}$, as \citet{kong2025fair} also observe for EIPM.  For a single fixed encoder, Equation~(\ref{eq:uniform}) is the analogue of their Theorem~4 and the two inclusions are the analogue of their Theorem~5: an encoder that meets the empirical constraint at level $\rho$ meets the population constraint at level $\rho+Cr_{n,\delta}$.
+
+\begin{corollary}[Fairness certificate for the learned encoder]
+\label{cor:certificate}
+Let the assumptions of Theorems~\ref{thm:transfer} and \ref{thm:uniform} hold, and let $\widehat{h}_n\in\mathcal{E}_n$ be an encoder that may depend on $\mathcal{D}$, such as the encoder returned by Algorithm~\ref{alg:supipm-frl}.  On the event of Theorem~\ref{thm:uniform}, simultaneously for every $B>0$ and every $\beta>0$ with $\beta\ne(d+3)/2$,
+\begin{equation}
+  \sup_{f\in\mathcal{H}^{\beta}_d(B)}\ \sup_{s\in\mathcal{S}_n}
+  \left|\mathbb{E}\!\left[f(\tau(\widehat{h}_n(\mathbf{X})))\mid S=s\right]
+        -\mathbb{E}\!\left[f(\tau(\widehat{h}_n(\mathbf{X})))\right]\right|
+  \le C_{d,\beta}\,B
+  \left\{\widehat{D}_n(\widehat{h}_n)+Cr_{n,\delta}\right\}^{\alpha_{d,\beta}} .
+  \label{eq:certificate}
+\end{equation}
+If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
+\end{corollary}
+
+The left-hand side of Equation~(\ref{eq:certificate}) is a population quantity attached to the encoder returned by Algorithm~\ref{alg:supipm-frl}, and one evaluation of the empirical supIPM bounds it for every H\"older prediction head and every sensitive value in $\mathcal{S}_n$.  Trimming affects the rate rather than the consistency: when the two suprema run over all of $\mathcal{S}$, as in Equations~(\ref{eq:supipm}) and (\ref{eq:empirical-supipm}), the partial kernel mass near $a$ and $b$ raises the bias there from $\gamma_n^2$ to $\gamma_n$, so that balancing the two terms of $r_{n,\delta}$ at $\gamma_n\asymp(\log n/n)^{1/3}$ gives uniform consistency over the entire sensitive domain at the rate $O\{(\log n/n)^{1/3}\}$ (Appendix~\ref{app:untrimmed}).
 
 
 \section{Experiments}
@@ -397,6 +494,244 @@ $[\epsilon_n , 1- \epsilon_n]$에서 증명. 모든 S에 대해서 protect한다
 
 \bibliographystyle{iclr2027_conference}
 \bibliography{bibliography}
+
+\appendix
+
+\section{Proofs for Section~\ref{sec:theory}}
+\label{app:proofs}
+
+Throughout the appendix $\mathbb{E}$ denotes expectation under the distribution of $(\mathbf{X},S)$ and $\mathbb{E}_n$ the average over the sample, $\mathbb{E}_n\varphi:=n^{-1}\sum_{i=1}^n\varphi(\mathbf{X}_i,S_i)$.  We abbreviate $\gamma:=\gamma_n$ and write $C$ for a constant that depends only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, whose value may change between occurrences.  The constant may also depend on the length of $\mathcal{S}$, which this list already controls: $p_S$ integrates to one and is bounded below by $c_S$, so $b-a\le1/c_S$.  The class of scores induced by the encoder class and the ReLU discriminators is
+\begin{equation}
+  \mathcal{G}_n:=\left\{\mathbf{x}\mapsto v(\widetilde{h}(\mathbf{x})):
+    h\in\mathcal{E}_n,\ v\in\mathcal{V}_{\mathrm{R}}\right\},
+  \label{eq:score-class}
+\end{equation}
+and $0\le g\le2$ for every $g\in\mathcal{G}_n$, because $|\theta^\top\mathbf{z}+\mu|\le2$ whenever $\mathbf{z}\in\mathbb{B}^d$, $\theta\in\mathbb{S}^{d-1}$ and $\mu\in[-1,1]$.  For $g\in\mathcal{G}_n$ and $s\in\mathcal{S}$ put
+\begin{align*}
+  a_g(s)&:=\int_{\mathcal{X}}g(\mathbf{x})p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
+  & m_g(s)&:=\frac{a_g(s)}{p_S(s)}=\mathbb{E}[g(\mathbf{X})\mid S=s],\\
+  b_{g,\gamma}(s)&:=\mathbb{E}\{K_{\gamma}(S,s)g(\mathbf{X})\},
+  & q_{\gamma}(s)&:=\mathbb{E}K_{\gamma}(S,s),\\
+  m_{g,\gamma}(s)&:=\frac{b_{g,\gamma}(s)}{q_{\gamma}(s)},
+  & \widehat{m}_{g,\gamma}(s)
+  &:=\frac{\mathbb{E}_n\{K_{\gamma}(S,s)g(\mathbf{X})\}}{\mathbb{E}_nK_{\gamma}(S,s)}
+   =\sum_{i=1}^n\widehat{w}_{\gamma}(i;s)g(\mathbf{X}_i),
+\end{align*}
+where $m_g$ is the version of the conditional expectation fixed in Equation~(\ref{eq:pointwise-conditional}).  With $g=v\circ\widetilde{h}$ and the suprema taken over $v\in\mathcal{V}_{\mathrm{R}}$ and $s\in\mathcal{S}_n$, Equations~(\ref{eq:trimmed-supipm}) and (\ref{eq:trimmed-empirical-supipm}) read
+\begin{equation}
+  D_n(h)=\sup_{g,s}\left|m_g(s)-\mathbb{E}g\right|,
+  \qquad
+  \widehat{D}_n(h)=\sup_{g,s}\left|\widehat{m}_{g,\gamma}(s)-\mathbb{E}_ng\right| ,
+  \label{eq:D-in-scores}
+\end{equation}
+and both are at most $2$.  We use Bernstein's inequality in the following form \citep[e.g.,][]{boucheron2013concentration}: if $W_1,\ldots,W_n$ are independent copies of a random variable $W$ with $0\le W\le M$ and $\operatorname{Var}(W)\le\sigma^2$, then
+\begin{equation}
+  \mathbb{P}\left(\left|\frac{1}{n}\sum_{i=1}^nW_i-\mathbb{E}W\right|\ge u\right)
+  \le2\exp\left(-\frac{nu^2}{2\sigma^2+2Mu/3}\right),
+  \qquad u>0 .
+  \label{eq:bernstein}
+\end{equation}
+
+\subsection{Proof of Theorem~\ref{thm:transfer}}
+\label{app:proof-transfer}
+
+\begin{proof}
+Fix $s\in\mathcal{S}$ and write $\mathbb{P}_s:=\mathbb{P}_{\widetilde{h}(\mathbf{X})\mid S=s}$ and $\mathbb{P}_0:=\mathbb{P}_{\widetilde{h}(\mathbf{X})}$, both probability measures on $\mathbb{B}^d$.  Let $f\in\mathcal{H}^{\beta}_d(B)$, so that $f/B\in\mathcal{H}^{\beta}_d$.  Equation~(\ref{eq:relu-holder}) \citep[Theorem~2]{park2025relu} gives
+\[
+  \left|\int f\,\mathrm{d}\mathbb{P}_s-\int f\,\mathrm{d}\mathbb{P}_0\right|
+  \le B\operatorname{IPM}_{\mathcal{H}^{\beta}_d}(\mathbb{P}_s,\mathbb{P}_0)
+  \le C_{d,\beta}B\,
+     \operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)^{\alpha_{d,\beta}} .
+\]
+By Equation~(\ref{eq:supipm}) we have $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{h}(\mathbf{X});S)$, and $t\mapsto t^{\alpha_{d,\beta}}$ is increasing on $[0,\infty)$, so the right-hand side is at most $C_{d,\beta}B\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{h}(\mathbf{X});S)^{\alpha_{d,\beta}}$.  This bound does not depend on $s$, so taking the supremum over $s\in\mathcal{S}$ and then over $f$ proves Equation~(\ref{eq:transfer}); taking the supremum over $s$ in a subset of $\mathcal{S}$ instead proves the restricted statement.  Finally, ReLU-IPM separates probability distributions on $\mathbb{B}^d$ \citep[Proposition~1]{park2025relu}, so $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{h}(\mathbf{X});S)=0$ forces $\mathbb{P}_s=\mathbb{P}_0$ for every $s\in\mathcal{S}$, and then $\int f\,\mathrm{d}\mathbb{P}_s=\int f\,\mathrm{d}\mathbb{P}_0$ for every bounded measurable $f$.
+\end{proof}
+
+\subsection{Proof of Theorem~\ref{thm:uniform}}
+\label{app:proof-uniform}
+
+Both $\widehat{D}_n(h)$ and $D_n(h)$ lie in $[0,2]$, so Equation~(\ref{eq:uniform}) is trivial for $C\ge2$ once $r_{n,\delta}\ge1$.  We may therefore assume $r_{n,\delta}<1$.  Since $\Gamma_{n,\delta}\ge1$ and $\gamma\le1$, the condition $\Gamma_{n,\delta}\le cn\gamma$ also gives $\gamma\ge1/(cn)$.
+
+\paragraph{Step 1: entropy of the score class.}
+The map $\tau$ is $1$-Lipschitz on $\mathbb{R}^d$: its Jacobian at $\mathbf{z}$ is $u^{-1}(I_d-\mathbf{z}\mathbf{z}^\top/u^2)$ with $u:=(1+\lVert\mathbf{z}\rVert_2^2)^{1/2}$, a symmetric matrix whose eigenvalues are $u^{-1}$, with multiplicity $d-1$, and $u^{-3}$, all of them in $(0,1]$.  For $\mathbf{z},\mathbf{z}'\in\mathbb{B}^d$, $\theta,\theta'\in\mathbb{S}^{d-1}$ and $\mu,\mu'\in[-1,1]$, the map $t\mapsto(t)_+$ is $1$-Lipschitz, so
+\[
+  \left|v_{\theta,\mu}(\mathbf{z})-v_{\theta',\mu'}(\mathbf{z}')\right|
+  \le\left|\theta^\top(\mathbf{z}-\mathbf{z}')\right|
+    +\left|(\theta-\theta')^\top\mathbf{z}'\right|+|\mu-\mu'|
+  \le\lVert\mathbf{z}-\mathbf{z}'\rVert_2+\lVert\theta-\theta'\rVert_2+|\mu-\mu'| .
+\]
+Hence $\lVert v_{\theta,\mu}\circ\widetilde{h}-v_{\theta',\mu'}\circ\widetilde{h}'\rVert_\infty\le\lVert h-h'\rVert_\infty+\lVert\theta-\theta'\rVert_2+|\mu-\mu'|$.  Covering $\mathcal{E}_n$ at scale $\eta$ by Assumption~\ref{as:encoder}, covering $\mathbb{S}^{d-1}$ and $[-1,1]$ at scale $\eta/2$, and using $A_n\ge e$ and $\mathfrak{v}_n\ge1$, we obtain an absolute constant $C_0\ge e$ with
+\begin{equation}
+  N(2\eta,\mathcal{G}_n,\lVert\cdot\rVert_\infty)
+  \le\left(\frac{A_n}{\eta}\right)^{\mathfrak{v}_n}
+     \left(\frac{C_0}{\eta}\right)^{d+1}
+  \le\left(\frac{A_n\vee C_0}{\eta}\right)^{2(\mathfrak{v}_n+d)},
+  \qquad 0<\eta\le1 .
+  \label{eq:score-entropy}
+\end{equation}
+Since $\mathcal{G}_n$ has sup-norm diameter at most $2$, a single centre suffices at any scale larger than $2$.
+
+\paragraph{Step 2: uniform second-order bias.}
+Let $s\in\mathcal{S}_n$ and put $r_n:=\epsilon_n/\gamma\ge1$ and $I_n:=[-r_n,r_n]$, so that $s+\gamma t\in\mathcal{S}$ for every $t\in I_n$.  Extend $p(\mathbf{x},\cdot)$ and $p_S$ by zero outside $\mathcal{S}$.  The substitution $s'=s+\gamma t$ gives
+\begin{equation}
+  b_{g,\gamma}(s)=\int_{\mathbb{R}}K(t)\,a_g(s+\gamma t)\,\mathrm{d}t,
+  \qquad
+  q_{\gamma}(s)=\int_{\mathbb{R}}K(t)\,p_S(s+\gamma t)\,\mathrm{d}t .
+  \label{eq:change-of-variable}
+\end{equation}
+Since $0\le g\le2$ we have $0\le a_g\le2p_S\le2C_S$ on $\mathcal{S}$, so the contribution of $t\notin I_n$ to the first integral of Equation~(\ref{eq:change-of-variable}) is at most $2C_ST_K(r_n)\le2C_S\gamma^2$ by Assumption~\ref{as:kernel}; the corresponding contribution to $q_{\gamma}(s)$ is at most $C_S\gamma^2$.  Moreover
+\[
+  q_{\gamma}(s)\ge\int_{I_n}K(t)p_S(s+\gamma t)\,\mathrm{d}t
+  \ge c_S\{1-T_K(r_n)\}\ge c_S(1-\gamma^2)\ge\tfrac{3}{4}c_S,
+\]
+because $\gamma\le1/2$, and $q_{\gamma}(s)\le C_S\int K=C_S$.  Under Assumption~\ref{as:smooth-density} the envelopes $M_1$ and $M_2$ permit differentiation under the integral sign, so $a_g$ and $p_S$ are twice continuously differentiable on $\mathcal{S}$ with
+\begin{equation}
+  \sup_{g\in\mathcal{G}_n}\lVert a_g''\rVert_\infty\le2\lVert M_2\rVert_{L_1(\nu)},
+  \qquad
+  \lVert p_S''\rVert_\infty\le\lVert M_2\rVert_{L_1(\nu)} .
+  \label{eq:second-derivative}
+\end{equation}
+Taylor's theorem with the Lagrange remainder gives $|a_g(s+\gamma t)-a_g(s)-\gamma t\,a_g'(s)|\le\gamma^2t^2\lVert a_g''\rVert_\infty/2$ for every $t\in I_n$, while $\int_{I_n}K(t)\,\mathrm{d}t=1-T_K(r_n)$ and $\int_{I_n}tK(t)\,\mathrm{d}t=0$ because $K$ and $I_n$ are symmetric about the origin.  Hence
+\[
+  \left|\int_{I_n}K(t)\,a_g(s+\gamma t)\,\mathrm{d}t-a_g(s)\right|
+  \le a_g(s)\,T_K(r_n)
+    +\frac{\gamma^2}{2}\lVert a_g''\rVert_\infty\int_{\mathbb{R}}t^2K(t)\,\mathrm{d}t .
+\]
+Combining this with the tail bound above and with Equation~(\ref{eq:second-derivative}), and repeating the argument for $p_S$, we obtain, uniformly over $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$,
+\begin{equation}
+  \left|b_{g,\gamma}(s)-a_g(s)\right|\le C\gamma^2,
+  \qquad
+  \left|q_{\gamma}(s)-p_S(s)\right|\le C\gamma^2 .
+  \label{eq:bias}
+\end{equation}
+Writing $m_{g,\gamma}-m_g=(b_{g,\gamma}-a_g)/q_{\gamma}+m_g(p_S-q_{\gamma})/q_{\gamma}$ and using $0\le m_g\le2$ together with $q_{\gamma}\ge3c_S/4$,
+\begin{equation}
+  \sup_{g\in\mathcal{G}_n}\ \sup_{s\in\mathcal{S}_n}
+  \left|m_{g,\gamma}(s)-m_g(s)\right|\le C\gamma^2 .
+  \label{eq:ratio-bias}
+\end{equation}
+
+\paragraph{Step 3: uniform stochastic error.}
+Fix $u$ with $n^{-1}\le u\le1$.  Let $g_1,\ldots,g_{N_1}$ be the centres of a $\zeta_g$-cover of $\mathcal{G}_n$ in $\lVert\cdot\rVert_\infty$ and let $s_1,\ldots,s_{N_2}$ be the centres of a $\zeta_s$-cover of $\mathcal{S}_n$ in $|\cdot|$, where
+\[
+  \zeta_g:=\frac{\gamma u}{8\lVert K\rVert_\infty},
+  \qquad
+  \zeta_s:=\frac{\gamma^2u}{16L_K}
+\]
+and $L_K$ is the Lipschitz constant of $K$.  Given $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$, choose $k$ and $j$ with $\lVert g-g_k\rVert_\infty\le\zeta_g$ and $|s-s_j|\le\zeta_s$.  From $|K_{\gamma}(s',s)-K_{\gamma}(s',s_j)|\le L_K\gamma^{-2}|s-s_j|$, from $K_{\gamma}\le\lVert K\rVert_\infty/\gamma$ and from $0\le g_k\le2$,
+\[
+  \sup_{\mathbf{x}\in\mathcal{X},\,s'\in\mathcal{S}}
+  \left|K_{\gamma}(s',s)g(\mathbf{x})-K_{\gamma}(s',s_j)g_k(\mathbf{x})\right|
+  \le\frac{\lVert K\rVert_\infty}{\gamma}\zeta_g+\frac{2L_K}{\gamma^2}\zeta_s
+  \le\frac{u}{4},
+\]
+whence $\left|(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\}\right|\le\left|(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s_j)g_k(\mathbf{X})\}\right|+u/2$.  The variable $W:=K_{\gamma}(S,s_j)g_k(\mathbf{X})$ obeys $0\le W\le2\lVert K\rVert_\infty/\gamma=:M$ and, by $q_{\gamma}\le C_S$,
+\[
+  \operatorname{Var}(W)\le\mathbb{E}W^2
+  \le\frac{4\lVert K\rVert_\infty}{\gamma}\,\mathbb{E}K_{\gamma}(S,s_j)
+  \le\frac{4\lVert K\rVert_\infty C_S}{\gamma}=:\sigma^2 .
+\]
+Applying Equation~(\ref{eq:bernstein}) at $u/2$ to each of the $N_1N_2$ pairs and taking a union bound,
+\begin{equation}
+  \mathbb{P}\left(
+    \sup_{g\in\mathcal{G}_n,\,s\in\mathcal{S}_n}
+    \left|(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\}\right|>u
+  \right)
+  \le2N_1N_2\exp\left(-\frac{nu^2}{8\sigma^2+4Mu/3}\right).
+  \label{eq:union}
+\end{equation}
+By Equation~(\ref{eq:score-entropy}) at $\eta=\zeta_g/2$, by $N_2\le1+(b-a)/(2\zeta_s)$, and by $u\ge n^{-1}$, $\gamma\ge1/(cn)$ and $A_n\ge e$,
+\begin{equation}
+  \log(N_1N_2)
+  \le C\left\{(\mathfrak{v}_n+d)\log\frac{A_n}{\gamma u}
+    +\log\frac{1}{\gamma^2u}\right\}
+  \le C(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma} .
+  \label{eq:log-cover}
+\end{equation}
+Since $\sigma^2$ and $M$ are of order $\gamma^{-1}$ and $u\le1$, the right-hand side of Equation~(\ref{eq:union}) is at most $\delta/3$ as soon as
+\[
+  u\ \ge\ C\left\{\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}
+    +\frac{\Gamma_{n,\delta}}{n\gamma}\right\},
+\]
+and here the second term is dominated by the first because $\Gamma_{n,\delta}\le cn\gamma$.  Taking $u$ equal to the resulting multiple of $\sqrt{\Gamma_{n,\delta}/(n\gamma)}$, which lies in $[n^{-1},1]$ because $\Gamma_{n,\delta}\ge1$, $\gamma\le1$ and $r_{n,\delta}<1$, we obtain with probability at least $1-\delta/3$
+\begin{equation}
+  \sup_{g\in\mathcal{G}_n,\,s\in\mathcal{S}_n}
+  \left|(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\}\right|
+  \le C\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}} .
+  \label{eq:num-stoch}
+\end{equation}
+The same argument applied to the class $\{s'\mapsto K_{\gamma}(s',s):s\in\mathcal{S}_n\}$, for which only the cover of $\mathcal{S}_n$ is needed, and to the class $\mathcal{G}_n$, whose members satisfy $M=2$ and $\operatorname{Var}\le4$ and which is covered at scale $u/4$, gives on an event of probability at least $1-\delta$ containing the event of Equation~(\ref{eq:num-stoch}),
+\begin{equation}
+  \sup_{s\in\mathcal{S}_n}\left|(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s)\right|
+  \le C\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}},
+  \qquad
+  \sup_{g\in\mathcal{G}_n}\left|(\mathbb{E}_n-\mathbb{E})g\right|
+  \le C\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}},
+  \label{eq:den-marg-stoch}
+\end{equation}
+the second bound using $\gamma\le1$.  Choosing $c$ small enough that the constant in Equation~(\ref{eq:den-marg-stoch}) satisfies $C\sqrt{c}\le c_S/4$, the lower bound $q_{\gamma}\ge3c_S/4$ of Step~2 gives, on the same event,
+\begin{equation}
+  \inf_{s\in\mathcal{S}_n}\mathbb{E}_nK_{\gamma}(S,s)\ \ge\ \frac{c_S}{2}>0,
+  \label{eq:den-lower}
+\end{equation}
+so that the convention $0/0:=0$ in Equation~(\ref{eq:trimmed-empirical-supipm}) is never invoked.  Writing $A_{g,s}:=(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\}$ and $B_s:=(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s)$, the identity
+\[
+  \widehat{m}_{g,\gamma}(s)-m_{g,\gamma}(s)
+  =\frac{A_{g,s}-m_{g,\gamma}(s)B_s}{\mathbb{E}_nK_{\gamma}(S,s)},
+  \qquad 0\le m_{g,\gamma}(s)\le2,
+\]
+combined with Equations~(\ref{eq:num-stoch})--(\ref{eq:den-lower}) and with the bias bound in Equation~(\ref{eq:ratio-bias}), yields
+\begin{equation}
+  \sup_{g\in\mathcal{G}_n,\,s\in\mathcal{S}_n}
+  \left|\widehat{m}_{g,\gamma}(s)-m_g(s)\right|
+  \le C\left\{\gamma^2+\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}\right\}
+  =C\,r_{n,\delta} .
+  \label{eq:cond-mean-uniform}
+\end{equation}
+
+\paragraph{Step 4: conclusion.}
+For real-valued functions $F$ and $G$ on a common index set, $\left|\sup_t|F(t)|-\sup_t|G(t)|\right|\le\sup_t|F(t)-G(t)|$.  Applied to Equation~(\ref{eq:D-in-scores}), this gives, for every $h\in\mathcal{E}_n$,
+\[
+  \left|\widehat{D}_n(h)-D_n(h)\right|
+  \le\sup_{g,s}\left|\widehat{m}_{g,\gamma}(s)-m_g(s)\right|
+    +\sup_{g}\left|(\mathbb{E}_n-\mathbb{E})g\right|
+  \le C\,r_{n,\delta}
+\]
+by Equations~(\ref{eq:cond-mean-uniform}) and (\ref{eq:den-marg-stoch}).  The right-hand side does not depend on $h$, which proves Equation~(\ref{eq:uniform}).  If $h\in\mathcal{E}_n(\rho-Cr_{n,\delta})$, then $\widehat{D}_n(h)\le D_n(h)+Cr_{n,\delta}\le\rho$ on this event, and if $\widehat{D}_n(h)\le\rho$, then $D_n(h)\le\rho+Cr_{n,\delta}$.  These are the two inclusions stated in Theorem~\ref{thm:uniform}.
+\qed
+
+\subsection{Proof of Corollary~\ref{cor:certificate}}
+\label{app:proof-certificate}
+
+\begin{proof}
+Equation~(\ref{eq:uniform}) holds uniformly over $\mathcal{E}_n$, so it applies to $\widehat{h}_n$ even though $\widehat{h}_n$ depends on $\mathcal{D}$, and on the event of Theorem~\ref{thm:uniform} we have $D_n(\widehat{h}_n)\le\widehat{D}_n(\widehat{h}_n)+Cr_{n,\delta}$.  By the restricted form of Theorem~\ref{thm:transfer}, the left-hand side of Equation~(\ref{eq:certificate}) is at most $C_{d,\beta}BD_n(\widehat{h}_n)^{\alpha_{d,\beta}}$, and $t\mapsto t^{\alpha_{d,\beta}}$ is increasing, so Equation~(\ref{eq:certificate}) follows.  The event of Theorem~\ref{thm:uniform} depends on neither $\beta$ nor $B$, so the bound holds simultaneously for all of them.
+
+For the rate, bounded $A_n$ and $\mathfrak{v}_n$ together with $\delta_n=n^{-c_1}$ give $\Gamma_{n,\delta_n}\asymp\log n$, and with $\gamma_n\asymp(\log n/n)^{1/5}$ both terms of $r_{n,\delta_n}$ are of order $(\log n/n)^{2/5}$.  The requirement $\Gamma_{n,\delta_n}\le cn\gamma_n$ reads $\log n=O\{n^{4/5}(\log n)^{1/5}\}$ and the requirement $\gamma_n\le\epsilon_n$ reads $(\log n/n)^{1/5}=O(1/\log n)$, and both hold for all large $n$.
+\end{proof}
+
+\subsection{Estimation without trimming}
+\label{app:untrimmed}
+
+Let the suprema in Equations~(\ref{eq:trimmed-supipm}) and (\ref{eq:trimmed-empirical-supipm}) run over all of $\mathcal{S}$, so that they reduce to Equations~(\ref{eq:supipm}) and (\ref{eq:empirical-supipm}).  Assumptions~\ref{as:positive-density}, \ref{as:smooth-density} and \ref{as:encoder} remain in force, and Assumption~\ref{as:kernel} is retained with its two trimming conditions $\gamma_n\le\epsilon_n$ and $T_K(\epsilon_n/\gamma_n)\le\gamma_n^2$ omitted, so that the bandwidth satisfies $\gamma_n\to0$ and $0<\gamma_n\le1/2$ alone.  Only Step~2 of Appendix~\ref{app:proof-uniform} changes; Steps~1, 3 and 4 use Assumption~\ref{as:kernel} only through the regularity of $K$ and through $\gamma\le1$.  Fix $s\in\mathcal{S}$, put $T_s:=\{t\in\mathbb{R}:s+\gamma t\in\mathcal{S}\}$ and $\kappa(s):=\int_{T_s}K(t)\,\mathrm{d}t$.  The interval $T_s$ contains $[0,(b-a)/(2\gamma)]$ or $[-(b-a)/(2\gamma),0]$, because $s$ is at distance at least $(b-a)/2$ from one of the two endpoints of $\mathcal{S}$, so the symmetry of $K$ gives
+\[
+  \kappa(s)\ \ge\ \tfrac{1}{2}-T_K\!\left(\tfrac{b-a}{2\gamma}\right)\ \ge\ \tfrac{1}{4}
+\]
+for every $n$ large enough that $T_K\{(b-a)/(2\gamma_n)\}\le1/4$, and as soon as $\gamma_n\le(b-a)/2$ when $K$ is supported on $[-1,1]$.  A first-order Taylor expansion on $T_s$, together with $\lVert a_g'\rVert_\infty\le2\lVert M_1\rVert_{L_1(\nu)}$ and $\lVert p_S'\rVert_\infty\le\lVert M_1\rVert_{L_1(\nu)}$, gives
+\[
+  b_{g,\gamma}(s)=\kappa(s)a_g(s)+R_b,
+  \qquad
+  q_{\gamma}(s)=\kappa(s)p_S(s)+R_q,
+\]
+with $|R_b|\vee|R_q|\le2\lVert M_1\rVert_{L_1(\nu)}\,\gamma\int|t|K(t)\,\mathrm{d}t$,
+where $\int|t|K(t)\,\mathrm{d}t<\infty$ by the Cauchy--Schwarz inequality and Assumption~\ref{as:kernel}.  Since $q_{\gamma}(s)\ge c_S\kappa(s)\ge c_S/4$ and $a_g(s)/p_S(s)\le2$,
+\[
+  \left|m_{g,\gamma}(s)-m_g(s)\right|
+  =\frac{\left|R_bp_S(s)-a_g(s)R_q\right|}{p_S(s)q_{\gamma}(s)}
+  \le\frac{|R_b|+2|R_q|}{q_{\gamma}(s)}
+  \le\frac{4(|R_b|+2|R_q|)}{c_S}
+  \le C\gamma,
+\]
+uniformly over $g\in\mathcal{G}_n$ and $s\in\mathcal{S}$.  Steps~1, 3 and 4 of Appendix~\ref{app:proof-uniform} go through with $\mathcal{S}_n$ replaced by $\mathcal{S}$, with $c$ re-chosen so that $C\sqrt{c}\le c_S/8$, and with $c_S/2$ replaced by $c_S/8$ in Equation~(\ref{eq:den-lower}).  The untrimmed estimator therefore satisfies Equation~(\ref{eq:uniform}) with $\gamma_n^2$ replaced by $\gamma_n$ in $r_{n,\delta}$.  If $A_n$ and $\mathfrak{v}_n$ are bounded and $\delta_n=n^{-c_1}$ for some $c_1>0$, balancing the two terms at $\gamma_n\asymp(\log n/n)^{1/3}$ gives the rate $O\{(\log n/n)^{1/3}\}$.
+\qed
 
 \end{document}
 
