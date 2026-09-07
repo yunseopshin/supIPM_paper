@@ -368,9 +368,9 @@ Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discr
 \section{Theoretical Analysis}
 \label{sec:theory}
 
-A small supIPM constrains every prediction head of bounded H\"older norm (Theorem~\ref{thm:transfer}), and the empirical supIPM estimates its population counterpart uniformly over a class of encoders (Theorem~\ref{thm:uniform}); Corollary~\ref{cor:certificate} combines the two.  The proofs are given in Appendix~\ref{app:proofs}.
+The empirical supIPM estimates its population counterpart uniformly over a class of encoders (Theorem~\ref{thm:uniform}), and Corollary~\ref{cor:certificate} turns that estimate into a bound on the worst-case discrepancy of every prediction head of bounded H\"older norm.  The proofs are given in Appendix~\ref{app:proofs}.
 
-Write $\mathcal{S}=[a,b]$, let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$ map $\mathbb{R}^d$ into $\mathbb{B}^d$, and put $\widetilde{h}:=\tau\circ h$ for an encoder $h:\mathcal{X}\to\mathbb{R}^d$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$.  The weights $\widehat{w}_{\gamma}(i;s)$ in Equation~(\ref{eq:supipm-estimators}) are those of a local constant smoother, whose bias at $s$ is of order $\gamma^2$ when $[s-\gamma,s+\gamma]\subseteq\mathcal{S}$ and of order $\gamma$ when the window is truncated by an endpoint.  The finite-sample results are therefore stated on an interior region $\mathcal{S}_n$ that exhausts the interior of $\mathcal{S}$:
+Write $\mathcal{S}=[a,b]$, let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$ map $\mathbb{R}^d$ into $\mathbb{B}^d$, and put $\widetilde{h}:=\tau\circ h$ for an encoder $h:\mathcal{X}\to\mathbb{R}^d$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$.  The finite-sample results are stated on an interior region $\mathcal{S}_n$, which holds $s$ away from the endpoints of $\mathcal{S}$ by a margin that vanishes with $n$:
 \begin{equation}
 \begin{aligned}
   \mathcal{S}_n
@@ -427,23 +427,6 @@ On a bounded $\mathcal{X}$ this holds for the ReLU networks of depth $L$ and wid
   \label{eq:rate}
 \end{equation}
 
-\begin{theorem}[Fairness of prediction heads]
-\label{thm:transfer}
-Let $d\ge3$, let $h:\mathcal{X}\to\mathbb{R}^d$ be measurable, and let $\beta>0$ with $\beta\ne(d+3)/2$.  There exists a constant $C_{d,\beta}$, depending only on $d$ and $\beta$, such that
-\begin{equation}
-  \sup_{f\in\mathcal{H}^{\beta}_d(B)}
-  \operatorname{GDP}_{\infty}(f\circ\widetilde{h})
-  \ \le\ C_{d,\beta}\,B\,
-  \operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}
-  \left(\widetilde{h}(\mathbf{X});S\right)^{\alpha_{d,\beta}}
-  \qquad\text{for every }B>0 ,
-  \label{eq:transfer}
-\end{equation}
-and the same inequality holds with $\operatorname{GDP}_{\infty}$ and $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}$ replaced by $\operatorname{GDP}_{\infty,n}$ and $D_n(h)$.  In particular, $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{h}(\mathbf{X});S)=0$ implies $\operatorname{GDP}_{\infty}(f\circ\widetilde{h})=0$ for every bounded measurable $f:\mathbb{B}^d\to\mathbb{R}$.
-\end{theorem}
-
-The right-hand side of Equation~(\ref{eq:transfer}) depends on neither the sensitive value nor the prediction head, so a bound on the supIPM leaves no sensitive value exempt and no prediction head of the given smoothness unconstrained.  The exponent $\alpha_{d,\beta}$ is the price of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself; it equals one above the smoothness $(d+3)/2$ and stays positive below it, so the worst-case discrepancy vanishes with the supIPM at every smoothness level.
-
 \begin{theorem}[Uniform convergence of the empirical supIPM]
 \label{thm:uniform}
 Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist constants $C,c>0$, depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, such that for every $\delta\in(0,1)$ and every $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$,
@@ -459,7 +442,7 @@ The two terms of $r_{n,\delta}$ are the squared bandwidth bias of the smoother a
 
 \begin{corollary}[Fairness certificate]
 \label{cor:certificate}
-Let the assumptions of Theorems~\ref{thm:transfer} and \ref{thm:uniform} hold and let $C$ and $c$ be the constants of Theorem~\ref{thm:uniform}.  For every $\delta\in(0,1)$ and every $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$, simultaneously for every $h\in\mathcal{E}_n$, every $B>0$ and every $\beta>0$ with $\beta\ne(d+3)/2$,
+Let the assumptions of Theorem~\ref{thm:uniform} hold, let $d\ge3$, and let $C$ and $c$ be the constants of Theorem~\ref{thm:uniform}.  For every $\delta\in(0,1)$ and every $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$, simultaneously for every $h\in\mathcal{E}_n$, every $B>0$ and every $\beta>0$ with $\beta\ne(d+3)/2$,
 \begin{equation}
   \sup_{f\in\mathcal{H}^{\beta}_d(B)}
   \operatorname{GDP}_{\infty,n}(f\circ\widetilde{h})
@@ -470,7 +453,7 @@ Let the assumptions of Theorems~\ref{thm:transfer} and \ref{thm:uniform} hold an
 If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
 \end{corollary}
 
-The event on which Equation~(\ref{eq:certificate}) holds does not depend on the encoder, so the bound applies to one chosen from $\mathcal{E}_n$ after the sample has been seen: a single evaluation of $\widehat{D}_n$ certifies every H\"older prediction head at every sensitive value in $\mathcal{S}_n$.
+The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, so a single evaluation of $\widehat{D}_n$ certifies every H\"older prediction head at every sensitive value in $\mathcal{S}_n$.  The exponent $\alpha_{d,\beta}$ is the price of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself; it equals one above the smoothness $(d+3)/2$ and stays positive below it.  The event does not depend on the encoder, so the bound applies to one chosen from $\mathcal{E}_n$ after the sample has been seen.
 
 
 \section{Experiments}
@@ -812,34 +795,6 @@ for a constant $C_0$ depending only on $c_S$ and $K$.  Since $\Gamma_{n,\delta}\
 by Lemma~\ref{lem:bias} and Equation~(\ref{eq:lambda-range}), provided $c$ is small enough that $C_\ast\sqrt{c}\le c_S/4$.
 \end{proof}
 
-\subsection{Proof of Theorem~\ref{thm:transfer}}
-\label{app:proof-transfer}
-
-\begin{proof}
-Fix $s\in\mathcal{S}$ and write $\mathbb{P}_s:=\mathbb{P}_{\widetilde{h}(\mathbf{X})\mid S=s}$ and $\mathbb{P}_0:=\mathbb{P}_{\widetilde{h}(\mathbf{X})}$, two probability measures on $\mathbb{B}^d$ because $\tau$ takes values in $\mathbb{B}^d$.  Let $B>0$ and $f\in\mathcal{H}^{\beta}_d(B)$, so that $f/B\in\mathcal{H}^{\beta}_d$ and hence
-\[
-  \left|\int f\,\mathrm{d}\mathbb{P}_s-\int f\,\mathrm{d}\mathbb{P}_0\right|
-  \le B\operatorname{IPM}_{\mathcal{H}^{\beta}_d}(\mathbb{P}_s,\mathbb{P}_0) .
-\]
-Since $d\ge3$ and $\beta\ne(d+3)/2$, Equation~(\ref{eq:relu-holder}) \citep[Theorem~2]{park2025relu} bounds the right-hand side by $C_{d,\beta}B\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)^{\alpha_{d,\beta}}$.  By the definition of the supIPM in Equation~(\ref{eq:supipm}),
-\[
-  \operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)
-  \le\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{h}(\mathbf{X});S),
-\]
-and $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$, so
-\begin{equation}
-  \left|\mathbb{E}\!\left[f(\widetilde{h}(\mathbf{X}))\mid S=s\right]
-        -\mathbb{E}\!\left[f(\widetilde{h}(\mathbf{X}))\right]\right|
-  \le C_{d,\beta}B
-     \operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}
-     (\widetilde{h}(\mathbf{X});S)^{\alpha_{d,\beta}} .
-  \label{eq:pointwise-transfer}
-\end{equation}
-The right-hand side of Equation~(\ref{eq:pointwise-transfer}) depends on neither $s$ nor $f$.  Taking the supremum over $s\in\mathcal{S}$, which by Equation~(\ref{eq:linfty-gdp}) produces $\operatorname{GDP}_{\infty}(f\circ\widetilde{h})$, and then the supremum over $f\in\mathcal{H}^{\beta}_d(B)$, proves Equation~(\ref{eq:transfer}).  Taking instead the supremum over $s$ in a subset of $\mathcal{S}$ proves the corresponding restricted inequality; for the subset $\mathcal{S}_n$ the right-hand side may be replaced by $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, since Equation~(\ref{eq:pointwise-transfer}) holds with $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le D_n(h)$ for $s\in\mathcal{S}_n$.
-
-For the last assertion, ReLU-IPM separates probability distributions on $\mathbb{B}^d$ \citep[Proposition~1]{park2025relu}.  If $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{h}(\mathbf{X});S)=0$, then $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)=0$ and hence $\mathbb{P}_s=\mathbb{P}_0$ for every $s\in\mathcal{S}$, so $\int f\,\mathrm{d}\mathbb{P}_s=\int f\,\mathrm{d}\mathbb{P}_0$ for every bounded measurable $f$ and $\operatorname{GDP}_{\infty}(f\circ\widetilde{h})=0$.
-\end{proof}
-
 \subsection{Proof of Theorem~\ref{thm:uniform}}
 \label{app:proof-uniform}
 
@@ -900,7 +855,16 @@ Let $\mathcal{A}_n$ be the event of Lemma~\ref{lem:stochastic}, on which Equatio
   \qquad h\in\mathcal{E}_n .
   \label{eq:population-from-empirical}
 \end{equation}
-Fix $h\in\mathcal{E}_n$, $B>0$ and $\beta>0$ with $\beta\ne(d+3)/2$.  By the restricted form of Theorem~\ref{thm:transfer} proved in Appendix~\ref{app:proof-transfer}, the left-hand side of Equation~(\ref{eq:certificate}) is at most $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$; combining this with Equation~(\ref{eq:population-from-empirical}) and the monotonicity of $t\mapsto t^{\alpha_{d,\beta}}$ gives Equation~(\ref{eq:certificate}).  The event $\mathcal{A}_n$ depends on neither $h$, nor $B$, nor $\beta$, so the bound holds simultaneously for all of them.
+Fix $h\in\mathcal{E}_n$, $B>0$, $\beta>0$ with $\beta\ne(d+3)/2$, and $s\in\mathcal{S}_n$, and write $\mathbb{P}_s:=\mathbb{P}_{\widetilde{h}(\mathbf{X})\mid S=s}$ and $\mathbb{P}_0:=\mathbb{P}_{\widetilde{h}(\mathbf{X})}$, two probability measures on $\mathbb{B}^d$ because $\tau$ takes values in $\mathbb{B}^d$.  For $f\in\mathcal{H}^{\beta}_d(B)$ we have $f/B\in\mathcal{H}^{\beta}_d$, so, since $d\ge3$ and $\beta\ne(d+3)/2$, Equation~(\ref{eq:relu-holder}) \citep[Theorem~2]{park2025relu} gives
+\begin{equation}
+  \left|\mathbb{E}\!\left[f(\widetilde{h}(\mathbf{X}))\mid S=s\right]
+        -\mathbb{E}\!\left[f(\widetilde{h}(\mathbf{X}))\right]\right|
+  \le B\operatorname{IPM}_{\mathcal{H}^{\beta}_d}(\mathbb{P}_s,\mathbb{P}_0)
+  \le C_{d,\beta}B\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}
+     (\mathbb{P}_s,\mathbb{P}_0)^{\alpha_{d,\beta}} .
+  \label{eq:pointwise-transfer}
+\end{equation}
+The map $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$ and $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le D_n(h)$ by Equation~(\ref{eq:interior}), so the right-hand side of Equation~(\ref{eq:pointwise-transfer}) is at most $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, a quantity depending on neither $s$ nor $f$.  Taking the supremum over $s\in\mathcal{S}_n$ and then over $f\in\mathcal{H}^{\beta}_d(B)$ therefore bounds the left-hand side of Equation~(\ref{eq:certificate}) by $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, and Equation~(\ref{eq:population-from-empirical}) with the same monotonicity gives Equation~(\ref{eq:certificate}).  The event $\mathcal{A}_n$ depends on neither $h$, nor $B$, nor $\beta$, so the bound holds simultaneously for all of them.
 
 For the rate, boundedness of $A_n$ and $\mathfrak{v}_n$ and the choice $\delta_n=n^{-c_1}$ give $\Gamma_{n,\delta_n}\asymp\log(n/\gamma_n)\asymp\log n$ for $\gamma_n\asymp(\log n/n)^{1/5}$.  With this bandwidth,
 \[
