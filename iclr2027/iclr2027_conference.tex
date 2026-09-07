@@ -368,16 +368,11 @@ Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discr
 \section{Theoretical Analysis}
 \label{sec:theory}
 
-The empirical supIPM estimates its population counterpart uniformly over a class of encoders (Theorem~\ref{thm:uniform}), and Corollary~\ref{cor:certificate} turns that estimate into a bound on the worst-case discrepancy of every prediction head of bounded H\"older norm.  The assumptions and the proofs are given in Appendix~\ref{app:proofs}.
+The empirical supIPM estimates its population counterpart uniformly over a class of encoders (Theorem~\ref{thm:uniform}), and Corollary~\ref{cor:certificate} converts that estimate into a bound on the worst-case discrepancy of every prediction head of bounded H\"older norm.  The assumptions and the proofs are given in Appendix~\ref{app:proofs}.
 
-Write $\mathcal{S}=[a,b]$, let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$ map $\mathbb{R}^d$ into $\mathbb{B}^d$, and put $\widetilde{h}:=\tau\circ h$ for an encoder $h:\mathcal{X}\to\mathbb{R}^d$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$.  The finite-sample results are stated on an interior region $\mathcal{S}_n$ whose margin from the endpoints of $\mathcal{S}$ vanishes with $n$.  Restricting the supremum over $s$ in Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) to $\mathcal{S}_n$ gives
+Write $\mathcal{S}=[a,b]$, let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$ map $\mathbb{R}^d$ into $\mathbb{B}^d$, and put $\widetilde{h}:=\tau\circ h$ for an encoder $h:\mathcal{X}\to\mathbb{R}^d$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$.  The finite-sample results are stated on the interior region $\mathcal{S}_n:=[a+\epsilon_n,\,b-\epsilon_n]$, where $0<\epsilon_n<\tfrac{1}{2}(b-a)$ and $\epsilon_n\to0$.  Restricting the supremum over $s$ in Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) to $\mathcal{S}_n$ gives
 \begin{equation}
 \begin{aligned}
-  \mathcal{S}_n
-  &:=[a+\epsilon_n,\,b-\epsilon_n],
-  \qquad 0<\epsilon_n<\tfrac{1}{2}(b-a),
-  \qquad \epsilon_n\to0,
-  \\
   \operatorname{GDP}_{\infty,n}(g)
   &:=\sup_{s\in\mathcal{S}_n}
      \left|\mathbb{E}[g(\mathbf{X})\mid S=s]-\mathbb{E}[g(\mathbf{X})]\right|,
@@ -396,9 +391,9 @@ Write $\mathcal{S}=[a,b]$, let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)
 \end{aligned}
   \label{eq:interior}
 \end{equation}
-Here conditional expectations are the versions in Equation~(\ref{eq:pointwise-conditional}), $\gamma_n$ is the bandwidth of the kernel in Equation~(\ref{eq:supipm-estimators}), $0/0:=0$ in $\widehat{w}_{\gamma_n}(i;s)$, and $p(\mathbf{x},s)$ is the joint density fixed in Section~\ref{sec:supipm-criterion}.
+Throughout, conditional expectations given $S=s$ are the versions in Equation~(\ref{eq:pointwise-conditional}), $p(\mathbf{x},s)$ and $\nu$ are the joint density and the dominating measure fixed in Section~\ref{sec:supipm-criterion}, and $\gamma_n$ is the bandwidth in Equation~(\ref{eq:supipm-estimators}).  We read $\widehat{w}_{\gamma_n}(i;s)$ as zero when its denominator vanishes.
 
-Appendix~\ref{app:assumptions} adds Assumptions~\ref{as:smooth-density}--\ref{as:encoder} to Assumption~\ref{as:positive-density}: the sample consists of independent copies of $(\mathbf{X},S,Y)$ and the joint density is twice continuously differentiable in $s$ with integrable envelopes $M_1$ and $M_2$; the profile $K$ in $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ is bounded, symmetric and Lipschitz, and the bandwidth $\gamma_n$ vanishes with $n$ and is tied to the margin $\epsilon_n$; and the encoder class $\mathcal{E}_n$ has $\eta$-covering numbers at most $(A_n/\eta)^{\mathfrak{v}_n}$ in the supremum norm.  For $0<\delta<1$ set
+The sample consists of independent copies of $(\mathbf{X},S,Y)$, and for $\nu$-almost every $\mathbf{x}$ the joint density is twice continuously differentiable in $s$, with envelopes $M_1,M_2\in L_1(\nu)$ for its first two derivatives (Assumption~\ref{as:smooth-density}).  The kernel is $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ for a bounded, symmetric and Lipschitz probability density $K$ of finite second moment, and the bandwidth obeys $\gamma_n\to0$ and $\gamma_n\le\min\{\epsilon_n,1/2\}$, leaving little kernel mass beyond $\mathcal{S}$ at any $s\in\mathcal{S}_n$ (Assumption~\ref{as:kernel}).  Covering $\mathcal{E}_n$ in the supremum norm takes at most $(A_n/\eta)^{\mathfrak{v}_n}$ balls of radius $\eta\le1$ (Assumption~\ref{as:encoder}).  For $0<\delta<1$ set
 \begin{equation}
   \Gamma_{n,\delta}
   :=(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma_n}+\log\frac{1}{\delta},
@@ -419,9 +414,9 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist c
 \end{equation}
 \end{theorem}
 
-The two terms of $r_{n,\delta}$ are the squared bandwidth bias of the local constant smoother in Equation~(\ref{eq:supipm-estimators}) and a stochastic error of order $(n\gamma_n)^{-1/2}$ inflated by the entropy of $\mathcal{E}_n$, and the condition $\Gamma_{n,\delta}\le cn\gamma_n$ asks the effective sample size $n\gamma_n$ in a bandwidth window to dominate that entropy.  The supremum over $\mathcal{E}_n$ is what the application needs, since the encoder produced by Algorithm~\ref{alg:supipm-frl} is a function of the sample.  The ReLU discriminator contributes only its $d+1$ parameters to the entropy, so the representation dimension enters $\Gamma_{n,\delta}$ linearly and leaves the order of $r_{n,\delta}$ in $n$ unchanged.
+The two terms of $r_{n,\delta}$ are the bias of the local constant smoother in Equation~(\ref{eq:supipm-estimators}), of order $\gamma_n^2$, and a stochastic error of order $(n\gamma_n)^{-1/2}$ inflated by the entropy of $\mathcal{E}_n$.  The condition $\Gamma_{n,\delta}\le cn\gamma_n$ requires the effective sample size $n\gamma_n$ in a bandwidth window to dominate that entropy.  Because the encoder produced by Algorithm~\ref{alg:supipm-frl} is a function of the sample, the supremum over $\mathcal{E}_n$ cannot be removed.  Here $\mathcal{E}_n$ is any class that contains it.  The class $\mathcal{V}_{\mathrm{R}}$ contributes only the $d+1$ coordinates of $(\theta,\mu)$ to the entropy, so the representation dimension enters $\Gamma_{n,\delta}$ linearly and leaves the order of $r_{n,\delta}$ in $n$ unchanged.
 
-For $B>0$ let $\mathcal{H}^{\beta}_d(B):=\{f\in C^{k}(\mathbb{B}^d):\lVert f\rVert_{\mathcal{H}^{\beta}}\le B\}$ be the H\"older ball of radius $B$ in Equation~(\ref{eq:holder-ball}), and let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and the exponent in Equation~(\ref{eq:relu-holder}), so that $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $\alpha_{d,\beta}=1$ for $\beta>(d+3)/2$.
+For $B>0$ let $\mathcal{H}^{\beta}_d(B)$ be the H\"older ball of Equation~(\ref{eq:holder-ball}) with the radius $1$ replaced by $B$, and let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and the exponent in Equation~(\ref{eq:relu-holder}), so that $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $\alpha_{d,\beta}=1$ for $\beta>(d+3)/2$.
 
 \begin{corollary}[Fairness certificate]
 \label{cor:certificate}
@@ -436,7 +431,7 @@ Let the assumptions of Theorem~\ref{thm:uniform} hold, let $d\ge3$, and let $C$ 
 If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
 \end{corollary}
 
-The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$, so a single evaluation of $\widehat{D}_n$ certifies every H\"older prediction head at every sensitive value in $\mathcal{S}_n$, for an encoder chosen once the sample has been seen.  The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and it equals one for a head smoother than $(d+3)/2$.
+The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$.  A single evaluation of $\widehat{D}_n$ therefore certifies every H\"older prediction head at every sensitive value in $\mathcal{S}_n$, for an encoder chosen with the sample in hand.  The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself.  It equals one when $\beta>(d+3)/2$.
 
 
 \section{Experiments}
