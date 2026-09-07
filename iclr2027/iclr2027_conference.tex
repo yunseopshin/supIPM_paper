@@ -2,7 +2,7 @@
 \documentclass{article} % For LaTeX2e
 \usepackage[T1]{fontenc}
 \usepackage{iclr2027_conference,times}
-
+\usepackage{kotex}
 % Optional math commands from https://github.com/goodfeli/dlbook_notation.
 \input{math_commands.tex}
 \usepackage{amsthm}
@@ -200,7 +200,7 @@ A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{motivation.pdf}
-  \caption{The conditional and the marginal distribution of the representation coincide at a typical sensitive value and differ at $s^{\star}$, a sensitive value where few observations lie.}
+  \caption{The conditional and the marginal distribution of the representation coincide at a typical sensitive value and differ at $s_0$, a sensitive value where few observations lie.}
   \label{fig:motivation}
 \end{figure}
 
@@ -216,7 +216,7 @@ A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
   \label{eq:gdp}
 \end{equation}
 
-Because Equation~(\ref{eq:gdp}) averages this discrepancy over $S$, a large discrepancy confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  Figure~\ref{fig:motivation} illustrates such a case: the discrepancy between the conditional and the marginal distribution is large at the worst-case value $s^{\star}$, whose neighborhood carries too little probability to affect the average over $S$.  Categorical DP, by contrast, imposes one fairness level on every group regardless of its probability.  An extension to a continuous sensitive attribute should meet the same standard at every sensitive value.  We therefore replace the average by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
+Because Equation~(\ref{eq:gdp}) averages this discrepancy over $S$, a large discrepancy confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  Figure~\ref{fig:motivation} illustrates such a case: the discrepancy between the conditional and the marginal distribution is large at the worst-case value $s_0$, whose neighborhood carries too little probability to affect the average over $S$.  Categorical DP, by contrast, imposes one fairness level on every group regardless of its probability.  An extension to a continuous sensitive attribute should meet the same standard at every sensitive value.  We therefore replace the average by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
 \begin{equation}
   \operatorname{GDP}_{\infty}(g)
   :=\sup_{s\in\mathcal{S}}
@@ -301,7 +301,7 @@ Whereas the EIPM estimator in Equation~(\ref{eq:eipm-estimator}) averages the di
 
 \subsection{Learning with the supIPM penalty}
 \label{sec:supipm-objective}
-
+%s^* 찾는 알고리즘 수정 처음엔 0.3 0.5 0.7 중에 큰거 0.7이 뽑혔으면 이제 0.6 0.7 0.8 중에 큰거. 0.6이 뽑혔으면 0.55 0.6 0.65 중 큰거... 이런식으로 찾는 알고리즘으로 수정.
 We use the empirical supIPM as a penalty and train the encoder $h_{\phi}$ and the prediction head $f_{\psi}$ jointly by minimizing
 \begin{equation}
   \mathcal{L}(\phi,\psi)
@@ -326,14 +326,14 @@ Minimizing Equation~(\ref{eq:supipm-penalized-objective}) requires evaluating th
 \end{equation}
 Then $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)=\sup_{s\in\mathcal{S}}\sup_{\theta\in\mathbb{S}^{d-1},\,\mu\in[-1,1]}\Delta(s;\theta,\mu)$, so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem, which we solve by alternating gradient descent in $(\phi,\psi)$ with projected gradient ascent in $s$ and in $(\theta,\mu)$.
 
-Because gradient ascent can converge to a local maximum, we follow \citet{park2025relu} and perform the ascent from several initial values in parallel, maintaining $T$ candidate sensitive values $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ and $M$ discriminators $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$, where $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$.  Let $\hat{s}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ be the candidate at which the largest discrepancy is detected.  The candidates and the discriminators are updated by gradient ascent on
+Because gradient ascent can converge to a local maximum, we follow \citet{park2025relu} and perform the ascent from several initial values in parallel, maintaining $T$ candidate sensitive values $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ and $M$ discriminators $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$, where $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$.  Let $s^{\star}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ be the candidate at which the largest discrepancy is detected.  The candidates and the discriminators are updated by gradient ascent on
 \begin{equation}
   G(\mathbf{s}):=\sum_{t=1}^{T}\max_{m\in[M]}\Delta(s^{(t)};\theta_m,\mu_m),
   \qquad
-  H(\mathbf{v}):=\sum_{m=1}^{M}\Delta(\hat{s};\theta_m,\mu_m),
+  H(\mathbf{v}):=\sum_{m=1}^{M}\Delta(s^{\star};\theta_m,\mu_m),
   \label{eq:stacked-objectives}
 \end{equation}
-where $\mathbf{v}$ and $\hat{s}$ are held fixed at their current values in $G$ and in $H$, respectively.  The $t$-th summand of $G$ depends on $\mathbf{s}$ only through $s^{(t)}$, and the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, so one ascent step on $G$ moves all $T$ candidates and one ascent step on $H$ moves all $M$ discriminators.  We write $\Pi_{A}$ for the projection onto a set $A$.  After each ascent step, $\Pi_{\mathcal{S}}$ returns each candidate to the sensitive domain, and $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ returns each $\theta_m$ to the unit sphere and each $\mu_m$ to $[-1,1]$.  The encoder and the prediction head are then updated by gradient descent on $\mathcal{L}(\phi,\psi)$ with the empirical supIPM replaced by $\max_{m\in[M]}\Delta(\hat{s};\theta_m,\mu_m)$, that is, with the outer supremum taken over the $T$ candidates and the inner supremum over the $M$ discriminators.
+where $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $G$ and in $H$, respectively.  The $t$-th summand of $G$ depends on $\mathbf{s}$ only through $s^{(t)}$, and the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, so one ascent step on $G$ moves all $T$ candidates and one ascent step on $H$ moves all $M$ discriminators.  We write $\Pi_{A}$ for the projection onto a set $A$.  After each ascent step, $\Pi_{\mathcal{S}}$ returns each candidate to the sensitive domain, and $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ returns each $\theta_m$ to the unit sphere and each $\mu_m$ to $[-1,1]$.  The encoder and the prediction head are then updated by gradient descent on $\mathcal{L}(\phi,\psi)$ with the empirical supIPM replaced by $\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)$, that is, with the outer supremum taken over the $T$ candidates and the inner supremum over the $M$ discriminators.
 
 Algorithm~\ref{alg:supipm-frl} assembles these three updates into $R$ iterations, and we name the resulting procedure supIPM-FRL.  Each iteration performs $J_v$ discriminator updates, each preceded by $J_s$ ascent steps of freshly initialized candidates, and closes with one descent step.  The discriminator updates, the candidate ascent steps and the descent step use the step sizes $\eta_v$, $\eta_s$ and $\eta$.
 
@@ -350,11 +350,11 @@ Algorithm~\ref{alg:supipm-frl} assembles these three updates into $R$ iterations
     \FOR{$J_s$ steps}
       \STATE $\mathbf{s}\leftarrow\Pi_{\mathcal{S}}\!\left(\mathbf{s}+\eta_s\,\nabla_{\mathbf{s}}G(\mathbf{s})\right)$
     \ENDFOR
-    \STATE $\hat{s}\leftarrow\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ \label{alg:s-star}
+    \STATE $s^{\star}\leftarrow\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ \label{alg:s-star}
     \STATE $\mathbf{v}\leftarrow\Pi_{\mathbb{S}^{d-1}\times[-1,1]}\!\left(\mathbf{v}+\eta_v\,\nabla_{\mathbf{v}}H(\mathbf{v})\right)$
   \ENDFOR
-  \STATE Recompute $\hat{s}$ by repeating lines~\ref{alg:s-init}--\ref{alg:s-star} with the updated $\mathbf{v}$
-  \STATE $(\phi,\psi)\leftarrow(\phi,\psi)-\eta\,\nabla_{(\phi,\psi)}\big[\tfrac{1}{n}\sum_{i=1}^n\ell(f_{\psi}(\widetilde{\mathbf{Z}}_i),Y_i)+\lambda\max_{m\in[M]}\Delta(\hat{s};\theta_m,\mu_m)\big]$ \label{alg:encoder-step}
+  \STATE Recompute $s^{\star}$ by repeating lines~\ref{alg:s-init}--\ref{alg:s-star} with the updated $\mathbf{v}$
+  \STATE $(\phi,\psi)\leftarrow(\phi,\psi)-\eta\,\nabla_{(\phi,\psi)}\big[\tfrac{1}{n}\sum_{i=1}^n\ell(f_{\psi}(\widetilde{\mathbf{Z}}_i),Y_i)+\lambda\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)\big]$ \label{alg:encoder-step}
 \ENDFOR
 \RETURN $h_{\phi}$, $f_{\psi}$
 \end{algorithmic}
@@ -363,6 +363,7 @@ Algorithm~\ref{alg:supipm-frl} assembles these three updates into $R$ iterations
 Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discrepancy}) are built from sample averages, so the procedure applies unchanged when these averages are computed on the current minibatch.
 
 \section{Theoretical Analysis}
+$[\epsilon_n , 1- \epsilon_n]$에서 증명. 모든 S에 대해서 protect한다는 우리의 주장과 상충되지 않게 하기 위해서 $\epsilon_n \rightarrow 0$을 가정함.
 % DEFERRED FROM SECTION 3.1: the smoothness condition on the joint density.
 % Equation~\ref{eq:pointwise-conditional} does not need it -- Assumptions 1 and 2 suffice to
 % define the conditional expectation pointwise -- but the consistency analysis does.
@@ -379,7 +380,7 @@ Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discr
 
 
 \subsection{Simulation study}
-
+우리 알고리즘이 차별이 큰 $s_0$ 로 잘 수렴하는거. 이거 쓰면 되지 않나?? 굳이 supIPM 따로 한거로 시뮬을 해야되나..? 그건 사실 어짜피 relu ipm그대로 가져온건데.... 그래서 우리것의 merit을 주장하려면  문제가 있는 지점을 찾고 protect한다는 시뮬을 보여주는게맞는듯
 \subsection{Real data analysis}
 
 

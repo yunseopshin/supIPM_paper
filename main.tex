@@ -181,10 +181,15 @@
     \item A simple corollary is that for any $f\in \mathcal{H},$ we have
     $$\sup_s | \mathbb{E}(f(g_{\hat{\gamma}}(X)|S=s)-\mathbb{E}(f(g_{\hat{\gamma}}(X)))|
    = O_p(a_n).$$
-
-    
+   \item 이 때 $S$를 full domian ($[0,1]$)으로 사용하면 $a_n = (\frac{\log n}{n})^{\frac{1}{3}}$, $[t, 1-t]$ 이렇게 사용하면 $a_n = (\frac{\log n}{n})^{\frac{2}{5}}$가 되어서 mini-max optimal이 되지만 main 주장인 모든 $s \in S$에 대해서 불공정을 protect할 수 있다. 라고 주장하기가 애매해 질 것 같습니다.
 \end{itemize}
 
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{figures/motivation.pdf}
+  \caption{The conditional and the marginal distribution of the representation coincide at a typical sensitive value and differ at $s_0$, a sensitive value where few observations lie.}
+  \label{fig:motivation}
+\end{figure}
 
 
  \bibliographystyle{plainnat}
