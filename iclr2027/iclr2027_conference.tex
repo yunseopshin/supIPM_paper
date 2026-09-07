@@ -369,7 +369,7 @@ Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discr
 
 We establish two properties of supIPM with the ReLU discriminator class.  A small population supIPM bounds $\operatorname{GDP}_{\infty}$ of every prediction head of bounded H\"older norm, and the empirical supIPM in Equation~(\ref{eq:empirical-supipm}) converges to the population supIPM uniformly over the encoder class, so that the fairness level attained on the sample transfers to the population.  Proofs are collected in Appendix~\ref{app:proofs}.
 
-\subsection{Trimming and assumptions}
+\subsection{Assumptions}
 \label{sec:theory-assumptions}
 
 Write $\mathcal{S}=[a,b]$ and $\tau(\mathbf{z}):=\mathbf{z}/\sqrt{\lVert\mathbf{z}\rVert_2^2+1}\in\mathbb{B}^d$, and for an encoder $h:\mathcal{X}\to\mathbb{R}^d$ let $\widetilde{h}:=\tau\circ h$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$ is the normalized representation of Section~\ref{sec:supipm-criterion}.  Conditional expectations given $S=s$ are the versions in Equation~(\ref{eq:pointwise-conditional}).  The weights $\widehat{w}_{\gamma}(i;s)$ in Equation~(\ref{eq:supipm-estimators}) are those of a local constant smoother.  Within distance $\gamma$ of $a$ or of $b$ such a smoother collects only part of the kernel mass, and its bias there is of first order in $\gamma$ rather than of second order.  We therefore state the finite-sample results on the interior region $\mathcal{S}_n:=[a+\epsilon_n,\,b-\epsilon_n]$, whose trimming width satisfies $0<\epsilon_n<(b-a)/2$ and $\epsilon_n\to0$, and we write
