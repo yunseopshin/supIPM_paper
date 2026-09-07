@@ -370,9 +370,33 @@ Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discr
 
 A small supIPM constrains every prediction head of bounded H\"older norm (Theorem~\ref{thm:transfer}), and the empirical supIPM estimates its population counterpart uniformly over a class of encoders (Theorem~\ref{thm:uniform}); Corollary~\ref{cor:certificate} combines the two.  The proofs are given in Appendix~\ref{app:proofs}.
 
-Write $\mathcal{S}=[a,b]$ and $\tau(\mathbf{z}):=\mathbf{z}/\sqrt{\lVert\mathbf{z}\rVert_2^2+1}$, which maps $\mathbb{R}^d$ into $\mathbb{B}^d$.  For an encoder $h:\mathcal{X}\to\mathbb{R}^d$ put $\widetilde{h}:=\tau\circ h$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$ is the normalized representation of Section~\ref{sec:supipm-criterion}.  Conditional expectations given $S=s$ are the versions in Equation~(\ref{eq:pointwise-conditional}).
-
-The weights $\widehat{w}_{\gamma}(i;s)$ in Equation~(\ref{eq:supipm-estimators}) are those of a local constant smoother.  Its bias at $s$ is of order $\gamma^2$ when the window $[s-\gamma,s+\gamma]$ is contained in $\mathcal{S}$, and of order $\gamma$ otherwise, because the kernel mass inside $\mathcal{S}$ is then no longer symmetric about $s$.  The finite-sample results are therefore stated on the interior region $\mathcal{S}_n:=[a+\epsilon_n,\,b-\epsilon_n]$, where $0<\epsilon_n<(b-a)/2$ and $\epsilon_n\to0$, so that every interior point of $\mathcal{S}$ lies in $\mathcal{S}_n$ for all large $n$.  For an encoder $h$ we write $D_n(h)$ and $\widehat{D}_n(h)$ for the quantities in Equations~(\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) at the representation $\widetilde{h}(\mathbf{X})$, and $\operatorname{GDP}_{\infty,n}$ for Equation~(\ref{eq:linfty-gdp}), in each case with the supremum over $s\in\mathcal{S}$ replaced by the supremum over $s\in\mathcal{S}_n$; in $\widehat{D}_n$ we adopt the convention $0/0:=0$ in $\widehat{w}_{\gamma_n}(i;s)$.  Assumption~\ref{as:positive-density} is in force throughout, and $p(\mathbf{x},s)$ is the joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$ fixed in Section~\ref{sec:supipm-criterion}.
+Write $\mathcal{S}=[a,b]$, let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$ map $\mathbb{R}^d$ into $\mathbb{B}^d$, and put $\widetilde{h}:=\tau\circ h$ for an encoder $h:\mathcal{X}\to\mathbb{R}^d$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$.  The weights $\widehat{w}_{\gamma}(i;s)$ in Equation~(\ref{eq:supipm-estimators}) are those of a local constant smoother, whose bias at $s$ is of order $\gamma^2$ when $[s-\gamma,s+\gamma]\subseteq\mathcal{S}$ and of order $\gamma$ when the window is truncated by an endpoint.  The finite-sample results are therefore stated on an interior region $\mathcal{S}_n$ that exhausts the interior of $\mathcal{S}$:
+\begin{equation}
+\begin{aligned}
+  \mathcal{S}_n
+  &:=[a+\epsilon_n,\,b-\epsilon_n],
+  \qquad 0<\epsilon_n<\tfrac{1}{2}(b-a),
+  \qquad \epsilon_n\to0,
+  \\
+  \operatorname{GDP}_{\infty,n}(g)
+  &:=\sup_{s\in\mathcal{S}_n}
+     \left|\mathbb{E}[g(\mathbf{X})\mid S=s]-\mathbb{E}[g(\mathbf{X})]\right|,
+  \\
+  D_n(h)
+  &:=\sup_{s\in\mathcal{S}_n}
+     \operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}
+     \bigl(\mathbb{P}_{\widetilde{h}(\mathbf{X})\mid S=s},
+           \mathbb{P}_{\widetilde{h}(\mathbf{X})}\bigr),
+  \\
+  \widehat{D}_n(h)
+  &:=\sup_{s\in\mathcal{S}_n}
+     \operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}
+     \bigl(\widehat{\mathbb{P}}^{\gamma_n}_{\widetilde{h}(\mathbf{X})\mid S=s},
+           \widehat{\mathbb{P}}_{\widetilde{h}(\mathbf{X})}\bigr).
+\end{aligned}
+  \label{eq:interior}
+\end{equation}
+Here conditional expectations are the versions in Equation~(\ref{eq:pointwise-conditional}), $0/0:=0$ in $\widehat{w}_{\gamma_n}(i;s)$, and $p(\mathbf{x},s)$ is the joint density fixed in Section~\ref{sec:supipm-criterion}; Assumption~\ref{as:positive-density} is in force throughout.
 
 \begin{assumption}[Smooth joint density]
 \label{as:smooth-density}
