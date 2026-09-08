@@ -368,9 +368,9 @@ Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discr
 \section{Theoretical Analysis}
 \label{sec:theory}
 
-The empirical supIPM estimates its population counterpart uniformly over a class of encoders (Theorem~\ref{thm:uniform}), and Corollary~\ref{cor:certificate} converts that estimate into a bound on the worst-case discrepancy of every prediction head of bounded H\"older norm.  The assumptions and the proofs are given in Appendix~\ref{app:proofs}.
+In Theorem~\ref{thm:uniform} below we show that the empirical supIPM estimates its population counterpart uniformly over a class of encoders.  Corollary~\ref{cor:certificate} converts this estimate into a bound on the worst-case discrepancy of every prediction head of bounded H\"older norm.
 
-Write $\mathcal{S}=[a,b]$, let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$ map $\mathbb{R}^d$ into $\mathbb{B}^d$, and put $\widetilde{h}:=\tau\circ h$ for an encoder $h:\mathcal{X}\to\mathbb{R}^d$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$.  The finite-sample results are stated on the interior region $\mathcal{S}_n:=[a+\epsilon_n,\,b-\epsilon_n]$, where $0<\epsilon_n<\tfrac{1}{2}(b-a)$ and $\epsilon_n\to0$.  Restricting the supremum over $s$ in Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) to $\mathcal{S}_n$ gives
+Write $\mathcal{S}=[a,b]$ and let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$ map $\mathbb{R}^d$ into $\mathbb{B}^d$.  For an encoder $h:\mathcal{X}\to\mathbb{R}^d$ put $\widetilde{h}:=\tau\circ h$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$.  Both results are stated on the interior region $\mathcal{S}_n:=[a+\epsilon_n,\,b-\epsilon_n]$, where $0<\epsilon_n<\tfrac{1}{2}(b-a)$ and $\epsilon_n\to0$.  Restricting the supremum over $s$ in Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) to $\mathcal{S}_n$ gives
 \begin{equation}
 \begin{aligned}
   \operatorname{GDP}_{\infty,n}(g)
@@ -391,9 +391,9 @@ Write $\mathcal{S}=[a,b]$, let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)
 \end{aligned}
   \label{eq:interior}
 \end{equation}
-Throughout, conditional expectations given $S=s$ are the versions in Equation~(\ref{eq:pointwise-conditional}), $p(\mathbf{x},s)$ and $\nu$ are the joint density and the dominating measure fixed in Section~\ref{sec:supipm-criterion}, and $\gamma_n$ is the bandwidth in Equation~(\ref{eq:supipm-estimators}).  We read $\widehat{w}_{\gamma_n}(i;s)$ as zero when its denominator vanishes.
+Throughout, conditional expectations given $S=s$ are the versions in Equation~(\ref{eq:pointwise-conditional}), and $p(\mathbf{x},s)$ and $\nu$ are as in Section~\ref{sec:supipm-criterion}.  The bandwidth $\gamma_n$ is that of Equation~(\ref{eq:supipm-estimators}), and $\widehat{w}_{\gamma_n}(i;s)$ is set to zero when its denominator vanishes.
 
-The sample consists of independent copies of $(\mathbf{X},S,Y)$, and for $\nu$-almost every $\mathbf{x}$ the joint density is twice continuously differentiable in $s$, with envelopes $M_1,M_2\in L_1(\nu)$ for its first two derivatives (Assumption~\ref{as:smooth-density}).  The kernel is $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ for a bounded, symmetric and Lipschitz probability density $K$ of finite second moment, and the bandwidth obeys $\gamma_n\to0$ and $\gamma_n\le\min\{\epsilon_n,1/2\}$, leaving little kernel mass beyond $\mathcal{S}$ at any $s\in\mathcal{S}_n$ (Assumption~\ref{as:kernel}).  Covering $\mathcal{E}_n$ in the supremum norm takes at most $(A_n/\eta)^{\mathfrak{v}_n}$ balls of radius $\eta\le1$ (Assumption~\ref{as:encoder}).  For $0<\delta<1$ set
+We impose three further conditions, stated in Appendix~\ref{app:proofs} together with the proofs.  Assumption~\ref{as:smooth-density} requires independent copies of $(\mathbf{X},S,Y)$ and a joint density twice continuously differentiable in $s$ for $\nu$-almost every $\mathbf{x}$, with envelopes $M_1,M_2\in L_1(\nu)$ for its first two derivatives.  Assumption~\ref{as:kernel} specifies $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ with a bounded, symmetric and Lipschitz probability density $K$ of finite second moment.  The bandwidth satisfies $\gamma_n\to0$, $\gamma_n\le\min\{\epsilon_n,1/2\}$ and a tail condition that bounds the kernel mass beyond $\mathcal{S}$ by $\gamma_n^2$ at every $s\in\mathcal{S}_n$.  Assumption~\ref{as:encoder} bounds the covering number of the encoder class $\mathcal{E}_n$ in the supremum norm by $(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.  For $0<\delta<1$ set
 \begin{equation}
   \Gamma_{n,\delta}
   :=(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma_n}+\log\frac{1}{\delta},
@@ -414,9 +414,9 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist c
 \end{equation}
 \end{theorem}
 
-The two terms of $r_{n,\delta}$ are the bias of the local constant smoother in Equation~(\ref{eq:supipm-estimators}), of order $\gamma_n^2$, and a stochastic error of order $(n\gamma_n)^{-1/2}$ inflated by the entropy of $\mathcal{E}_n$.  The condition $\Gamma_{n,\delta}\le cn\gamma_n$ requires the effective sample size $n\gamma_n$ in a bandwidth window to dominate that entropy.  Because the encoder produced by Algorithm~\ref{alg:supipm-frl} is a function of the sample, the supremum over $\mathcal{E}_n$ cannot be removed.  Here $\mathcal{E}_n$ is any class that contains it.  The class $\mathcal{V}_{\mathrm{R}}$ contributes only the $d+1$ coordinates of $(\theta,\mu)$ to the entropy, so the representation dimension enters $\Gamma_{n,\delta}$ linearly and leaves the order of $r_{n,\delta}$ in $n$ unchanged.
+Theorem~\ref{thm:uniform} provides the convergence rate $r_{n,\delta}$ of the empirical supIPM.  The first term of $r_{n,\delta}$ is the bias of the local constant smoother in Equation~(\ref{eq:supipm-estimators}), of order $\gamma_n^2$.  The second term is a stochastic error of order $(n\gamma_n)^{-1/2}$ inflated by the entropy of $\mathcal{E}_n$.  The condition $\Gamma_{n,\delta}\le cn\gamma_n$ requires the effective sample size $n\gamma_n$ in a bandwidth window to dominate that entropy.  Because the encoder produced by Algorithm~\ref{alg:supipm-frl} is a function of the sample, the supremum over any class $\mathcal{E}_n$ containing it cannot be removed.  The ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ contributes only the $d+1$ coordinates of $(\theta,\mu)$ to the entropy, so the representation dimension enters $\Gamma_{n,\delta}$ linearly and leaves the order of $r_{n,\delta}$ in $n$ unchanged.
 
-For $B>0$ let $\mathcal{H}^{\beta}_d(B)$ be the H\"older ball of Equation~(\ref{eq:holder-ball}) with the radius $1$ replaced by $B$, and let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and the exponent in Equation~(\ref{eq:relu-holder}), so that $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $\alpha_{d,\beta}=1$ for $\beta>(d+3)/2$.
+For $B>0$ let $\mathcal{H}^{\beta}_d(B)$ be the H\"older ball of Equation~(\ref{eq:holder-ball}) with radius $B$.  Let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and exponent in Equation~(\ref{eq:relu-holder}), with $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $1$ for $\beta>(d+3)/2$.
 
 \begin{corollary}[Fairness certificate]
 \label{cor:certificate}
@@ -431,7 +431,7 @@ Let the assumptions of Theorem~\ref{thm:uniform} hold, let $d\ge3$, and let $C$ 
 If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
 \end{corollary}
 
-The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$.  A single evaluation of $\widehat{D}_n$ therefore certifies every H\"older prediction head at every sensitive value in $\mathcal{S}_n$, for an encoder chosen with the sample in hand.  The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself.  It equals one when $\beta>(d+3)/2$.
+In Corollary~\ref{cor:certificate} the right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$.  A single evaluation of $\widehat{D}_n$ therefore certifies every H\"older prediction head at every sensitive value in $\mathcal{S}_n$, for an encoder chosen with the sample in hand.  The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and equals one when $\beta>(d+3)/2$.
 
 
 \section{Experiments}
@@ -464,35 +464,35 @@ The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the se
 \subsection{Assumptions}
 \label{app:assumptions}
 
-Assumption~\ref{as:positive-density} of Section~\ref{sec:supipm-criterion} is in force throughout, $p(\mathbf{x},s)$ and $\nu$ are the joint density and the dominating measure fixed there, and $\mathcal{S}_n$, $\epsilon_n$ and $\gamma_n$ are as in Section~\ref{sec:theory}.
+Assumption~\ref{as:positive-density} of Section~\ref{sec:supipm-criterion} is maintained throughout, with $p(\mathbf{x},s)$ and $\nu$ as fixed there, and $\mathcal{S}=[a,b]$, $\mathcal{S}_n$, $\epsilon_n$ and $\gamma_n$ as in Section~\ref{sec:theory}.  We now state the three conditions imposed there.
 
 \begin{assumption}[Smooth joint density]
 \label{as:smooth-density}
 The sample $\mathcal{D}$ consists of independent copies of $(\mathbf{X},S,Y)$.  For $\nu$-almost every $\mathbf{x}$ the map $s\mapsto p(\mathbf{x},s)$ is twice continuously differentiable on $\mathcal{S}$, and there exist $M_1,M_2\in L_1(\nu)$ such that $\sup_{s\in\mathcal{S}}\left|\partial_s^{j}p(\mathbf{x},s)\right|\le M_j(\mathbf{x})$ for $j\in\{1,2\}$.
 \end{assumption}
 
-No smoothness in $\mathbf{x}$ is required; the envelopes serve only to differentiate under the integral sign in $s$, uniformly over bounded measurable $g$.
+Assumption~\ref{as:smooth-density} imposes no smoothness in $\mathbf{x}$.  The envelopes $M_1$ and $M_2$ serve only to differentiate under the integral sign in $s$, uniformly over bounded measurable $g$.
 
 \begin{assumption}[Kernel and bandwidth]
 \label{as:kernel}
 $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ for a bounded, symmetric and Lipschitz function $K:\mathbb{R}\to[0,\infty)$ with $\int K=1$ and $\int t^2K(t)\,\mathrm{d}t<\infty$.  With $T_K(r):=\int_{|t|>r}K(t)\,\mathrm{d}t$ the tail mass of $K$, the bandwidth satisfies $\gamma_n\to0$, $0<\gamma_n\le\min\{\epsilon_n,1/2\}$ and $T_K(\epsilon_n/\gamma_n)\le\gamma_n^2$.
 \end{assumption}
 
-The last condition keeps the kernel mass beyond $\mathcal{S}$ of the order of the squared bandwidth at every $s\in\mathcal{S}_n$.  It is vacuous for a kernel supported on $[-1,1]$, and holds for the Gaussian kernel whenever $\epsilon_n\asymp1/\log n$ and $\gamma_n$ decays polynomially.
+The tail condition of Assumption~\ref{as:kernel} bounds the kernel mass beyond $\mathcal{S}$ by $\gamma_n^2$ at every $s\in\mathcal{S}_n$.  It is vacuous for a kernel supported on $[-1,1]$.  For the Gaussian kernel it holds whenever $\epsilon_n\asymp1/\log n$ and $\gamma_n$ decays polynomially.
 
 \begin{assumption}[Encoder class]
 \label{as:encoder}
 $\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1996weak} of measurable encoders $h:\mathcal{X}\to\mathbb{R}^d$ such that, with $\lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2$ and $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ the smallest number of $\lVert\cdot\rVert_\infty$-balls of radius $\eta$ covering a class $\mathcal{F}$, there exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ with $N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)\le(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.
 \end{assumption}
 
-On a bounded $\mathcal{X}$ this holds for ReLU networks of depth $L$ and width $H$ with bounded parameters, with $\mathfrak{v}_n$ of the order of the number of parameters and $\log A_n$ of the order of $L\log H$ \citep{schmidthieber2020nonparametric}.
+Assumption~\ref{as:encoder} holds on a bounded $\mathcal{X}$ for ReLU networks of depth $L$ and width $H$ with bounded parameters.  For such networks $\mathfrak{v}_n$ is of the order of the number of parameters and $\log A_n$ of the order of $L\log H$ \citep{schmidthieber2020nonparametric}.
 
 \subsection{Notation}
 \label{app:notation}
 
-Throughout the appendix $\mathbb{E}$ denotes expectation under the joint distribution of $(\mathbf{X},S)$ and $\mathbb{E}_n$ the average over the sample, $\mathbb{E}_n\varphi:=n^{-1}\sum_{i=1}^n\varphi(\mathbf{X}_i,S_i)$.  We abbreviate $\gamma:=\gamma_n$ and $\epsilon:=\epsilon_n$, and we write $C$ for a finite positive constant depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, whose value may change from one occurrence to the next.  The length of $\mathcal{S}$ is controlled by this list, since $p_S$ integrates to one and is bounded below by $c_S$, so that $b-a\le1/c_S$.
+Throughout the appendix $\mathbb{E}$ denotes expectation under the joint distribution of $(\mathbf{X},S)$ and $\mathbb{E}_n$ the average over the sample, $\mathbb{E}_n\varphi:=n^{-1}\sum_{i=1}^n\varphi(\mathbf{X}_i,S_i)$.  We abbreviate $\gamma:=\gamma_n$ and $\epsilon:=\epsilon_n$.  We write $C$ for a finite positive constant depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, whose value may change from one occurrence to the next.  Since $p_S$ integrates to one and is bounded below by $c_S$, the length $b-a\le1/c_S$ of $\mathcal{S}$ is controlled by the same list.
 
-The encoder class and the ReLU discriminators induce the class of scores
+The encoder class $\mathcal{E}_n$ and the ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ induce the class of scores
 \begin{equation}
   \mathcal{G}_n:=\left\{\mathbf{x}\mapsto v(\widetilde{h}(\mathbf{x})):
     h\in\mathcal{E}_n,\ v\in\mathcal{V}_{\mathrm{R}}\right\} .
@@ -516,29 +516,29 @@ Every $g\in\mathcal{G}_n$ satisfies $0\le g\le2$, because $0\le(\theta^\top\math
 \end{aligned}
   \label{eq:app-notation}
 \end{equation}
-where $m_g$ is the version of the conditional expectation fixed in Equation~(\ref{eq:pointwise-conditional}), and $m_{g,\gamma}$ and $\widehat{m}_{g,\gamma}$ are its population and empirical local constant approximations.  Since $\widehat{w}_{\gamma}(i;s)=K_{\gamma}(S_i,s)/\sum_{j=1}^nK_{\gamma}(S_j,s)$, we have $\widehat{m}_{g,\gamma}(s)=\sum_{i=1}^n\widehat{w}_{\gamma}(i;s)g(\mathbf{X}_i)$ whenever the denominator is positive, and hence, for every $h\in\mathcal{E}_n$,
+where $m_g$ is the version of the conditional expectation fixed in Equation~(\ref{eq:pointwise-conditional}), and $m_{g,\gamma}$ and $\widehat{m}_{g,\gamma}$ are its population and empirical local constant approximations.  Since $\widehat{w}_{\gamma}(i;s)=K_{\gamma}(S_i,s)/\sum_{j=1}^nK_{\gamma}(S_j,s)$, we have $\widehat{m}_{g,\gamma}(s)=\sum_{i=1}^n\widehat{w}_{\gamma}(i;s)g(\mathbf{X}_i)$ whenever the denominator is positive.  Hence, for every $h\in\mathcal{E}_n$,
 \begin{equation}
   D_n(h)=\sup_{g,s}\left|m_g(s)-\mathbb{E}g\right|,
   \qquad
   \widehat{D}_n(h)=\sup_{g,s}\left|\widehat{m}_{g,\gamma}(s)-\mathbb{E}_ng\right| ,
   \label{eq:D-in-scores}
 \end{equation}
-the suprema running over $g=v\circ\widetilde{h}$ with $v\in\mathcal{V}_{\mathrm{R}}$ and over $s\in\mathcal{S}_n$.  Because $g$, $m_g$, $m_{g,\gamma}$ and $\widehat{m}_{g,\gamma}$ all take values in $[0,2]$, both quantities in Equation~(\ref{eq:D-in-scores}) lie in $[0,2]$.
+where the suprema run over $g=v\circ\widetilde{h}$ with $v\in\mathcal{V}_{\mathrm{R}}$ and over $s\in\mathcal{S}_n$.  Because $g$, $m_g$, $m_{g,\gamma}$ and $\widehat{m}_{g,\gamma}$ all take values in $[0,2]$, both quantities in Equation~(\ref{eq:D-in-scores}) lie in $[0,2]$.
 
-We shall use Bernstein's inequality in the following form \citep[e.g.,][Chapter~2]{boucheron2013concentration}.  If $W_1,\ldots,W_n$ are independent copies of a random variable $W$ with $0\le W\le M$ and $\operatorname{Var}(W)\le\sigma^2$, then
+We use Bernstein's inequality in the following form \citep[e.g.,][Chapter~2]{boucheron2013concentration}.  If $W_1,\ldots,W_n$ are independent copies of a random variable $W$ with $0\le W\le M$ and $\operatorname{Var}(W)\le\sigma^2$, then
 \begin{equation}
   \mathbb{P}\left(\left|\frac{1}{n}\sum_{i=1}^nW_i-\mathbb{E}W\right|\ge u\right)
   \le2\exp\left(-\frac{nu^2}{2\sigma^2+2Mu/3}\right),
   \qquad u>0 .
   \label{eq:bernstein}
 \end{equation}
-We shall also use the elementary inequality
+We also use the elementary inequality
 \begin{equation}
   \left|\ \sup_{t\in T}|F(t)|-\sup_{t\in T}|G(t)|\ \right|
   \le\sup_{t\in T}\left|F(t)-G(t)\right|,
   \label{eq:sup-diff}
 \end{equation}
-valid for any index set $T$ and any bounded $F,G:T\to\mathbb{R}$: for every $t$, $|F(t)|\le|G(t)|+\sup_T|F-G|$, whence $\sup_T|F|\le\sup_T|G|+\sup_T|F-G|$, and the roles of $F$ and $G$ may be exchanged.
+valid for any index set $T$ and any bounded $F,G:T\to\mathbb{R}$: for every $t$, $|F(t)|\le|G(t)|+\sup_T|F-G|$, so $\sup_T|F|\le\sup_T|G|+\sup_T|F-G|$, and the roles of $F$ and $G$ may be exchanged.
 
 \subsection{Auxiliary lemmas}
 \label{app:lemmas}
@@ -564,7 +564,7 @@ valid for any index set $T$ and any bounded $F,G:T\to\mathbb{R}$: for every $t$,
 \[
   J(\mathbf{z})=u(\mathbf{z})^{-1}\left(I_d-\frac{\mathbf{z}\mathbf{z}^\top}{u(\mathbf{z})^2}\right).
 \]
-The matrix $J(\mathbf{z})$ is symmetric; it has eigenvalue $u^{-1}(1-\lVert\mathbf{z}\rVert_2^2u^{-2})=u^{-3}$ in the direction $\mathbf{z}$ and eigenvalue $u^{-1}$, with multiplicity $d-1$, on the orthogonal complement of $\mathbf{z}$.  Since $u(\mathbf{z})\ge1$, all eigenvalues lie in $(0,1]$, so the operator norm of $J(\mathbf{z})$ is at most one for every $\mathbf{z}$.  As $\mathbb{R}^d$ is convex, the mean value inequality gives $\lVert\tau(\mathbf{z})-\tau(\mathbf{z}')\rVert_2\le\lVert\mathbf{z}-\mathbf{z}'\rVert_2$.
+The matrix $J(\mathbf{z})$ is symmetric.  It has eigenvalue $u^{-1}(1-\lVert\mathbf{z}\rVert_2^2u^{-2})=u^{-3}$ in the direction $\mathbf{z}$ and eigenvalue $u^{-1}$ of multiplicity $d-1$ on the orthogonal complement of $\mathbf{z}$.  Since $u(\mathbf{z})\ge1$, all eigenvalues lie in $(0,1]$, so the operator norm of $J(\mathbf{z})$ is at most one for every $\mathbf{z}$.  As $\mathbb{R}^d$ is convex, the mean value inequality gives $\lVert\tau(\mathbf{z})-\tau(\mathbf{z}')\rVert_2\le\lVert\mathbf{z}-\mathbf{z}'\rVert_2$.
 
 (ii) The map $t\mapsto(t)_+$ is $1$-Lipschitz on $\mathbb{R}$, so
 \[
@@ -581,7 +581,7 @@ and the Cauchy--Schwarz inequality together with $\lVert\theta\rVert_2=1$ and $\
   \le\lVert h-h'\rVert_\infty+\lVert\theta-\theta'\rVert_2+|\mu-\mu'| .
   \label{eq:score-lipschitz}
 \end{equation}
-Take an $(\eta/2)$-net of $\mathcal{E}_n$ in $\lVert\cdot\rVert_\infty$, of cardinality at most $(2A_n/\eta)^{\mathfrak{v}_n}$ by Assumption~\ref{as:encoder}; an $(\eta/4)$-net of $\mathbb{S}^{d-1}$ in $\lVert\cdot\rVert_2$, of cardinality at most $(1+8/\eta)^d\le(9/\eta)^d$ by the standard volumetric bound for subsets of the unit ball; and an $(\eta/4)$-net of $[-1,1]$, of cardinality at most $\lceil4/\eta\rceil\le5/\eta$.  By Equation~(\ref{eq:score-lipschitz}) the induced functions form an $\eta$-net of $\mathcal{G}_n$, and its cardinality is at most
+Take an $(\eta/2)$-net of $\mathcal{E}_n$ in $\lVert\cdot\rVert_\infty$, of cardinality at most $(2A_n/\eta)^{\mathfrak{v}_n}$ by Assumption~\ref{as:encoder}.  Next take an $(\eta/4)$-net of $\mathbb{S}^{d-1}$ in $\lVert\cdot\rVert_2$, of cardinality at most $(1+8/\eta)^d\le(9/\eta)^d$ by the standard volumetric bound for subsets of the unit ball.  Finally take an $(\eta/4)$-net of $[-1,1]$, of cardinality at most $\lceil4/\eta\rceil\le5/\eta$.  By Equation~(\ref{eq:score-lipschitz}) the induced functions form an $\eta$-net of $\mathcal{G}_n$, and its cardinality is at most
 \[
   \left(\frac{2A_n}{\eta}\right)^{\mathfrak{v}_n}
   \left(\frac{9}{\eta}\right)^{d}\frac{5}{\eta}
@@ -641,7 +641,7 @@ Extend $p(\mathbf{x},\cdot)$ and $p_S$ by zero outside $\mathcal{S}$, so that $a
 \end{equation}
 Fix $s\in\mathcal{S}_n$, set $r_n:=\epsilon/\gamma$ and $I_n:=[-r_n,r_n]$.  Since $\gamma\le\epsilon$ we have $r_n\ge1$, and $s+\gamma t\in[s-\epsilon,s+\epsilon]\subseteq\mathcal{S}$ for every $t\in I_n$.
 
-\emph{The denominator.}  By Lemma~\ref{lem:regularity} and Assumption~\ref{as:positive-density}, $0\le p_S\le C_S$ everywhere after the extension, so $q_{\gamma}(s)\le C_S\int K=C_S$; and $p_S\ge c_S$ on $\mathcal{S}$ gives
+\emph{The denominator.}  By Lemma~\ref{lem:regularity} and Assumption~\ref{as:positive-density}, $0\le p_S\le C_S$ everywhere after the extension, so $q_{\gamma}(s)\le C_S\int K=C_S$.  In addition, $p_S\ge c_S$ on $\mathcal{S}$ gives
 \[
   q_{\gamma}(s)\ \ge\ \int_{I_n}K(t)p_S(s+\gamma t)\,\mathrm{d}t
   \ \ge\ c_S\{1-T_K(r_n)\}
@@ -662,7 +662,7 @@ On $I_n$ the segment joining $s$ and $s+\gamma t$ is contained in $\mathcal{S}$,
   \le\gamma^2t^2\lVert M_2\rVert_{L_1(\nu)},
   \qquad t\in I_n .
 \]
-Multiplying by $K(t)$ and integrating over $I_n$, and using $\int_{I_n}K=1-T_K(r_n)$ together with $\int_{I_n}tK(t)\,\mathrm{d}t=0$, which holds because $K$ is symmetric and $I_n$ is symmetric about the origin,
+Multiply by $K(t)$ and integrate over $I_n$.  Because $K$ and $I_n$ are symmetric about the origin, $\int_{I_n}tK(t)\,\mathrm{d}t=0$, and with $\int_{I_n}K=1-T_K(r_n)$ this gives
 \[
   \left|\int_{I_n}K(t)a_g(s+\gamma t)\,\mathrm{d}t-a_g(s)\right|
   \le a_g(s)T_K(r_n)
@@ -676,7 +676,7 @@ Adding Equation~(\ref{eq:tail-term}), and using $T_K(r_n)\le\gamma^2$, $a_g\le2C
   =\frac{b_{g,\gamma}(s)-a_g(s)}{q_{\gamma}(s)}
    +m_g(s)\,\frac{p_S(s)-q_{\gamma}(s)}{q_{\gamma}(s)} ,
 \]
-as is checked by expanding the right-hand side.  Bounding $|m_g|\le2$ by Lemma~\ref{lem:regularity} and $q_{\gamma}\ge3c_S/4$ by Equation~(\ref{eq:denominator-bias}), and inserting the two bias bounds just proved, yields the second bound in Equation~(\ref{eq:numerator-bias}).  None of the constants depends on $g$ or on $s$.
+as is checked by expanding the right-hand side.  Since $|m_g|\le2$ by Lemma~\ref{lem:regularity} and $q_{\gamma}\ge3c_S/4$ by Equation~(\ref{eq:denominator-bias}), inserting the two bias bounds just proved yields the second bound in Equation~(\ref{eq:numerator-bias}).  None of the constants depends on $g$ or on $s$.
 \end{proof}
 
 \begin{lemma}[Uniform stochastic error]
@@ -718,7 +718,7 @@ Throughout, $c$ is taken small enough for the finitely many requirements below, 
   \qquad
   \zeta_s:=\frac{\gamma^2u}{16L_K},
 \]
-$L_K$ being the Lipschitz constant of $K$.  Replacing $\zeta_g$ by $\min\{\zeta_g,1\}$ if necessary, which only refines the net, let $g_1,\ldots,g_{N_1}$ be a $\zeta_g$-net of $\mathcal{G}_n$ in $\lVert\cdot\rVert_\infty$ with $0\le g_k\le2$, which exists by Lemma~\ref{lem:entropy}(iii), and let $s_1,\ldots,s_{N_2}$ be a $\zeta_s$-net of $\mathcal{S}_n$ in $|\cdot|$.  Given $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$, choose $k$ and $j$ with $\lVert g-g_k\rVert_\infty\le\zeta_g$ and $|s-s_j|\le\zeta_s$.  Since $K$ is $L_K$-Lipschitz,
+where $L_K$ is the Lipschitz constant of $K$.  Replace $\zeta_g$ by $\min\{\zeta_g,1\}$ if necessary, which only refines the following net.  Lemma~\ref{lem:entropy}(iii) then provides a $\zeta_g$-net $g_1,\ldots,g_{N_1}$ of $\mathcal{G}_n$ in $\lVert\cdot\rVert_\infty$ with $0\le g_k\le2$.  Let $s_1,\ldots,s_{N_2}$ be a $\zeta_s$-net of $\mathcal{S}_n$ in $|\cdot|$.  Given $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$, choose $k$ and $j$ with $\lVert g-g_k\rVert_\infty\le\zeta_g$ and $|s-s_j|\le\zeta_s$.  Since $K$ is $L_K$-Lipschitz,
 \[
   \left|K_{\gamma}(s',s)-K_{\gamma}(s',s_j)\right|
   =\frac{1}{\gamma}\left|K\!\left(\frac{s'-s}{\gamma}\right)
@@ -733,7 +733,7 @@ so, using $K_{\gamma}\le\lVert K\rVert_\infty/\gamma$ and $0\le g_k\le2$,
   \le\frac{u}{4} .
   \label{eq:discretisation}
 \end{equation}
-Both $\mathbb{E}_n$ and $\mathbb{E}$ are averages of the same function, so Equation~(\ref{eq:discretisation}) gives
+Applying Equation~(\ref{eq:discretisation}) under $\mathbb{E}_n$ and under $\mathbb{E}$ gives
 \[
   \left|(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\}\right|
   \le\left|(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s_j)g_k(\mathbf{X})\}\right|
@@ -757,7 +757,7 @@ The variable $W:=K_{\gamma}(S,s_j)g_k(\mathbf{X})$ satisfies $0\le W\le M:=2\lVe
   \le\frac{4\lVert K\rVert_\infty}{\gamma}\,\mathbb{E}K_{\gamma}(S,s_j)
   \le\frac{4\lVert K\rVert_\infty C_S}{\gamma}=:\sigma^2 .
 \]
-Applying Equation~(\ref{eq:bernstein}) at $u/2$, each summand in Equation~(\ref{eq:union-bound}) is at most $2\exp\{-nu^2/(8\sigma^2+4Mu/3)\}$, so the right-hand side of Equation~(\ref{eq:union-bound}) is at most $\delta/3$ as soon as
+By Equation~(\ref{eq:bernstein}) at $u/2$, each summand in Equation~(\ref{eq:union-bound}) is at most $2\exp\{-nu^2/(8\sigma^2+4Mu/3)\}$.  The right-hand side of Equation~(\ref{eq:union-bound}) is therefore at most $\delta/3$ as soon as
 \begin{equation}
   \frac{nu^2}{8\sigma^2+4Mu/3}\ \ge\ \ell,
   \qquad
@@ -778,15 +778,15 @@ It remains to bound $\ell$.  Lemma~\ref{lem:entropy}(iii) with $\eta=\zeta_g$ an
   \qquad
   \log N_2\le\log\left(1+\frac{8L_K(b-a)}{\gamma^2u}\right).
 \]
-Using $u\ge n^{-1}$, $\gamma\ge1/(cn)$, $b-a\le1/c_S$, $A_n\ge e$, $\mathfrak{v}_n\ge1$ and $d\ge1$, both logarithms are bounded by a multiple of $\log(A_nn/\gamma)$ with a factor depending only on $c_S$ and $K$, whence
+Since $u\ge n^{-1}$, $\gamma\ge1/(cn)$, $b-a\le1/c_S$, $A_n\ge e$, $\mathfrak{v}_n\ge1$ and $d\ge1$, both logarithms are bounded by a multiple of $\log(A_nn/\gamma)$ with a factor depending only on $c_S$ and $K$.  Hence
 \begin{equation}
   \ell\ \le\ C_0\left\{(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma}+\log\frac{1}{\delta}\right\}
   \ =\ C_0\,\Gamma_{n,\delta}
   \label{eq:entropy-bound}
 \end{equation}
-for a constant $C_0$ depending only on $c_S$ and $K$.  Since $\Gamma_{n,\delta}\le cn\gamma$, we have $\Gamma_{n,\delta}/(n\gamma)\le\sqrt{c}\,\Lambda_n$, so both requirements in Equation~(\ref{eq:u-requirement}) are met by $u=C_1\Lambda_n$ once $C_1$ is a large enough multiple of $\max\{\sqrt{\lVert K\rVert_\infty C_SC_0},\,\lVert K\rVert_\infty C_0\}$ and $c\le1$.  Fixing such a $C_1$ and then $c\le C_1^{-2}$ completes Step~1: the first bound in Equation~(\ref{eq:good-event}) fails with probability at most $\delta/3$.
+for a constant $C_0$ depending only on $c_S$ and $K$.  Since $\Gamma_{n,\delta}\le cn\gamma$, we have $\Gamma_{n,\delta}/(n\gamma)\le\sqrt{c}\,\Lambda_n$.  Both requirements in Equation~(\ref{eq:u-requirement}) are therefore met by $u=C_1\Lambda_n$ once $C_1$ is a large enough multiple of $\max\{\sqrt{\lVert K\rVert_\infty C_SC_0},\,\lVert K\rVert_\infty C_0\}$ and $c\le1$.  Fixing such a $C_1$ and then $c\le C_1^{-2}$ completes Step~1: the first bound in Equation~(\ref{eq:good-event}) fails with probability at most $\delta/3$.
 
-\emph{Step 2: the denominator and the marginal.}  The class $\{s'\mapsto K_{\gamma}(s',s):s\in\mathcal{S}_n\}$ is handled by the same argument with $N_1=1$, the discretisation error being controlled by the $\zeta_s$-net alone; this gives the second bound in Equation~(\ref{eq:good-event}) with probability at least $1-\delta/3$.  For the class $\mathcal{G}_n$ the variables $W:=g_k(\mathbf{X})$ satisfy $0\le W\le2$ and $\operatorname{Var}(W)\le1$, and only the $\zeta_g$-net is needed, with $\zeta_g$ replaced by $u/4$; the same computation, together with $\gamma\le1$, gives the third bound with probability at least $1-\delta/3$.  A union bound over the three events yields $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$, with $C_\ast$ the largest of the three constants $C_1$ so produced.
+\emph{Step 2: the denominator and the marginal.}  The class $\{s'\mapsto K_{\gamma}(s',s):s\in\mathcal{S}_n\}$ is handled by the same argument with $N_1=1$, where the $\zeta_s$-net alone controls the discretization error.  This gives the second bound in Equation~(\ref{eq:good-event}) with probability at least $1-\delta/3$.  For the class $\mathcal{G}_n$ the variables $W:=g_k(\mathbf{X})$ satisfy $0\le W\le2$ and $\operatorname{Var}(W)\le1$.  Only the $\zeta_g$-net is needed, with $\zeta_g$ replaced by $u/4$.  The same computation, together with $\gamma\le1$, gives the third bound with probability at least $1-\delta/3$.  A union bound over the three events yields $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$, where $C_\ast$ is the largest of the three constants $C_1$ obtained.
 
 \emph{Step 3: the denominator is bounded away from zero.}  On $\mathcal{A}_n$, for $s\in\mathcal{S}_n$,
 \[
@@ -804,7 +804,7 @@ by Lemma~\ref{lem:bias} and Equation~(\ref{eq:lambda-range}), provided $c$ is sm
 \begin{proof}
 Let $C_\ast$ and $c$ be the constants of Lemma~\ref{lem:stochastic} and let $\mathcal{A}_n$ be the event in Equation~(\ref{eq:good-event}), so that $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$ whenever $\Gamma_{n,\delta}\le cn\gamma$.  We show that Equation~(\ref{eq:uniform}) holds on $\mathcal{A}_n$.
 
-Work on $\mathcal{A}_n$ and fix $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$.  By Lemma~\ref{lem:stochastic} the denominator $\mathbb{E}_nK_{\gamma}(S,s)$ is at least $c_S/2$, so $\widehat{m}_{g,\gamma}(s)$ is well defined and the convention $0/0:=0$ in $\widehat{D}_n$ is never invoked.  Write
+On $\mathcal{A}_n$ fix $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$.  By Lemma~\ref{lem:stochastic} the denominator $\mathbb{E}_nK_{\gamma}(S,s)$ is at least $c_S/2$, so $\widehat{m}_{g,\gamma}(s)$ is well defined and the zero convention for $\widehat{w}_{\gamma}(i;s)$ in Section~\ref{sec:theory} is never invoked.  Write
 \[
   A_{g,s}:=(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\},
   \qquad
@@ -816,7 +816,7 @@ Since $\widehat{m}_{g,\gamma}=(b_{g,\gamma}+A_{g,s})/(q_{\gamma}+B_s)$ and $m_{g
   =\frac{A_{g,s}-m_{g,\gamma}(s)B_s}{\mathbb{E}_nK_{\gamma}(S,s)} .
   \label{eq:ratio-identity}
 \end{equation}
-Since $0\le g\le2$ and $K_{\gamma}\ge0$ we have $0\le b_{g,\gamma}(s)\le2q_{\gamma}(s)$ and hence $0\le m_{g,\gamma}(s)\le2$, so Equation~(\ref{eq:ratio-identity}), the bound $\mathbb{E}_nK_{\gamma}(S,s)\ge c_S/2$ and the first two bounds in Equation~(\ref{eq:good-event}) give
+Since $0\le g\le2$ and $K_{\gamma}\ge0$, we have $0\le b_{g,\gamma}(s)\le2q_{\gamma}(s)$ and hence $0\le m_{g,\gamma}(s)\le2$.  Equation~(\ref{eq:ratio-identity}), the bound $\mathbb{E}_nK_{\gamma}(S,s)\ge c_S/2$ and the first two bounds in Equation~(\ref{eq:good-event}) then give
 \[
   \left|\widehat{m}_{g,\gamma}(s)-m_{g,\gamma}(s)\right|
   \le\frac{2}{c_S}\left(|A_{g,s}|+2|B_s|\right)
@@ -831,7 +831,7 @@ Combining this with the bias bound of Lemma~\ref{lem:bias} and with the definiti
   \label{eq:conditional-mean-uniform}
 \end{equation}
 
-Now fix $h\in\mathcal{E}_n$ and apply Equation~(\ref{eq:sup-diff}) with index set $T=\mathcal{V}_{\mathrm{R}}\times\mathcal{S}_n$ and, for $t=(v,s)$ and $g=v\circ\widetilde{h}\in\mathcal{G}_n$,
+Now fix $h\in\mathcal{E}_n$.  Apply Equation~(\ref{eq:sup-diff}) with index set $T=\mathcal{V}_{\mathrm{R}}\times\mathcal{S}_n$ and, for $t=(v,s)$ and $g=v\circ\widetilde{h}\in\mathcal{G}_n$,
 \[
   F(t):=\widehat{m}_{g,\gamma}(s)-\mathbb{E}_ng,
   \qquad
@@ -845,7 +845,7 @@ both bounded by $2$ in absolute value.  By Equation~(\ref{eq:D-in-scores}), $\su
      \left|\widehat{m}_{g,\gamma}(s)-m_g(s)\right|
     +\sup_{g\in\mathcal{G}_n}\left|(\mathbb{E}_n-\mathbb{E})g\right| .
 \]
-The first term is at most $Cr_{n,\delta}$ by Equation~(\ref{eq:conditional-mean-uniform}) and the second at most $C_\ast\Lambda_n\le C_\ast r_{n,\delta}$ by Equation~(\ref{eq:good-event}).  The resulting bound does not depend on $h$, so it may be taken over $h\in\mathcal{E}_n$, which proves Equation~(\ref{eq:uniform}) on $\mathcal{A}_n$ and hence with probability at least $1-\delta$.
+The first term is at most $Cr_{n,\delta}$ by Equation~(\ref{eq:conditional-mean-uniform}) and the second at most $C_\ast\Lambda_n\le C_\ast r_{n,\delta}$ by Equation~(\ref{eq:good-event}).  The resulting bound does not depend on $h$, so it also bounds $\sup_{h\in\mathcal{E}_n}\left|\widehat{D}_n(h)-D_n(h)\right|$.  This proves Equation~(\ref{eq:uniform}) on $\mathcal{A}_n$, and hence with probability at least $1-\delta$.
 \end{proof}
 
 \subsection{Proof of Corollary~\ref{cor:certificate}}
@@ -858,7 +858,7 @@ Let $\mathcal{A}_n$ be the event of Lemma~\ref{lem:stochastic}, on which Equatio
   \qquad h\in\mathcal{E}_n .
   \label{eq:population-from-empirical}
 \end{equation}
-Fix $h\in\mathcal{E}_n$, $B>0$, $\beta>0$ with $\beta\ne(d+3)/2$, and $s\in\mathcal{S}_n$, and write $\mathbb{P}_s:=\mathbb{P}_{\widetilde{h}(\mathbf{X})\mid S=s}$ and $\mathbb{P}_0:=\mathbb{P}_{\widetilde{h}(\mathbf{X})}$, two probability measures on $\mathbb{B}^d$ because $\tau$ takes values in $\mathbb{B}^d$.  For $f\in\mathcal{H}^{\beta}_d(B)$ we have $f/B\in\mathcal{H}^{\beta}_d$, so, since $d\ge3$ and $\beta\ne(d+3)/2$, Equation~(\ref{eq:relu-holder}) \citep[Theorem~2]{park2025relu} gives
+Fix $h\in\mathcal{E}_n$, $B>0$, $\beta>0$ with $\beta\ne(d+3)/2$, and $s\in\mathcal{S}_n$.  Write $\mathbb{P}_s:=\mathbb{P}_{\widetilde{h}(\mathbf{X})\mid S=s}$ and $\mathbb{P}_0:=\mathbb{P}_{\widetilde{h}(\mathbf{X})}$, which are probability measures on $\mathbb{B}^d$ because $\tau$ takes values in $\mathbb{B}^d$.  For $f\in\mathcal{H}^{\beta}_d(B)$ we have $f/B\in\mathcal{H}^{\beta}_d$, and since $d\ge3$ and $\beta\ne(d+3)/2$, Theorem~2 of \citet{park2025relu}, restated in Equation~(\ref{eq:relu-holder}), gives
 \begin{equation}
   \left|\mathbb{E}\!\left[f(\widetilde{h}(\mathbf{X}))\mid S=s\right]
         -\mathbb{E}\!\left[f(\widetilde{h}(\mathbf{X}))\right]\right|
@@ -867,9 +867,9 @@ Fix $h\in\mathcal{E}_n$, $B>0$, $\beta>0$ with $\beta\ne(d+3)/2$, and $s\in\math
      (\mathbb{P}_s,\mathbb{P}_0)^{\alpha_{d,\beta}} .
   \label{eq:pointwise-transfer}
 \end{equation}
-The map $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$ and $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le D_n(h)$ by Equation~(\ref{eq:interior}), so the right-hand side of Equation~(\ref{eq:pointwise-transfer}) is at most $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, a quantity depending on neither $s$ nor $f$.  Taking the supremum over $s\in\mathcal{S}_n$ and then over $f\in\mathcal{H}^{\beta}_d(B)$ therefore bounds the left-hand side of Equation~(\ref{eq:certificate}) by $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, and Equation~(\ref{eq:population-from-empirical}) with the same monotonicity gives Equation~(\ref{eq:certificate}).  The event $\mathcal{A}_n$ depends on neither $h$, nor $B$, nor $\beta$, so the bound holds simultaneously for all of them.
+The map $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$, and $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le D_n(h)$ by Equation~(\ref{eq:interior}).  The right-hand side of Equation~(\ref{eq:pointwise-transfer}) is therefore at most $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, which depends on neither $s$ nor $f$.  Taking the supremum over $s\in\mathcal{S}_n$ and then over $f\in\mathcal{H}^{\beta}_d(B)$ bounds the left-hand side of Equation~(\ref{eq:certificate}) by $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$.  Equation~(\ref{eq:population-from-empirical}) and the same monotonicity then give Equation~(\ref{eq:certificate}).  The event $\mathcal{A}_n$ depends on neither $h$, nor $B$, nor $\beta$, so the bound holds simultaneously for all of them.
 
-For the rate, boundedness of $A_n$ and $\mathfrak{v}_n$ and the choice $\delta_n=n^{-c_1}$ give $\Gamma_{n,\delta_n}\asymp\log(n/\gamma_n)\asymp\log n$ for $\gamma_n\asymp(\log n/n)^{1/5}$.  With this bandwidth,
+For the rate, the boundedness of $A_n$ and $\mathfrak{v}_n$, together with $\delta_n=n^{-c_1}$, gives $\Gamma_{n,\delta_n}\asymp\log(n/\gamma_n)\asymp\log n$ for $\gamma_n\asymp(\log n/n)^{1/5}$.  With this bandwidth,
 \[
   \gamma_n^2\asymp\left(\frac{\log n}{n}\right)^{2/5},
   \qquad
@@ -877,7 +877,7 @@ For the rate, boundedness of $A_n$ and $\mathfrak{v}_n$ and the choice $\delta_n
   \asymp\sqrt{\frac{\log n}{n^{4/5}(\log n)^{1/5}}}
   =\left(\frac{\log n}{n}\right)^{2/5},
 \]
-so $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.  The two side conditions hold for all large $n$: $\Gamma_{n,\delta_n}\le cn\gamma_n$ reads $\log n=O\{n^{4/5}(\log n)^{1/5}\}$, and $\gamma_n\le\epsilon_n$ reads $(\log n/n)^{1/5}=O(1/\log n)$.
+so $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.  The condition $\Gamma_{n,\delta_n}\le cn\gamma_n$ reads $\log n=O\{n^{4/5}(\log n)^{1/5}\}$, and $\gamma_n\le\epsilon_n$ reads $(\log n/n)^{1/5}=O(1/\log n)$.  Both hold for all large $n$.
 \end{proof}
 
 \end{document}
