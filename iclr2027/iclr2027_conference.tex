@@ -198,7 +198,7 @@ A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
 \section{supIPM for fair representation learning}
 \label{sec:supipm}
 
-\subsection{From GDP to supIPM}
+\subsection{Uniform Fairness over the Sensitive Domain}
 \label{sec:supipm-criterion}
 
 \begin{figure}[t]
@@ -303,7 +303,7 @@ where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$.  Obse
 Whereas the EIPM estimator in Equation~(\ref{eq:eipm-estimator}) averages the discrepancy at the observed sensitive values, Equation~(\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy.  
 % Section~\ref{sec:supipm-objective} performs this search during training.
 
-\subsection{Learning with the supIPM penalty}
+\subsection{Fair Representation Learning with supIPM}
 \label{sec:supipm-objective}
 %s^* 찾는 알고리즘 수정 처음엔 0.3 0.5 0.7 중에 큰거 0.7이 뽑혔으면 이제 0.6 0.7 0.8 중에 큰거. 0.6이 뽑혔으면 0.55 0.6 0.65 중 큰거... 이런식으로 찾는 알고리즘으로 수정.
 We use the empirical supIPM as a penalty and train the encoder $h_{\phi}$ and the prediction head $f_{\psi}$ jointly by minimizing
