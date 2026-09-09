@@ -429,7 +429,7 @@ Let the assumptions of Theorem~\ref{thm:uniform} hold, let $d\ge3$, and let $C$ 
   \left\{\widehat{D}_n(h)+Cr_{n,\delta}\right\}^{\alpha_{d,\beta}} .
   \label{eq:certificate}
 \end{equation}
-If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta : =\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
+If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta:=\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
 \end{corollary}
 
 In Corollary~\ref{cor:certificate} the right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$.  A single evaluation of $\widehat{D}_n$ therefore certifies every H\"older prediction head at every sensitive value in $\mathcal{S}_n$.  The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and equals one when $\beta>(d+3)/2$.
@@ -488,7 +488,7 @@ The tail condition of Assumption~\ref{as:kernel} bounds the kernel mass beyond $
 
 \begin{assumption}[Encoder class]
 \label{as:encoder}
-$\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1996weak} of measurable functions $h:\mathcal{X}\to\mathbb{R}^d$ such that, with $\lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2$ and $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ the smallest number of $\lVert\cdot\rVert_\infty$-balls of radius $\eta$ covering a class $\mathcal{F}$, there exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ with $N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)\le(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.
+$\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1996weak} of measurable encoders $h:\mathcal{X}\to\mathbb{R}^d$ such that, with $\lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2$ and $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ the smallest number of $\lVert\cdot\rVert_\infty$-balls of radius $\eta$ covering a class $\mathcal{F}$, there exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ with $N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)\le(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.
 \end{assumption}
 
 Assumption~\ref{as:encoder} holds on a bounded $\mathcal{X}$ for ReLU networks of depth $L$ and width $H$ with bounded parameters.  For such networks $\mathfrak{v}_n$ is of the order of the number of parameters and $\log A_n$ of the order of $L\log H$ \citep{schmidthieber2020nonparametric}.
@@ -703,7 +703,7 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist c
 \end{aligned}
   \label{eq:good-event}
 \end{equation}
-satisfies $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$  where $\Lambda_n:=\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}$.  Moreover, on the event $\mathcal{A}_n$, 
+satisfies $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$, where $\Lambda_n:=\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}$.  Moreover, on the event $\mathcal{A}_n$, 
 \begin{equation}
 \inf_{s\in\mathcal{S}_n}\mathbb{E}_nK_{\gamma}(S,s)\ge c_S/2
 \end{equation}
