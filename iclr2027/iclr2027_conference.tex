@@ -432,7 +432,7 @@ Let the assumptions of Theorem~\ref{thm:uniform} hold, let $d\ge3$, and let $C$ 
 If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta : =\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
 \end{corollary}
 
-In Corollary~\ref{cor:certificate} the right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$.  A single evaluation of $\widehat{D}_n$ therefore certifies every H\"older prediction head at every sensitive value in $\mathcal{S}_n$, for an encoder chosen with the sample in hand.  The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and equals one when $\beta>(d+3)/2$.
+In Corollary~\ref{cor:certificate} the right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$.  A single evaluation of $\widehat{D}_n$ therefore certifies every H\"older prediction head at every sensitive value in $\mathcal{S}_n$.  The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and equals one when $\beta>(d+3)/2$.
 
 
 \section{Experiments}
@@ -703,7 +703,12 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist c
 \end{aligned}
   \label{eq:good-event}
 \end{equation}
-satisfies $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$  where $\Lambda_n:=\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}$.  On $\mathcal{A}_n$ one has $\inf_{s\in\mathcal{S}_n}\mathbb{E}_nK_{\gamma}(S,s)\ge c_S/2$.
+satisfies $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$  where $\Lambda_n:=\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}$.  Moreover, on the event $\mathcal{A}_n$, 
+\begin{equation}
+\inf_{s\in\mathcal{S}_n}\mathbb{E}_nK_{\gamma}(S,s)\ge c_S/2
+\end{equation}
+holds.
+
 \end{lemma}
 
 \begin{proof}
@@ -717,7 +722,7 @@ Throughout, $c$ is taken small enough for the finitely many requirements below, 
   \label{eq:lambda-range}
 \end{equation}
 
-\emph{Step 1: the numerator class.}  Let $u:=C_1\Lambda_n$ with $C_1\ge1$ to be chosen, and assume $c\le C_1^{-2}$, so that $n^{-1}\le u\le1$ by Equation~(\ref{eq:lambda-range}).  Put
+\emph{Step 1: the numerator class.}  Let $u:=C_1\Lambda_n$ with $C_1\ge1$ to be chosen, and assume $c\le C_1^{-2}$, so that $n^{-1}\le u\le1$ by Equation~(\ref{eq:lambda-range}).  Let
 \[
   \zeta_g:=\frac{\gamma u}{8\lVert K\rVert_\infty},
   \qquad
@@ -762,7 +767,7 @@ The variable $W:=K_{\gamma}(S,s_j)g_k(\mathbf{X})$ satisfies $0\le W\le M:=2\lVe
   \le\frac{4\lVert K\rVert_\infty}{\gamma}\,\mathbb{E}K_{\gamma}(S,s_j)
   \le\frac{4\lVert K\rVert_\infty C_S}{\gamma}=:\sigma^2 .
 \]
-By Equation~(\ref{eq:bernstein}) at $u/2$, each summand in Equation~(\ref{eq:union-bound}) is at most $2\exp\{-nu^2/(8\sigma^2+4Mu/3)\}$.  The right-hand side of Equation~(\ref{eq:union-bound}) is therefore at most $\delta/3$ as soon as
+By Equation~(\ref{eq:bernstein}) at $u/2$, each summand in Equation~(\ref{eq:union-bound}) is at most $2\exp\{-nu^2/(8\sigma^2+4Mu/3)\}$.  The right-hand side of Equation~(\ref{eq:union-bound}) is therefore bounded by $\delta/3$, provided that
 \begin{equation}
   \frac{nu^2}{8\sigma^2+4Mu/3}\ \ge\ \ell,
   \qquad
@@ -776,7 +781,7 @@ Equation~(\ref{eq:bernstein-requirement}) holds whenever $nu^2\ge16\ell\sigma^2$
   u\ \ge\ \frac{16\lVert K\rVert_\infty\ell}{3n\gamma} .
   \label{eq:u-requirement}
 \end{equation}
-It remains to bound $\ell$.  Lemma~\ref{lem:entropy}(iii) with $\eta=\zeta_g$ and the bound $N_2\le1+(b-a)/(2\zeta_s)$ give
+It remains to bound $\ell$.  (iii) of Lemma~\ref{lem:entropy} with $\eta=\zeta_g$ and the bound $N_2\le1+(b-a)/(2\zeta_s)$ give
 \[
   \log N_1\le(\mathfrak{v}_n+d+1)
     \log\frac{72\lVert K\rVert_\infty A_n}{\gamma u},
@@ -884,6 +889,8 @@ For the rate, the boundedness of $A_n$ and $\mathfrak{v}_n$, together with $\del
 \]
 so $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.  The condition $\Gamma_{n,\delta_n}\le cn\gamma_n$ reads $\log n=O\{n^{4/5}(\log n)^{1/5}\}$, and $\gamma_n\le\epsilon_n$ reads $(\log n/n)^{1/5}=O(1/\log n)$.  Both hold for all large $n$.
 \end{proof}
+
+\section{Algorithm of supIPM-FRL}
 
 \section{Experiments for synthetic dataset}
 
