@@ -8,6 +8,7 @@
 \usepackage{amsthm}
 
 \usepackage{hyperref}
+\usepackage[capitalize,noabbrev]{cleveref}
 \usepackage{url}
 \usepackage{graphicx}
 \graphicspath{{../figures/}{figures/}}
@@ -88,7 +89,7 @@ A new criterion for a continuous $S$ should therefore hold at every sensitive va
 
 \paragraph{Contributions.}
 \begin{itemize}
-  \item We introduce $L_{\infty}$-GDP, a fairness criterion for prediction models, and supIPM, its representation-level counterpart.  Both extend the groupwise requirement of categorical DP to a continuous sensitive attribute by measuring the worst-case discrepancy over the sensitive domain.
+  \item We propose $L_{\infty}$-GDP, a fairness criterion for prediction models, and supIPM, its representation-level counterpart.  Both extend the groupwise condition of categorical DP to a continuous sensitive attribute by measuring the worst-case discrepancy over the sensitive domain.
   \item We estimate supIPM from kernel weights and ReLU-IPM, and propose supIPM-FRL, an adversarial procedure that is compatible with minibatch training.
   \item We prove that the empirical supIPM is a uniformly consistent estimator, so that the fairness level attained on the sample transfers to the population.
   % uniformly over the sensitive domain and over prediction heads of bounded H\"older norm.
@@ -110,7 +111,7 @@ The discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\math
   \left|\int v(\mathbf{z})\,\mathrm{d}\mathbb{P}(\mathbf{z})-\int v(\mathbf{z})\,\mathrm{d}\mathbb{Q}(\mathbf{z})\right|.
   \label{eq:prelim-ipm}
 \end{equation}
-We say that $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions if $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})=0$ implies $\mathbb{P}=\mathbb{Q}$.  The class $\mathcal{V}$ determines which prediction heads the IPM controls, because $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})$ bounds $\left|\int v\,\mathrm{d}\mathbb{P}-\int v\,\mathrm{d}\mathbb{Q}\right|$ for every $v\in\mathcal{V}$, including any prediction head in $\mathcal{V}$.
+We say that $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions if $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})=0$ implies $\mathbb{P}=\mathbb{Q}$.  The class $\mathcal{V}$ determines which prediction heads the IPM controls, because $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})$ bounds $\left|\int v\,\mathrm{d}\mathbb{P}-\int v\,\mathrm{d}\mathbb{Q}\right|$ for every $v\in\mathcal{V}$.
 
 For a continuous sensitive attribute, \citet{kong2025fair} propose fair representation using EIPM (FREM).  They average, over the distribution of $S$, the IPM between the conditional and the marginal distribution, and define EIPM as
 \begin{equation}
@@ -161,7 +162,7 @@ Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$
   \right\},
   \label{eq:relu-class}
 \end{equation}
-where $(a)_+:=\max\{a,0\}$.  The ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, that is, Equation~(\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  Although $\mathcal{V}_{\mathrm{R}}$ is indexed by the finite-dimensional parameter $(\theta,\mu)$ alone, ReLU-IPM separates probability distributions on $\mathbb{B}^d$ \citep{park2025relu}.  The finite dimension of $(\theta,\mu)$ makes this supremum computable: \citet{park2025relu} evaluate ReLU-IPM between empirical distributions by gradient ascent over $(\theta,\mu)$, projecting $\theta$ back onto the unit sphere after each step.
+where $(a)_+:=\max\{a,0\}$.  The ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, that is, Equation~(\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  Although $\mathcal{V}_{\mathrm{R}}$ is indexed by the finite-dimensional parameter $(\theta,\mu)$ alone, ReLU-IPM separates probability distributions on $\mathbb{B}^d$ \citep{park2025relu}.  The finite dimension of $(\theta,\mu)$ makes this supremum computable. \citet{park2025relu} evaluate ReLU-IPM between empirical distributions by gradient ascent over $(\theta,\mu)$, projecting $\theta$ back onto the unit sphere after each step.
 
 To describe the prediction heads that ReLU-IPM controls, fix a smoothness index $\beta>0$ and let $k$ be the largest integer strictly smaller than $\beta$.  Let $\partial^{\mathbf{a}}$ denote the partial derivative indexed by a multi-index $\mathbf{a}\in\mathbb{N}_0^d$ of order $|\mathbf{a}|=a_1+\cdots+a_d$.  Then the $\beta$-H\"older norm of a $k$ times continuously differentiable function $v:\mathbb{B}^d\to\mathbb{R}$ and the $\beta$-H\"older ball on $\mathbb{B}^d$ are
 \begin{equation}
@@ -245,7 +246,7 @@ Assumption~\ref{as:positive-density} is adopted from FREM \citep{kong2025fair} a
 \end{equation}
 and this version is used in what follows, in particular inside the supremum in Equation~(\ref{eq:linfty-gdp}).
 
-The value $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed.  We therefore propose a criterion for the representation itself, which controls an entire class of prediction heads at once.  Such a criterion is the IPM of a discriminator class.
+The value $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed.  We therefore propose a criterion for the representation itself, which controls an entire class of prediction heads at once.  Such a criterion is  a discriminator class of the IPM .
 
 Because the discriminator classes of Section~\ref{sec:relu-ipm} are defined on $\mathbb{B}^d$, we map the representation $\mathbf{Z}=h_{\phi}(\mathbf{X})$ of the parameterized encoder $h_{\phi}$ in Section~\ref{sec:frem} into the unit ball by $\widetilde{\mathbf{Z}}:=\mathbf{Z}/\sqrt{\lVert\mathbf{Z}\rVert_2^2+1}\in\mathbb{B}^d$.  From here on, prediction heads and discriminator classes are defined on $\mathbb{B}^d$ and applied to $\widetilde{\mathbf{Z}}$.  The conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ is defined as in Equation~(\ref{eq:pointwise-conditional}).  For a discriminator class $\mathcal{V}$ on $\mathbb{B}^d$, we define
 \begin{align}
@@ -262,7 +263,7 @@ Because the discriminator classes of Section~\ref{sec:relu-ipm} are defined on $
 \end{align}
 Equation~(\ref{eq:supipm}) is the representation-level counterpart of $\operatorname{GDP}_{\infty}$: it measures the largest discrepancy between the conditional and marginal distributions before a prediction head is chosen.
 
-By Equation~(\ref{eq:supipm}), the constraint $\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\rho$ for a fairness level $\rho\ge0$ bounds $\left|\mathbb{E}[v(\widetilde{\mathbf{Z}})\mid S=s]-\mathbb{E}[v(\widetilde{\mathbf{Z}})]\right|$ by $\rho$ for every discriminator $v\in\mathcal{V}$ and every $s\in\mathcal{S}$.  For comparison with EIPM, write $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$ for Equation(~\ref{eq:eipm}) with $\mathbf{Z}$ replaced by $\widetilde{\mathbf{Z}}$.  Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$, so a supIPM bound of $\rho$ implies an EIPM bound at the same fairness level.  The converse fails without further regularity in $s$.
+By Equation~(\ref{eq:supipm}), the constraint $\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\rho$ for a fairness level $\rho\ge0$ bounds $\left|\mathbb{E}[v(\widetilde{\mathbf{Z}})\mid S=s]-\mathbb{E}[v(\widetilde{\mathbf{Z}})]\right|$ by $\rho$ for every discriminator $v\in\mathcal{V}$ and every $s\in\mathcal{S}$.  For comparison with EIPM, write $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$ for Equation~(\ref{eq:eipm}) with $\mathbf{Z}$ replaced by $\widetilde{\mathbf{Z}}$.  Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$, so a supIPM bound of $\rho$ implies an EIPM bound at the same fairness level.  The converse fails without further regularity in $s$.
 
 It remains to choose the discriminator class $\mathcal{V}$.  Because $\mathcal{V}$ fixes the prediction heads that supIPM controls, a guarantee for every head of bounded H\"older norm calls for the H\"older ball $\mathcal{H}^{\beta}_d$.  The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in Equation~(\ref{eq:supipm}) is the ReLU-IPM.  The inequality in Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ and $\mathbb{P}_{\widetilde{\mathbf{Z}}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\widetilde{\mathbf{Z}};S)$.
 
@@ -393,7 +394,7 @@ Write $\mathcal{S}=[a,b]$ and let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2
 \end{equation}
 Throughout, conditional expectations given $S=s$ are the versions in Equation~(\ref{eq:pointwise-conditional}), and $p(\mathbf{x},s)$ and $\nu$ are as in Section~\ref{sec:supipm-criterion}.  The bandwidth $\gamma_n$ is that of Equation~(\ref{eq:supipm-estimators}), and $\widehat{w}_{\gamma_n}(i;s)$ is set to zero when its denominator vanishes.
 
-We impose three further conditions, stated in Appendix~\ref{app:proofs} together with the proofs.  Assumption~\ref{as:smooth-density} requires independent copies of $(\mathbf{X},S,Y)$ and a joint density twice continuously differentiable in $s$ for $\nu$-almost every $\mathbf{x}$, with envelopes $M_1,M_2\in L_1(\nu)$ for its first two derivatives.  Assumption~\ref{as:kernel} specifies $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ with a bounded, symmetric and Lipschitz probability density $K$ of finite second moment.  The bandwidth satisfies $\gamma_n\to0$, $\gamma_n\le\min\{\epsilon_n,1/2\}$ and a tail condition that bounds the kernel mass beyond $\mathcal{S}$ by $\gamma_n^2$ at every $s\in\mathcal{S}_n$.  Assumption~\ref{as:encoder} bounds the covering number of the encoder class $\mathcal{E}_n$ in the supremum norm by $(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.  For $0<\delta<1$ set
+We impose three further conditions, stated in Appendix~\ref{app:proofs} together with the proofs.  Assumption~\ref{as:smooth-density} requires independent copies of $(\mathbf{X},S,Y)$ and a joint density twice continuously differentiable in $s$ for $\nu$-almost every $\mathbf{x}$, with envelopes $M_1,M_2\in L_1(\nu)$ for its first two derivatives.  Assumption~\ref{as:kernel} specifies $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ with a bounded, symmetric and Lipschitz probability density $K$ of finite second moment.  The bandwidth satisfies $\gamma_n\to0$, $\gamma_n\le\min\{\epsilon_n,1/2\}$ and a tail condition that bounds the kernel mass beyond $\mathcal{S}$ by $\gamma_n^2$ at every $s\in\mathcal{S}_n$.  Assumption~\ref{as:encoder} bounds the covering number of the encoder class $\mathcal{E}_n$ in the supremum norm by $(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.  For $0<\delta<1$, let
 \begin{equation}
   \Gamma_{n,\delta}
   :=(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma_n}+\log\frac{1}{\delta},
@@ -418,9 +419,9 @@ Theorem~\ref{thm:uniform} provides the convergence rate $r_{n,\delta}$ of the em
 
 For $B>0$ let $\mathcal{H}^{\beta}_d(B)$ be the H\"older ball of Equation~(\ref{eq:holder-ball}) with radius $B$.  Let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and exponent in Equation~(\ref{eq:relu-holder}), with $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $1$ for $\beta>(d+3)/2$.
 
-\begin{corollary}[Fairness certificate]
+\begin{corollary}
 \label{cor:certificate}
-Let the assumptions of Theorem~\ref{thm:uniform} hold, let $d\ge3$, and let $C$ and $c$ be the constants of Theorem~\ref{thm:uniform}.  For every $\delta\in(0,1)$ and every $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$, simultaneously for every $h\in\mathcal{E}_n$, every $B>0$ and every $\beta>0$ with $\beta\ne(d+3)/2$,
+Let the assumptions of Theorem~\ref{thm:uniform} hold, let $d\ge3$, and let $C$ and $c$ be the constants of Theorem~\ref{thm:uniform}.  For every $\delta\in(0,1)$ and  $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$, simultaneously for all  $h\in\mathcal{E}_n$,  $B>0$ and  $\beta>0$ with $\beta\ne(d+3)/2$,
 \begin{equation}
   \sup_{f\in\mathcal{H}^{\beta}_d(B)}
   \operatorname{GDP}_{\infty,n}(f\circ\widetilde{h})
@@ -428,7 +429,7 @@ Let the assumptions of Theorem~\ref{thm:uniform} hold, let $d\ge3$, and let $C$ 
   \left\{\widehat{D}_n(h)+Cr_{n,\delta}\right\}^{\alpha_{d,\beta}} .
   \label{eq:certificate}
 \end{equation}
-If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
+If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta : =\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
 \end{corollary}
 
 In Corollary~\ref{cor:certificate} the right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$.  A single evaluation of $\widehat{D}_n$ therefore certifies every H\"older prediction head at every sensitive value in $\mathcal{S}_n$, for an encoder chosen with the sample in hand.  The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and equals one when $\beta>(d+3)/2$.
@@ -438,16 +439,20 @@ In Corollary~\ref{cor:certificate} the right-hand side of Equation~(\ref{eq:cert
 
 
 \subsection{Simulation study}
-우리 알고리즘이 차별이 큰 $s_0$ 로 잘 수렴하는거. 이거 쓰면 되지 않나?? 굳이 supIPM 따로 한거로 시뮬을 해야되나..? 그건 사실 어짜피 relu ipm그대로 가져온건데.... 그래서 우리것의 merit을 주장하려면  문제가 있는 지점을 찾고 protect한다는 시뮬을 보여주는게맞는듯
+supIPM vs FREM 의 stress test 실험
+기존 plot + 특정 mse 하나 딱 찝고 거기서 DP(s)를 찍어서 보여주기 x축이 s이고 y축이 DP(s)로
 \subsection{Real data analysis}
 
+Adult,Crime,Income data set에서 GDP,inftyGPD 기타 등등 보여주고 baseline들하고 비교.
+그리고 FREM하고 비교할건데 이거 Adult data에서 bad한경우 비교. 이런식으로 해야될것같음.. 여유 가능하면 다른 데이터셋들에서도 다 해보고.
+그리고 ablation으로 뭐 lamda차이 기타 등등 실험 짱박아 넣으면될듯 table도 appendix에 집어넣고..
+
+
+메인실험은 어느정도됐는데.. 이제 근거 support할 실험하고..ablation을 해야할듯..
 
 
 
-
-
-
-
+\section{Conclusion}
 
 
 
@@ -457,8 +462,9 @@ In Corollary~\ref{cor:certificate} the right-hand side of Equation~(\ref{eq:cert
 \bibliography{bibliography}
 
 \appendix
-
-\section{Assumptions and proofs for Section~\ref{sec:theory}}
+\crefalias{section}{appendix}
+\crefalias{subsection}{appendix}
+\section{Proof for main theorems}
 \label{app:proofs}
 
 \subsection{Assumptions}
@@ -482,7 +488,7 @@ The tail condition of Assumption~\ref{as:kernel} bounds the kernel mass beyond $
 
 \begin{assumption}[Encoder class]
 \label{as:encoder}
-$\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1996weak} of measurable encoders $h:\mathcal{X}\to\mathbb{R}^d$ such that, with $\lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2$ and $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ the smallest number of $\lVert\cdot\rVert_\infty$-balls of radius $\eta$ covering a class $\mathcal{F}$, there exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ with $N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)\le(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.
+$\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1996weak} of measurable functions $h:\mathcal{X}\to\mathbb{R}^d$ such that, with $\lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2$ and $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ the smallest number of $\lVert\cdot\rVert_\infty$-balls of radius $\eta$ covering a class $\mathcal{F}$, there exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ with $N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)\le(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.
 \end{assumption}
 
 Assumption~\ref{as:encoder} holds on a bounded $\mathcal{X}$ for ReLU networks of depth $L$ and width $H$ with bounded parameters.  For such networks $\mathfrak{v}_n$ is of the order of the number of parameters and $\log A_n$ of the order of $L\log H$ \citep{schmidthieber2020nonparametric}.
@@ -492,13 +498,13 @@ Assumption~\ref{as:encoder} holds on a bounded $\mathcal{X}$ for ReLU networks o
 
 Throughout the appendix $\mathbb{E}$ denotes expectation under the joint distribution of $(\mathbf{X},S)$ and $\mathbb{E}_n$ the average over the sample, $\mathbb{E}_n\varphi:=n^{-1}\sum_{i=1}^n\varphi(\mathbf{X}_i,S_i)$.  We abbreviate $\gamma:=\gamma_n$ and $\epsilon:=\epsilon_n$.  We write $C$ for a finite positive constant depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, whose value may change from one occurrence to the next.  Since $p_S$ integrates to one and is bounded below by $c_S$, the length $b-a\le1/c_S$ of $\mathcal{S}$ is controlled by the same list.
 
-The encoder class $\mathcal{E}_n$ and the ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ induce the class of scores
+The encoder class $\mathcal{E}_n$ and the ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ induce the class
 \begin{equation}
   \mathcal{G}_n:=\left\{\mathbf{x}\mapsto v(\widetilde{h}(\mathbf{x})):
     h\in\mathcal{E}_n,\ v\in\mathcal{V}_{\mathrm{R}}\right\} .
   \label{eq:score-class}
 \end{equation}
-Every $g\in\mathcal{G}_n$ satisfies $0\le g\le2$, because $0\le(\theta^\top\mathbf{z}+\mu)_+\le\lVert\theta\rVert_2\lVert\mathbf{z}\rVert_2+|\mu|\le2$ for $\mathbf{z}\in\mathbb{B}^d$, $\theta\in\mathbb{S}^{d-1}$ and $\mu\in[-1,1]$.  For a measurable $g:\mathcal{X}\to[0,2]$ and $s\in\mathcal{S}$ put
+Every $g\in\mathcal{G}_n$ satisfies $0\le g\le2$, because $0\le(\theta^\top\mathbf{z}+\mu)_+\le\lVert\theta\rVert_2\lVert\mathbf{z}\rVert_2+|\mu|\le2$ for $\mathbf{z}\in\mathbb{B}^d$, $\theta\in\mathbb{S}^{d-1}$ and $\mu\in[-1,1]$.  For a measurable $g:\mathcal{X}\to[0,2]$ and $s\in\mathcal{S}$ let
 \begin{equation}
 \begin{aligned}
   a_g(s)&:=\int_{\mathcal{X}}g(\mathbf{x})p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
@@ -538,14 +544,15 @@ We also use the elementary inequality
   \le\sup_{t\in T}\left|F(t)-G(t)\right|,
   \label{eq:sup-diff}
 \end{equation}
-valid for any index set $T$ and any bounded $F,G:T\to\mathbb{R}$: for every $t$, $|F(t)|\le|G(t)|+\sup_T|F-G|$, so $\sup_T|F|\le\sup_T|G|+\sup_T|F-G|$, and the roles of $F$ and $G$ may be exchanged.
+valid for any set $T$ and any bounded $F,G:T\to\mathbb{R}$: for every $t$, $|F(t)|\le|G(t)|+\sup_T|F-G|$, so $\sup_T|F|\le\sup_T|G|+\sup_T|F-G|$, and the roles of $F$ and $G$ may be exchanged.
 
 \subsection{Auxiliary lemmas}
 \label{app:lemmas}
 
 \begin{lemma}[Lipschitz continuity and entropy of the score class]
-\label{lem:entropy}
-\emph{(i)} The map $\tau$ is $1$-Lipschitz on $\mathbb{R}^d$.
+\label{lem:entropy} 
+$ \\$
+\emph{(i)} The map $\tau$ is $1$-Lipschitz on $\mathbb{R}^d$.\\
 \emph{(ii)} For $\mathbf{z},\mathbf{z}'\in\mathbb{B}^d$, $\theta,\theta'\in\mathbb{S}^{d-1}$ and $\mu,\mu'\in[-1,1]$,
 \[
   \left|v_{\theta,\mu}(\mathbf{z})-v_{\theta',\mu'}(\mathbf{z}')\right|
@@ -692,13 +699,11 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist c
    \left|(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s)\right|\le C_\ast\Lambda_n,
   \\
   &\sup_{g\in\mathcal{G}_n}\left|(\mathbb{E}_n-\mathbb{E})g\right|\le C_\ast\Lambda_n
-  \Bigg\},
-  \qquad
-  \Lambda_n:=\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}},
+  \Bigg\}
 \end{aligned}
   \label{eq:good-event}
 \end{equation}
-satisfies $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$.  On $\mathcal{A}_n$ one has $\inf_{s\in\mathcal{S}_n}\mathbb{E}_nK_{\gamma}(S,s)\ge c_S/2$.
+satisfies $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$  where $\Lambda_n:=\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}$.  On $\mathcal{A}_n$ one has $\inf_{s\in\mathcal{S}_n}\mathbb{E}_nK_{\gamma}(S,s)\ge c_S/2$.
 \end{lemma}
 
 \begin{proof}
@@ -879,6 +884,14 @@ For the rate, the boundedness of $A_n$ and $\mathfrak{v}_n$, together with $\del
 \]
 so $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.  The condition $\Gamma_{n,\delta_n}\le cn\gamma_n$ reads $\log n=O\{n^{4/5}(\log n)^{1/5}\}$, and $\gamma_n\le\epsilon_n$ reads $(\log n/n)^{1/5}=O(1/\log n)$.  Both hold for all large $n$.
 \end{proof}
+
+\section{Experiments for synthetic dataset}
+
+
+\section{Experiments for real dataset}
+
+
+\section{Ablation studies}
 
 \end{document}
 
