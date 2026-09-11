@@ -235,21 +235,24 @@ Because Equation~(\ref{eq:gdp}) averages over $S$, a large discrepancy in a regi
 \end{equation}
 The supremum in Equation~(\ref{eq:linfty-gdp}) requires the conditional expectation at every $s\in\mathcal{S}$.
 % , not only for $\mathbb{P}_S$-almost every $s$.  
-We impose the following condition on the distribution of $S$.
+We assume the following condition on the distribution of $S$.
 \begin{assumption}[Positive density]
 \label{as:positive-density}
 $S$ has a density $p_S$ with respect to the Lebesgue measure $\mathrm{Leb}$ on $\mathcal{S}$, and $0<c_S\le p_S(s)\le C_S<\infty$ for every $s\in\mathcal{S}$.
 \end{assumption}
-Following \citet{kong2025fair}, we assume Assumption~\ref{as:positive-density} throughout.  Let $\nu$ be a $\sigma$-finite measure on $\mathcal{X}$ and let $p(\mathbf{x},s)$ be a joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$, chosen so that $\int_{\mathcal{X}} p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})=p_S(s)$ for every $s\in\mathcal{S}$.  Because a conditional expectation given $S=s$ is determined only up to a $\mathbb{P}_S$-null set of $s$, we define it pointwise through this density as
+Following \citet{kong2025fair}, we assume Assumption~\ref{as:positive-density} throughout.  Let $\nu$ be a $\sigma$-finite measure on $\mathcal{X}$ and let $p(\mathbf{x},s)$ be a joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$. 
+% chosen so that $\int_{\mathcal{X}} p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})=p_S(s)$ for every $s\in\mathcal{S}$.  
+% Because a conditional expectation given $S=s$ is determined only up to a $\mathbb{P}_S$-null set of $s$, 
+From this, a conditional expectation given $S=s$ is as follows
 \begin{equation}
   \mathbb{E}[g(\mathbf{X})\mid S=s]
-  :=\frac{1}{p_S(s)}\int_{\mathcal{X}} g(\mathbf{x})\,p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
-  \qquad s\in\mathcal{S},
+  =\frac{1}{p_S(s)}\int_{\mathcal{X}} g(\mathbf{x})\,p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
+  \qquad s\in\mathcal{S}.
   \label{eq:pointwise-conditional}
 \end{equation}
-and use Equation~(\ref{eq:pointwise-conditional}) throughout, in particular inside the supremum in Equation~(\ref{eq:linfty-gdp}).
+% and use Equation~(\ref{eq:pointwise-conditional}) throughout, in particular inside the supremum in Equation~(\ref{eq:linfty-gdp}).
 
-The value $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed.  We therefore propose a criterion for the representation itself, which measures the discrepancy between the conditional and the marginal distribution of the representation at every $s$ through an IPM.  As in Section~\ref{sec:frem}, the discriminator class $\mathcal{V}$ of this IPM specifies the prediction heads that the criterion controls.  Because the discriminator classes of Section~\ref{sec:relu-ipm} are defined on the unit ball $\mathbb{B}^d$ whereas the representation $\mathbf{Z}=h_{\phi}(\mathbf{X})$ ranges over $\mathbb{R}^d$, we normalize the representation to $\widetilde{\mathbf{Z}}:=\mathbf{Z}/\sqrt{\lVert\mathbf{Z}\rVert_2^2+1}\in\mathbb{B}^d$, and hereafter prediction heads and discriminator classes are defined on $\mathbb{B}^d$ and applied to $\widetilde{\mathbf{Z}}$.  With the conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ defined as in Equation~(\ref{eq:pointwise-conditional}), we define, for a discriminator class $\mathcal{V}$ on $\mathbb{B}^d$,
+The value $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed.  We therefore propose a criterion for the representation itself, which measures the discrepancy between the conditional and the marginal distribution of the representation at every $s$ through an IPM.  As in Section~\ref{sec:frem}, the discriminator class $\mathcal{V}$ of this IPM specifies the prediction heads that the criterion controls.  Because the discriminator classes of Section~\ref{sec:relu-ipm} are defined on the unit ball $\mathbb{B}^d$ whereas the representation $\mathbf{Z}=h_{\phi}(\mathbf{X})$ ranges over $\mathbb{R}^d$, we normalize the representation to $\widetilde{\mathbf{Z}}:=\mathbf{Z}/\sqrt{\lVert\mathbf{Z}\rVert_2^2+1}\in\mathbb{B}^d$, and, prediction heads and discriminator classes are defined on $\mathbb{B}^d$ and applied to $\widetilde{\mathbf{Z}}$.  With the conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ defined as in Equation~(\ref{eq:pointwise-conditional}), we define, for a discriminator class $\mathcal{V}$ on $\mathbb{B}^d$,
 \begin{align}
   \operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)
   &:=\sup_{s\in\mathcal{S}}
@@ -350,7 +353,7 @@ Write $\mathcal{S}=[\underline{s},\overline{s}]$ and let $\tau(\mathbf{z}):=(1+\
 \end{equation}
 Conditional expectations given $S=s$ are those of Equation~(\ref{eq:pointwise-conditional}), with $p(\mathbf{x},s)$ and $\nu$ as in Section~\ref{sec:supipm-criterion}.  The bandwidth $\gamma_n$ is that of Equation~(\ref{eq:supipm-estimators}), and $\widehat{w}_{\gamma_n}(i;s)$ is set to zero when its denominator vanishes.
 
-We impose three further conditions, stated in Appendix~\ref{app:proofs} together with the proofs.  Assumption~\ref{as:smooth-density} requires independent copies of $(\mathbf{X},S,Y)$ and a joint density twice continuously differentiable in $s$ for $\nu$-almost every $\mathbf{x}$, with envelopes $M_1,M_2\in L_1(\nu)$ for its first two derivatives.  Assumption~\ref{as:kernel} specifies $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ with a bounded, symmetric and Lipschitz probability density $K$ of finite second moment.  The bandwidth satisfies $\gamma_n\to0$, $\gamma_n\le\min\{\epsilon_n,1/2\}$ and a tail condition that bounds the kernel mass beyond $\mathcal{S}$ by $\gamma_n^2$ at every $s\in\mathcal{S}_n$.  Assumption~\ref{as:encoder} bounds the covering number of the encoder class $\mathcal{E}_n$ in the supremum norm by $(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.  For $0<\delta<1$, let
+We impose three further conditions, stated in Appendix~\ref{app:proofs}.  Assumption~\ref{as:smooth-density} requires independent copies of $(\mathbf{X},S,Y)$ and a joint density twice continuously differentiable in $s$ for $\nu$-almost every $\mathbf{x}$, with envelopes $M_1,M_2\in L_1(\nu)$ for its first two derivatives.  Assumption~\ref{as:kernel} specifies $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ with a bounded, symmetric and Lipschitz probability density $K$ of finite second moment.  The bandwidth satisfies $\gamma_n\to0$, $\gamma_n\le\min\{\epsilon_n,1/2\}$ and a tail condition that bounds the kernel mass beyond $\mathcal{S}$ by $\gamma_n^2$ at every $s\in\mathcal{S}_n$.  Assumption~\ref{as:encoder} bounds the covering number of the encoder class $\mathcal{E}_n$ in the supremum norm by $(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.  For $0<\delta<1$, let
 \begin{equation}
   \Gamma_{n,\delta}
   :=(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma_n}+\log\frac{1}{\delta},
