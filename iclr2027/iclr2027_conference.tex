@@ -318,7 +318,7 @@ where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ 
 
 The empirical supIPM in Equation~(\ref{eq:empirical-supipm}) is a supremum over the sensitive value $s$ and over the discriminator parameter $(\theta,\mu)$, so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem.  We solve it by alternating gradient descent in $(\phi,\psi)$ with projected gradient ascent in $s$ and in $(\theta,\mu)$, which extends the computation of ReLU-IPM in \citet{park2025relu} to the additional supremum over $s$.  Because gradient ascent can converge to a local maximum, the ascent runs in parallel from $T$ candidate sensitive values and $M$ discriminators.  We refer to this training method as supIPM-FRL, which can be trained efficiently by minibatch learning.  The details of the learning method are given in Appendix~\ref{app:ascent}, and the full algorithm in Algorithm~\ref{alg:supipm-frl} of Appendix~\ref{app:algorithm-steps}.
 
-The fairness of a representation with a small empirical supIPM extends to every prediction head of bounded H\"older norm.  Section~\ref{sec:theory} proves that every such head then has a small $L_{\infty}$-GDP with high probability, up to an estimation error and away from the endpoints of the sensitive domain.
+The fairness of a representation with supIPM-FLR extends to every prediction head of bounded H\"older norm.  Section~\ref{sec:theory} proves that every such head then has a small $L_{\infty}$-GDP with high probability.
 
 \section{Theoretical Analysis}
 \label{sec:theory}
