@@ -99,7 +99,7 @@ A new criterion for a continuous $S$ should therefore hold at every sensitive va
 \section{Preliminaries}
 \label{sec:preliminaries}
 
-\subsection{Fair representation using EIPM (FREM)}
+\subsection{Fair representation using EIPM}
 \label{sec:frem}
 
 We observe an input $\mathbf{X}\in\mathcal{X}$, an outcome $Y\in\mathcal{Y}$, and a continuous sensitive attribute $S$ taking values in the sensitive domain $\mathcal{S}$, a compact interval of $\mathbb{R}$.  An encoder $h:\mathcal{X}\to\mathcal{Z}$ maps $\mathbf{X}$ to a representation $\mathbf{Z}=h(\mathbf{X})$ in the representation space $\mathcal{Z}=\mathbb{R}^d$, where $d$ is the representation dimension.  A prediction head $f:\mathcal{Z}\to\mathbb{R}$ maps the representation to a real-valued prediction, and $f\circ h$ denotes the composed prediction model.  When the encoder and the prediction head are parameterized, we write them as $h_{\phi}$ and $f_{\psi}$ with parameters $\phi$ and $\psi$.  We write $\mathbb{P}_S$ for the distribution of $S$, $\mathbb{P}_{\mathbf{Z}}$ for the marginal distribution of $\mathbf{Z}$, and $\mathbb{P}_{\mathbf{Z}\mid S=s}$ for the conditional distribution of $\mathbf{Z}$ given $S=s$.  
@@ -114,14 +114,16 @@ The discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\math
 \end{equation}
 We say that $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions if $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})=0$ implies $\mathbb{P}=\mathbb{Q}$.  The class $\mathcal{V}$ determines which prediction heads the IPM controls, because $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})$ bounds $\left|\int v\,\mathrm{d}\mathbb{P}-\int v\,\mathrm{d}\mathbb{Q}\right|$ for every $v\in\mathcal{V}$.
 
-For a continuous sensitive attribute, \citet{kong2025fair} propose fair representation using EIPM (FREM) and define EIPM as
+For a continuous sensitive attribute, \citet{kong2025fair} define the expectation
+of integral probability metric (EIPM) as
 \begin{equation}
   \operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)
   :=\int_{\mathcal{S}}
     \operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})
-  \,\mathrm{d}\mathbb{P}_S(s).
+  \,\mathrm{d}\mathbb{P}_S(s)
   \label{eq:eipm}
 \end{equation}
+and propose fair representation using EIPM (FREM).
 If $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions, then $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)=0$ implies $\mathbb{P}_{\mathbf{Z}\mid S=s}=\mathbb{P}_{\mathbf{Z}}$ for $\mathbb{P}_S$-almost every $s$.
 
 Given the sample $\mathcal{D}=\{(\mathbf{X}_i,S_i,Y_i)\}_{i=1}^n$ and $\mathbf{Z}_i=h(\mathbf{X}_i)$, FREM estimates the conditional distribution at each observed $S_i$ by kernel weighting,
@@ -205,11 +207,11 @@ A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
 \begin{figure}[t]
   \centering
   \includegraphics[width=0.8\textwidth]{motivation.pdf}
-  \caption{The conditional and the marginal distribution of the representation coincide at a typical sensitive value and differ at $s_0$, a sensitive value where few observations lie.}
+  \caption{The conditional and the marginal distribution of the representation coincide at a typical sensitive value and differ at neighborhood of $s_0$, a sensitive value where few observations lie.}
   \label{fig:motivation}
 \end{figure}
 
-For a bounded measurable function $g:\mathcal{X}\to\mathbb{R}$, \citet{jiang2022gdp} define GDP for a continuous sensitive attribute as
+For a bounded measurable function $g:\mathcal{X}\to\mathbb{R}$, \citet{jiang2022gdp} define generalized demographic parity (GDP) for a continuous sensitive attribute as
 \begin{equation}
   \operatorname{GDP}(g)
   :=\mathbb{E}_{S}\!\left[
@@ -221,7 +223,7 @@ For a bounded measurable function $g:\mathcal{X}\to\mathbb{R}$, \citet{jiang2022
   \label{eq:gdp}
 \end{equation}
 
-Because Equation~(\ref{eq:gdp}) averages over $S$, a large discrepancy confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  Figure~\ref{fig:motivation} illustrates such a case: the discrepancy is large at $s_0$, whose neighborhood carries too little probability to affect the average.  We therefore replace the average by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
+Because Equation~(\ref{eq:gdp}) averages over $S$, a large discrepancy in a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  Figure~\ref{fig:motivation} illustrates such a case: the discrepancy is large at $s_0$, whose neighborhood carries small probability to affect the average.  We therefore replace the average by a supremum and define $L_{\infty}$-generalized demographic parity ($L_{\infty}$-GDP), written $\operatorname{GDP}_{\infty}$, as
 \begin{equation}
   \operatorname{GDP}_{\infty}(g)
   :=\sup_{s\in\mathcal{S}}
