@@ -90,7 +90,7 @@ A new criterion for a continuous $S$ should therefore hold at every sensitive va
 
 \paragraph{Contributions.}
 \begin{itemize}
-  \item We propose $L_{\infty}$-GDP, a fairness criterion for prediction models, and supIPM, its representation-level counterpart.  Both extend the groupwise condition of categorical DP to a continuous sensitive attribute by measuring the worst discrepancy over the sensitive domain.
+  \item We propose $L_{\infty}-$GDP, a fairness criterion for prediction models, and supIPM, its representation-level counterpart.  Both extend the groupwise condition of categorical DP to a continuous sensitive attribute by measuring the worst discrepancy over the sensitive domain.
   \item We estimate supIPM from kernel weights and ReLU-IPM, and propose supIPM-FRL, an adversarial procedure that is compatible with minibatch training.
   \item We prove that the empirical supIPM is a uniformly consistent estimator, so that the fairness level attained on the sample transfers to the population.
   % uniformly over the sensitive domain and over prediction heads of bounded H\"older norm.
@@ -304,7 +304,7 @@ Unlike Equation~(\ref{eq:eipm-estimator}), Equation~(\ref{eq:empirical-supipm}) 
 \subsection{Fair Representation Learning with supIPM}
 \label{sec:supipm-objective}
 %s^* 찾는 알고리즘 수정 처음엔 0.3 0.5 0.7 중에 큰거 0.7이 뽑혔으면 이제 0.6 0.7 0.8 중에 큰거. 0.6이 뽑혔으면 0.55 0.6 0.65 중 큰거... 이런식으로 찾는 알고리즘으로 수정.
-The empirical supIPM of Section~\ref{sec:supipm-estimation} measures the fairness of any encoder on the sample.  To learn a representation with a small supIPM, we add this estimate as a penalty to the supervised risk and train the encoder $h_{\phi}$ and the prediction head $f_{\psi}$ jointly by minimizing
+The empirical supIPM of Section~\ref{sec:supipm-estimation} measures the fairness of any encoder on the sample.  To learn a fair representation with the supIPM, we add this estimate as a penalty to the supervised risk and train the encoder $h_{\phi}$ and the prediction head $f_{\psi}$ jointly by minimizing
 \begin{equation}
   \mathcal{L}(\phi,\psi)
   :=\frac{1}{n}\sum_{i=1}^n
@@ -478,7 +478,9 @@ Every $g\in\mathcal{G}_n$ satisfies $0\le g\le2$, because $0\le(\theta^\top\math
 \end{aligned}
   \label{eq:app-notation}
 \end{equation}
+
 where $m_g$ is the version of the conditional expectation fixed in Equation~(\ref{eq:pointwise-conditional}), and $m_{g,\gamma}$ and $\widehat{m}_{g,\gamma}$ are its population and empirical local constant approximations.  Since $\widehat{w}_{\gamma}(i;s)=K_{\gamma}(S_i,s)/\sum_{j=1}^nK_{\gamma}(S_j,s)$, we have $\widehat{m}_{g,\gamma}(s)=\sum_{i=1}^n\widehat{w}_{\gamma}(i;s)g(\mathbf{X}_i)$ whenever the denominator is positive.  Hence, for every $h\in\mathcal{E}_n$,
+
 \begin{equation}
   D_n(h)=\sup_{g,s}\left|m_g(s)-\mathbb{E}g\right|,
   \qquad
@@ -487,14 +489,14 @@ where $m_g$ is the version of the conditional expectation fixed in Equation~(\re
 \end{equation}
 where the suprema run over $g=v\circ\widetilde{h}$ with $v\in\mathcal{V}_{\mathrm{R}}$ and over $s\in\mathcal{S}_n$.  Because $g$, $m_g$, $m_{g,\gamma}$ and $\widehat{m}_{g,\gamma}$ all take values in $[0,2]$, both quantities in Equation~(\ref{eq:D-in-scores}) lie in $[0,2]$.
 
-We use Bernstein's inequality in the following form \citep[e.g.,][Chapter~2]{boucheron2013concentration}.  If $W_1,\ldots,W_n$ are independent copies of a random variable $W$ with $0\le W\le U$ and $\operatorname{Var}(W)\le\sigma^2$, then
+We use Bernstein's inequality in the following form \citep[Chapter~2]{boucheron2013concentration}.  If $W_1,\ldots,W_n$ are independent copies of a random variable $W$ with $0\le W\le U$ and $\operatorname{Var}(W)\le\sigma^2$, then
 \begin{equation}
   \mathbb{P}\left(\left|\frac{1}{n}\sum_{i=1}^nW_i-\mathbb{E}W\right|\ge u\right)
   \le2\exp\left(-\frac{nu^2}{2\sigma^2+2Uu/3}\right),
   \qquad u>0 .
   \label{eq:bernstein}
 \end{equation}
-We also use the elementary inequality
+We also use the inequality
 \begin{equation}
   \left|\ \sup_{t\in\mathcal{T}}|F_1(t)|-\sup_{t\in\mathcal{T}}|F_2(t)|\ \right|
   \le\sup_{t\in\mathcal{T}}\left|F_1(t)-F_2(t)\right|,
