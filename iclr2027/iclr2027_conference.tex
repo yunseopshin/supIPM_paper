@@ -299,13 +299,12 @@ where $K_{\gamma}$ is the kernel of Section~\ref{sec:frem}.  The weights sum to 
   \right|.
   \label{eq:empirical-supipm}
 \end{align}
-Unlike Equation~(\ref{eq:eipm-estimator}), Equation~(\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy.  
-% Section~\ref{sec:supipm-objective} performs this search during training.
+Unlike Equation~(\ref{eq:eipm-estimator}), Equation~(\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy.  Section~\ref{sec:supipm-objective} performs this search during training.
 
 \subsection{Fair Representation Learning with supIPM}
 \label{sec:supipm-objective}
 %s^* 찾는 알고리즘 수정 처음엔 0.3 0.5 0.7 중에 큰거 0.7이 뽑혔으면 이제 0.6 0.7 0.8 중에 큰거. 0.6이 뽑혔으면 0.55 0.6 0.65 중 큰거... 이런식으로 찾는 알고리즘으로 수정.
-We use the empirical supIPM as a penalty and train the encoder $h_{\phi}$ and the prediction head $f_{\psi}$ jointly by minimizing
+The empirical supIPM of Section~\ref{sec:supipm-estimation} measures the fairness of any encoder on the sample.  To learn a representation with a small supIPM, we add this estimate as a penalty to the supervised risk and train the encoder $h_{\phi}$ and the prediction head $f_{\psi}$ jointly by minimizing
 \begin{equation}
   \mathcal{L}(\phi,\psi)
   :=\frac{1}{n}\sum_{i=1}^n
@@ -317,28 +316,9 @@ We use the empirical supIPM as a penalty and train the encoder $h_{\phi}$ and th
 \end{equation}
 where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  Equation~(\ref{eq:supipm-penalized-objective}) is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)\le\rho$, as in Section~\ref{sec:supipm-criterion}.
 
-The empirical supIPM in Equation~(\ref{eq:empirical-supipm}) contains an outer supremum over the sensitive value $s\in\mathcal{S}$ and an inner supremum over the discriminator parameter $(\theta,\mu)$.  For $s\in\mathcal{S}$ and $(\theta,\mu)\in\mathbb{S}^{d-1}\times[-1,1]$, let $\Delta(s;\theta,\mu)$ denote the discrepancy detected at $s$ by the discriminator $v_{\theta,\mu}$:
-\begin{equation}
-  \Delta(s;\theta,\mu)
-  :=\left|
-    \sum_{i=1}^n
-    \left(\widehat{w}_{\gamma}(i;s)-\frac{1}{n}\right)
-    (\theta^\top\widetilde{\mathbf{Z}}_i+\mu)_+
-  \right|.
-  \label{eq:discriminator-discrepancy}
-\end{equation}
-Then $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)=\sup_{s\in\mathcal{S}}\sup_{\theta\in\mathbb{S}^{d-1},\,\mu\in[-1,1]}\Delta(s;\theta,\mu)$, so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem, which we solve by alternating gradient descent in $(\phi,\psi)$ with projected gradient ascent in $s$ and in $(\theta,\mu)$.
+The empirical supIPM in Equation~(\ref{eq:empirical-supipm}) is a supremum over the sensitive value $s$ and over the discriminator parameter $(\theta,\mu)$, so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem.  We solve it by alternating gradient descent in $(\phi,\psi)$ with projected gradient ascent in $s$ and in $(\theta,\mu)$, which extends the computation of ReLU-IPM in \citet{park2025relu} to the additional supremum over $s$.  Because gradient ascent can converge to a local maximum, the ascent runs in parallel from $T$ candidate sensitive values and $M$ discriminators, and the descent step replaces the two suprema by the largest discrepancy among the $T$ candidates and the $M$ discriminators.  We name the resulting procedure supIPM-FRL.  Every update depends on the data only through sums over the observations, so the procedure applies unchanged when these sums are computed on the current minibatch.  Appendix~\ref{app:algorithm} specifies the ascent objectives, the projections of the candidates and the discriminators, and the complete algorithm.
 
-Because gradient ascent can converge to a local maximum, we follow \citet{park2025relu} and perform the ascent from several initial values in parallel, with $T$ candidate sensitive values $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ and $M$ discriminators $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$, where $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$.  Let $s^{\star}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ be the candidate at which the largest discrepancy is detected.  The candidates and the discriminators are updated by gradient ascent on
-\begin{equation}
-  G(\mathbf{s}):=\sum_{t=1}^{T}\max_{m\in[M]}\Delta(s^{(t)};\theta_m,\mu_m),
-  \qquad
-  H(\mathbf{v}):=\sum_{m=1}^{M}\Delta(s^{\star};\theta_m,\mu_m),
-  \label{eq:stacked-objectives}
-\end{equation}
-where $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $G$ and in $H$, respectively.  Since the $t$-th summand of $G$ depends on $\mathbf{s}$ only through $s^{(t)}$ and the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, one ascent step on $G$ moves all $T$ candidates and one ascent step on $H$ moves all $M$ discriminators.  The encoder and the prediction head are then updated by gradient descent on $\mathcal{L}(\phi,\psi)$ with the empirical supIPM replaced by $\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)$.  We name the resulting procedure supIPM-FRL.  Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discrepancy}) are built from sample averages, so the procedure applies unchanged when these averages are computed on the current minibatch.  The initialization of the candidates, the projections that follow each ascent step, the number and the order of the updates, and the step sizes are specified in Algorithm~\ref{alg:supipm-frl} of Appendix~\ref{app:algorithm}.
-
-The representation learned in this way carries a fairness guarantee: with high probability, a small empirical supIPM implies, up to an estimation error, a small $L_{\infty}$-GDP for every prediction head of bounded H\"older norm, except near the endpoints of the sensitive domain.  Section~\ref{sec:theory} states and proves this guarantee.
+The fairness of a representation with a small empirical supIPM extends to every prediction head of bounded H\"older norm.  Section~\ref{sec:theory} proves that every such head then has a small $L_{\infty}$-GDP with high probability, up to an estimation error and away from the endpoints of the sensitive domain.
 
 \section{Theoretical Analysis}
 \label{sec:theory}
@@ -1102,16 +1082,41 @@ The map $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$, and $\
 which is Equation~(\ref{eq:certificate}).  The event $\Omega_n$ depends on neither $h$, nor $B$, nor $\beta$, so the bound holds simultaneously for all of them.
 \end{proof}
 
-\section{Algorithm of supIPM-FRL}
+\section{Details of Learning supIPM-FRL}
 \label{app:algorithm}
 
-Algorithm~\ref{alg:supipm-frl} assembles the three updates of Section~\ref{sec:supipm-objective} into $R$ iterations.  We write $\Pi_{A}$ for the projection onto a set $A$.  After each ascent step, $\Pi_{\mathcal{S}}$ returns each candidate to the sensitive domain, and $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ returns each $\theta_m$ to the unit sphere and each $\mu_m$ to $[-1,1]$.  Each iteration performs $J_v$ discriminator updates, each preceded by $J_s$ ascent steps of freshly initialized candidates, and closes with one descent step.  The discriminator updates, the candidate ascent steps and the descent step use the step sizes $\alpha_v$, $\alpha_s$ and $\alpha$.
+\subsection{The Ascent and Descent Steps}
+\label{app:ascent}
+
+For $s\in\mathcal{S}$ and $(\theta,\mu)\in\mathbb{S}^{d-1}\times[-1,1]$, let $\Delta(s;\theta,\mu)$ denote the discrepancy detected at $s$ by the discriminator $v_{\theta,\mu}$:
+\begin{equation}
+  \Delta(s;\theta,\mu)
+  :=\left|
+    \sum_{i=1}^n
+    \left(\widehat{w}_{\gamma}(i;s)-\frac{1}{n}\right)
+    (\theta^\top\widetilde{\mathbf{Z}}_i+\mu)_+
+  \right|.
+  \label{eq:discriminator-discrepancy}
+\end{equation}
+Then $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)=\sup_{s\in\mathcal{S}}\sup_{\theta\in\mathbb{S}^{d-1},\,\mu\in[-1,1]}\Delta(s;\theta,\mu)$.  Because gradient ascent can converge to a local maximum, we follow \citet{park2025relu} and perform the ascent from several initial values in parallel, with $T$ candidate sensitive values $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ and $M$ discriminators $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$, where $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$.  Let $s^{\star}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ be the candidate at which the largest discrepancy is detected.  The candidates and the discriminators are updated by gradient ascent on
+\begin{equation}
+  G(\mathbf{s}):=\sum_{t=1}^{T}\max_{m\in[M]}\Delta(s^{(t)};\theta_m,\mu_m),
+  \qquad
+  H(\mathbf{v}):=\sum_{m=1}^{M}\Delta(s^{\star};\theta_m,\mu_m),
+  \label{eq:stacked-objectives}
+\end{equation}
+where $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $G$ and in $H$, respectively.  Since the $t$-th summand of $G$ depends on $\mathbf{s}$ only through $s^{(t)}$ and the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, one ascent step on $G$ moves all $T$ candidates and one ascent step on $H$ moves all $M$ discriminators.  We write $\Pi_{A}$ for the projection onto a set $A$.  After each ascent step, $\Pi_{\mathcal{S}}$ returns each candidate to the sensitive domain, and $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ returns each $\theta_m$ to the unit sphere and each $\mu_m$ to $[-1,1]$.  The encoder and the prediction head are then updated by gradient descent on $\mathcal{L}(\phi,\psi)$ with the empirical supIPM replaced by $\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)$, that is, with the outer supremum taken over the $T$ candidates and the inner supremum over the $M$ discriminators.
+
+\subsection{Algorithm}
+\label{app:algorithm-steps}
+
+Algorithm~\ref{alg:supipm-frl} assembles the three updates of Appendix~\ref{app:ascent} into $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by $J_s$ ascent steps from newly initialized candidates, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The discriminator updates, the candidate ascent steps and the descent step use the step sizes $\alpha_v$, $\alpha_s$ and $\alpha$.
 
 \begin{algorithm}[H]
 \caption{supIPM-FRL}
 \label{alg:supipm-frl}
 \begin{algorithmic}[1]
-\REQUIRE sample $\mathcal{D}$, supervised loss $\ell$, kernel $K_{\gamma}$ with bandwidth $\gamma$, penalty parameter $\lambda$, number of candidates $T$, number of discriminators $M$
+\REQUIRE sample $\mathcal{D}$, supervised loss $\ell$, kernel $K_{\gamma}$ with bandwidth $\gamma$, penalty parameter $\lambda$, number of candidates $T$, number of discriminators $M$, number of iterations $R$, numbers of inner updates $J_v$ and $J_s$, step sizes $\alpha_v$, $\alpha_s$ and $\alpha$
 \ENSURE encoder $h_{\phi}$ and prediction head $f_{\psi}$
 \STATE Initialize $\phi$, $\psi$, and $\mathbf{v}$ with $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]$
 \FOR{$r=1,\ldots,R$}
