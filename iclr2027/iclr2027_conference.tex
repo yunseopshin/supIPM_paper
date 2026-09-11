@@ -444,7 +444,18 @@ The tail condition of Assumption~\ref{as:kernel} bounds the kernel mass beyond $
 
 \begin{assumption}[Encoder class]
 \label{as:encoder}
-$\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1996weak} of measurable encoders $h:\mathcal{X}\to\mathbb{R}^d$ such that, with $\lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2$ and $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ the smallest number of $\lVert\cdot\rVert_\infty$-balls of radius $\eta$ covering a class $\mathcal{F}$, there exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ with $N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)\le(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.
+$\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1996weak} of measurable encoders $h:\mathcal{X}\to\mathbb{R}^d$.  For encoders $h$ and $h'$ let
+\begin{equation}
+  \lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2 ,
+  \label{eq:encoder-sup-norm}
+\end{equation}
+and let $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ be the smallest number of $\lVert\cdot\rVert_\infty$-balls of radius $\eta$ that cover a class $\mathcal{F}$.  There exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ such that
+\begin{equation}
+  N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)
+  \le\left(\frac{A_n}{\eta}\right)^{\mathfrak{v}_n},
+  \qquad 0<\eta\le1 .
+  \label{eq:encoder-entropy}
+\end{equation}
 \end{assumption}
 
 Assumption~\ref{as:encoder} holds on a bounded $\mathcal{X}$ for ReLU networks with bounded parameters.  For such networks $\mathfrak{v}_n$ is of the order of the number of parameters and $\log A_n$ of the order of the depth times the logarithm of the width \citep{schmidthieber2020nonparametric}.
