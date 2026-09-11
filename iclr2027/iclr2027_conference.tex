@@ -328,7 +328,9 @@ The fairness of a representation learned by supIPM-FRL extends to every predicti
 \section{Theoretical Analysis}
 \label{sec:theory}
 
-supIPM-FRL of Section~\ref{sec:supipm-objective} learns the encoder by penalizing the empirical supIPM, whereas the fairness of the learned representation is measured by the population supIPM.  In Theorem~\ref{thm:uniform} below we show that the empirical supIPM estimates its population counterpart uniformly over a class of encoders.  Corollary~\ref{cor:certificate} then yields the bound on the $L_{\infty}$-GDP of H\"older prediction heads announced in Section~\ref{sec:supipm-objective}.
+% supIPM-FRL of Section~\ref{sec:supipm-objective} learns the encoder by penalizing the empirical supIPM, whereas the fairness of the learned representation is measured by the population supIPM.  
+In Theorem~\ref{thm:uniform} below we show that the empirical supIPM estimates its population counterpart uniformly over a class of encoders.  
+Corollary~\ref{cor:certificate} then proves the bound on the $L_{\infty}$-GDP of H\"older prediction heads stated at the end of Section~\ref{sec:supipm-objective}.
 
 Write $\mathcal{S}=[\underline{s},\overline{s}]$.  Both results are stated on the interior region $\mathcal{S}_n:=[\underline{s}+\epsilon_n,\,\overline{s}-\epsilon_n]$, where $0<\epsilon_n<\tfrac{1}{2}(\overline{s}-\underline{s})$ and $\epsilon_n\to0$.  Restricting the supremum over $s$ in Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) to $\mathcal{S}_n$ gives
 \begin{equation}
