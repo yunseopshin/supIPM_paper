@@ -316,7 +316,7 @@ The empirical supIPM of Section~\ref{sec:supipm-estimation} measures the fairnes
 \end{equation}
 where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  Equation~(\ref{eq:supipm-penalized-objective}) is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)\le\rho$, as in Section~\ref{sec:supipm-criterion}.
 
-The empirical supIPM in Equation~(\ref{eq:empirical-supipm}) is a supremum over the sensitive value $s$ and over the discriminator parameter $(\theta,\mu)$, so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem.  We solve it by alternating gradient descent in $(\phi,\psi)$ with projected gradient ascent in $s$ and in $(\theta,\mu)$, which extends the computation of ReLU-IPM in \citet{park2025relu} to the additional supremum over $s$.  Because gradient ascent can converge to a local maximum, the ascent runs in parallel from $T$ candidate sensitive values and $M$ discriminators, and the descent step replaces the two suprema by the largest discrepancy among the $T$ candidates and the $M$ discriminators.  We name the resulting procedure supIPM-FRL.  Every update depends on the data only through sums over the observations, so the procedure applies unchanged when these sums are computed on the current minibatch.  Appendix~\ref{app:algorithm} specifies the ascent objectives, the projections of the candidates and the discriminators, and the complete algorithm.
+The empirical supIPM in Equation~(\ref{eq:empirical-supipm}) is a supremum over the sensitive value $s$ and over the discriminator parameter $(\theta,\mu)$, so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem.  We solve it by alternating gradient descent in $(\phi,\psi)$ with projected gradient ascent in $s$ and in $(\theta,\mu)$, which extends the computation of ReLU-IPM in \citet{park2025relu} to the additional supremum over $s$.  Because gradient ascent can converge to a local maximum, the ascent runs in parallel from $T$ candidate sensitive values and $M$ discriminators.  We refer to this training method as supIPM-FRL, which can be trained efficiently by minibatch learning.  The details of the learning method are given in Appendix~\ref{app:ascent}, and the full algorithm in Algorithm~\ref{alg:supipm-frl} of Appendix~\ref{app:algorithm-steps}.
 
 The fairness of a representation with a small empirical supIPM extends to every prediction head of bounded H\"older norm.  Section~\ref{sec:theory} proves that every such head then has a small $L_{\infty}$-GDP with high probability, up to an estimation error and away from the endpoints of the sensitive domain.
 
@@ -1085,10 +1085,12 @@ which is Equation~(\ref{eq:certificate}).  The event $\Omega_n$ depends on neith
 \section{Details of Learning supIPM-FRL}
 \label{app:algorithm}
 
+This appendix supplies the details of the learning procedure outlined in Section~\ref{sec:supipm-objective}.  Appendix~\ref{app:ascent} describes the ascent steps over the sensitive values and the discriminators together with the descent step for the encoder and the prediction head, and Appendix~\ref{app:algorithm-steps} assembles these steps into Algorithm~\ref{alg:supipm-frl}.
+
 \subsection{The Ascent and Descent Steps}
 \label{app:ascent}
 
-For $s\in\mathcal{S}$ and $(\theta,\mu)\in\mathbb{S}^{d-1}\times[-1,1]$, let $\Delta(s;\theta,\mu)$ denote the discrepancy detected at $s$ by the discriminator $v_{\theta,\mu}$:
+Section~\ref{sec:supipm-objective} minimizes Equation~(\ref{eq:supipm-penalized-objective}) by alternating gradient descent in $(\phi,\psi)$ with projected gradient ascent in $s$ and in $(\theta,\mu)$.  To describe the ascent steps, for $s\in\mathcal{S}$ and $(\theta,\mu)\in\mathbb{S}^{d-1}\times[-1,1]$ let $\Delta(s;\theta,\mu)$ denote the discrepancy detected at $s$ by the discriminator $v_{\theta,\mu}$:
 \begin{equation}
   \Delta(s;\theta,\mu)
   :=\left|
@@ -1110,7 +1112,7 @@ where $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $G$
 \subsection{Algorithm}
 \label{app:algorithm-steps}
 
-Algorithm~\ref{alg:supipm-frl} assembles the three updates of Appendix~\ref{app:ascent} into $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by $J_s$ ascent steps from newly initialized candidates, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The discriminator updates, the candidate ascent steps and the descent step use the step sizes $\alpha_v$, $\alpha_s$ and $\alpha$.
+Algorithm~\ref{alg:supipm-frl} assembles the three updates of Appendix~\ref{app:ascent} into $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by $J_s$ ascent steps from newly initialized candidates, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The discriminator updates, the candidate ascent steps and the descent step use the step sizes $\alpha_v$, $\alpha_s$ and $\alpha$.  Every update depends on the data only through sums over the observations, so Algorithm~\ref{alg:supipm-frl} applies unchanged when these sums are computed on the current minibatch.
 
 \begin{algorithm}[H]
 \caption{supIPM-FRL}
