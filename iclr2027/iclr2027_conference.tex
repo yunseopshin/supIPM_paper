@@ -68,7 +68,7 @@ Address \\
 \maketitle
 
 \begin{abstract}
-Fair representation learning (FRL) seeks a representation that is informative for downstream prediction yet independent of a sensitive attribute. For a continuous sensitive attribute, existing methods measure the discrepancy between conditional and marginal distributions at each sensitive value and \emph{average} it over the distribution of the sensitive attribute. Such an average can be small even when a large discrepancy is confined to a low-probability range of sensitive values, where the criterion then provides no guarantee. So, we propose $L_\infty$-generalized demographic parity, which replaces the average by a supremum, and its representation-level counterpart, the supremum integral probability metric (supIPM). We then propose supIPM-FRL, which learns a representation under a constraint on the empirical supIPM. The procedure estimates conditional distributions by kernel weighting and measures their discrepancy from the marginal distribution by ReLU-IPM. 
+Fair representation learning (FRL) seeks a representation that is informative for downstream prediction yet independent of a sensitive attribute. For a continuous sensitive attribute, existing methods measure the discrepancy between conditional and marginal distributions at each sensitive value and \emph{average} it over the distribution of the sensitive attribute. Such an average can be small even when a large discrepancy is confined to a low-probability range of sensitive values, where the criterion then provides no guarantee. We therefore propose $L_\infty$-generalized demographic parity, which replaces the average by a supremum, and its representation-level counterpart, the supremum integral probability metric (supIPM). We then propose supIPM-FRL, which learns a representation under a constraint on the empirical supIPM, estimating conditional distributions by kernel weighting and measuring their discrepancy from the marginal distribution by ReLU-IPM. 
 % Such a discriminator is determined by a direction and a bias alone, so each discrepancy is maximized over the discriminator class by gradient ascent. 
 We prove that the empirical supIPM is a uniformly consistent estimator, so the fairness level attained on the sample transfers to the population. 
 % The transfer is uniform over the sensitive domain and over prediction heads of bounded H\"older norm. 
@@ -77,17 +77,16 @@ Experiments on tabular and graph benchmarks show that supIPM-FRL attains predict
 
 \section{Introduction}
 
-A learned representation serves many downstream tasks, including tasks that are unspecified when the representation is trained \citep{bengio2013representation}.  This transferability makes the fairness requirement harder to satisfy because constraining one prediction head does not prevent another from exploiting sensitive information retained in the representation \citep{madras2018adversarially}.  Fair representation learning (FRL) addresses this problem by seeking a representation that is informative for prediction and independent of the sensitive attribute $S$ \citep{zemel2013learning}.
+A learned representation serves many downstream tasks, including tasks unspecified at training time \citep{bengio2013representation}.  This transferability makes the fairness requirement more difficult to satisfy because constraining one prediction head does not prevent another from exploiting sensitive information retained in the representation \citep{madras2018adversarially}.  Fair representation learning (FRL) addresses this problem by seeking a representation that is informative for prediction and independent of the sensitive attribute $S$ \citep{zemel2013learning}.
 %, so that every measurable function of the representation is again independent of $S$
 
 
-Most existing FRL methods have been developed for a categorical $S$, where each value of $S$ defines a group.  In this case, demographic parity (DP) requires the prediction to have the same distribution in every group, and these methods enforce DP by aligning the distribution of the representation across groups.  One line of work trains an adversary to predict the group from the representation \citep{edwards2016censoring,madras2018adversarially}.  Another compares the distribution of the representation across groups through the maximum mean discrepancy (MMD) of a fixed kernel \citep{louizos2016variational}, an integral probability metric (IPM) over a prespecified parametric discriminator class \citep{kim2022parametric}, or the power of an MMD two-sample test with a learned kernel \citep{deka2023mmdbfair}.  This groupwise construction does not extend directly to a continuous $S$ such as age or income.  Distinct observations take distinct sensitive values with probability one, so at most one observation is available at any given sensitive value $s$, and one observation does not suffice to estimate the conditional distribution of the representation at $S=s$.  Discretizing $S$ makes the groupwise construction applicable, but the resulting criterion depends on how the bins are chosen \citep{kong2025fair}. 
-It can also split nearly identical values into different groups, and it ignores their ordering \citep{mary2019continuous}.
+Most existing FRL methods have been developed for a categorical $S$, where each value of $S$ defines a group.  In this case, demographic parity (DP) requires the prediction to have the same distribution in every group, and these methods enforce DP by aligning the distribution of the representation across groups.  One line of work trains an adversary to predict the group from the representation \citep{edwards2016censoring,madras2018adversarially}.  Another compares the distribution of the representation across groups through the maximum mean discrepancy (MMD) of a fixed kernel \citep{louizos2016variational}, an integral probability metric (IPM) over a prespecified parametric discriminator class \citep{kim2022parametric}, or the power of an MMD two-sample test with a learned kernel \citep{deka2023mmdbfair}.  This groupwise construction does not extend directly to a continuous $S$ such as age or income.  Distinct observations take distinct sensitive values with probability one, so at most one observation is available at any sensitive value $s$, which does not suffice to estimate the conditional distribution of the representation at $S=s$.  Discretizing $S$ makes the groupwise construction applicable, but the resulting criterion depends on how the bins are chosen \citep{kong2025fair}, and the discretization can split nearly identical values into different groups, and it ignores their ordering \citep{mary2019continuous}.
 % The discretization also introduces threshold effects and discards the ordering of the sensitive values \citep{mary2019continuous}.
 
 Existing methods that treat $S$ as continuous have largely focused on the fitted predictor rather than on the representation, measuring its dependence on $S$ through maximal correlation or through generalized demographic parity (GDP) \citep{mary2019continuous,grari2020continuous,jiang2022gdp}. In particular, GDP is the average over $S$ of the absolute difference between the conditional and marginal mean predictions.  \citet{kong2025fair} apply the same average at the representation level: the expectation of integral probability metrics (EIPM) is the average over $S$ of the IPM between the conditional distribution of the representation given $S=s$ and its marginal distribution.  Both criteria average the discrepancy over the distribution of $S$, so a large discrepancy confined to a low-probability range of sensitive values contributes little to the average.  The average thus departs from categorical DP, which imposes one fairness level on every group regardless of its probability.
 
-A new criterion for a continuous $S$ should therefore hold at every sensitive value.  For a representation, the criterion should also hold for every prediction head that may later be fitted on it.  In this paper we propose criteria that take the supremum over $S$ instead of the average, so that a single bound holds uniformly over the sensitive domain.  This replacement transforms GDP into $L_{\infty}$-generalized demographic parity ($L_{\infty}$-GDP) and EIPM into the supremum integral probability metric (supIPM).  Our estimator of supIPM obtains the conditional distribution at an arbitrary $s$ from kernel weights, without discretization, and searches the sensitive domain for the largest discrepancy.  The discrepancy is measured by the ReLU-IPM of \citet{park2025relu}, whose discriminators are single rectified linear units (ReLU) and which controls every prediction head of bounded H\"older norm.  We add this supIPM estimate as a penalty to the supervised risk and train the encoder and the prediction head with minibatches.
+A new criterion for a continuous $S$ should therefore hold at every sensitive value.  For a representation, the criterion should also hold for every prediction head that may later be fitted on it.  In this paper we propose criteria that take the supremum over $S$ instead of the average.  This replacement transforms GDP into $L_{\infty}$-generalized demographic parity ($L_{\infty}$-GDP) and EIPM into the supremum integral probability metric (supIPM).  Our estimator of supIPM obtains the conditional distribution at an arbitrary $s$ from kernel weights, without discretization, and searches the sensitive domain for the largest discrepancy.  The discrepancy is measured by the ReLU-IPM of \citet{park2025relu}, whose discriminators are single rectified linear units (ReLU) and which controls every prediction head of bounded H\"older norm.  We add this supIPM estimate as a penalty to the supervised risk and train the encoder and the prediction head with minibatches.
 
 \paragraph{Contributions.}
 \begin{itemize}
@@ -115,7 +114,7 @@ The discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\math
 \end{equation}
 We say that $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions if $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})=0$ implies $\mathbb{P}=\mathbb{Q}$.  The class $\mathcal{V}$ determines which prediction heads the IPM controls, because $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})$ bounds $\left|\int v\,\mathrm{d}\mathbb{P}-\int v\,\mathrm{d}\mathbb{Q}\right|$ for every $v\in\mathcal{V}$.
 
-For a continuous sensitive attribute, \citet{kong2025fair} propose fair representation using EIPM (FREM).  They average, over the distribution of $S$, the IPM between the conditional and the marginal distribution, and define EIPM as
+For a continuous sensitive attribute, \citet{kong2025fair} propose fair representation using EIPM (FREM) and define EIPM as
 \begin{equation}
   \operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)
   :=\int_{\mathcal{S}}
@@ -125,7 +124,7 @@ For a continuous sensitive attribute, \citet{kong2025fair} propose fair represen
 \end{equation}
 If $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions, then $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)=0$ implies $\mathbb{P}_{\mathbf{Z}\mid S=s}=\mathbb{P}_{\mathbf{Z}}$ for $\mathbb{P}_S$-almost every $s$.
 
-FREM estimates the conditional distribution at each observed $S_i$ by kernel weighting.  Given the sample $\mathcal{D}=\{(\mathbf{X}_i,S_i,Y_i)\}_{i=1}^n$ and $\mathbf{Z}_i=h(\mathbf{X}_i)$, FREM defines
+Given the sample $\mathcal{D}=\{(\mathbf{X}_i,S_i,Y_i)\}_{i=1}^n$ and $\mathbf{Z}_i=h(\mathbf{X}_i)$, FREM estimates the conditional distribution at each observed $S_i$ by kernel weighting,
 \begin{equation}
   \widehat{\mathbb{P}}^{(-i),\gamma}_{\mathbf{Z}\mid S=S_i}
   :=\sum_{j\ne i}\widehat{w}^{(-i)}_{\gamma}(j)\,\delta_{\mathbf{Z}_j},
@@ -134,7 +133,7 @@ FREM estimates the conditional distribution at each observed $S_i$ by kernel wei
   :=\frac{K_{\gamma}(S_j,S_i)}{\sum_{r\ne i}K_{\gamma}(S_r,S_i)},
   \label{eq:frem-conditional}
 \end{equation}
-where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$, $\delta_{\mathbf{z}}$ denotes the point mass at $\mathbf{z}$, and the superscript $(-i)$ indicates that observation $i$ is left out.  FREM compares this kernel-weighted conditional distribution with the leave-one-out empirical marginal distribution $\widehat{\mathbb{P}}^{(-i)}_{\mathbf{Z}}=(n-1)^{-1}\sum_{j\ne i}\delta_{\mathbf{Z}_j}$, which yields the estimator
+where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$, $\delta_{\mathbf{z}}$ denotes the point mass at $\mathbf{z}$, and the superscript $(-i)$ indicates that observation $i$ is left out.  Comparing Equation~(\ref{eq:frem-conditional}) with the leave-one-out empirical marginal distribution $\widehat{\mathbb{P}}^{(-i)}_{\mathbf{Z}}=(n-1)^{-1}\sum_{j\ne i}\delta_{\mathbf{Z}_j}$ yields the estimator
 \begin{equation}
   \widehat{\operatorname{EIPM}}^{\gamma}_{\mathcal{V}}(\mathbf{Z};S)
   :=\frac{1}{n}\sum_{i=1}^n
@@ -143,7 +142,7 @@ where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$, $\del
         \widehat{\mathbb{P}}^{(-i)}_{\mathbf{Z}}\right).
   \label{eq:eipm-estimator}
 \end{equation}
-With a general discriminator class, this estimator requires a separate maximization at every $S_i$.  FREM avoids these maximizations by taking $\mathcal{V}$ to be the unit ball of a reproducing kernel Hilbert space (RKHS), for which each IPM is the MMD and has a closed-form kernel expression \citep{gretton2012kernel,kong2025fair}.  For a supervised loss $\ell$ and a penalty parameter $\lambda\ge 0$, FREM then trains the encoder and the prediction head by minimizing
+With a general discriminator class, this estimator requires a separate maximization at every $S_i$, which FREM avoids by taking $\mathcal{V}$ to be the unit ball of a reproducing kernel Hilbert space (RKHS), for which each IPM is the MMD and has a closed-form kernel expression \citep{gretton2012kernel,kong2025fair}.  For a supervised loss $\ell$ and a penalty parameter $\lambda\ge 0$, FREM then trains the encoder and the prediction head by minimizing
 \begin{equation}
   \frac{1}{n}\sum_{i=1}^n \ell\!\left(f(\mathbf{Z}_i),Y_i\right)
   +\lambda\,\widehat{\operatorname{EIPM}}^{\gamma}_{\mathcal{V}}(\mathbf{Z};S).
@@ -153,7 +152,7 @@ With a general discriminator class, this estimator requires a separate maximizat
 \subsection{ReLU-IPM}
 \label{sec:relu-ipm}
 
-The RKHS unit ball of Section~\ref{sec:frem} determines the prediction heads that EIPM controls.  The RKHS of the Gaussian kernel, however, contains only infinitely differentiable functions \citep{park2025relu}, so a prediction head of lower smoothness lies outside $\mathcal{V}$.  \citet{park2025relu} address this restriction with ReLU-IPM, an IPM whose discriminator class is indexed by a finite-dimensional parameter and which nevertheless controls every prediction head of bounded H\"older norm.
+The RKHS unit ball of Section~\ref{sec:frem} determines the prediction heads that EIPM controls, and for the Gaussian kernel this RKHS contains only infinitely differentiable functions \citep{park2025relu}, so a prediction head of lower smoothness lies outside $\mathcal{V}$.  \citet{park2025relu} address this restriction with ReLU-IPM, an IPM whose discriminator class is indexed by a finite-dimensional parameter and which nevertheless controls every prediction head of bounded H\"older norm.
 
 Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$ be the unit ball and $\mathbb{S}^{d-1}:=\{\theta\in\mathbb{R}^d:\lVert\theta\rVert_2=1\}$ the unit sphere.  \citet{park2025relu} define the ReLU discriminator class on $\mathbb{B}^d$ by
 \begin{equation}
@@ -164,7 +163,7 @@ Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$
   \right\},
   \label{eq:relu-class}
 \end{equation}
-where $(a)_+:=\max\{a,0\}$.  The ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, that is, Equation~(\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  Although $\mathcal{V}_{\mathrm{R}}$ is indexed by the finite-dimensional parameter $(\theta,\mu)$ alone, ReLU-IPM separates probability distributions on $\mathbb{B}^d$ \citep{park2025relu}.  The finite dimension of $(\theta,\mu)$ makes this supremum computable. \citet{park2025relu} evaluate ReLU-IPM between empirical distributions by gradient ascent over $(\theta,\mu)$, projecting $\theta$ back onto the unit sphere after each step.
+where $(a)_+:=\max\{a,0\}$.  The ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, Equation~(\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  Although $\mathcal{V}_{\mathrm{R}}$ is indexed by the finite-dimensional parameter $(\theta,\mu)$ alone, ReLU-IPM separates probability distributions on $\mathbb{B}^d$ \citep{park2025relu}, and this finite dimension makes the supremum computable.  \citet{park2025relu} evaluate ReLU-IPM between empirical distributions by gradient ascent over $(\theta,\mu)$, projecting $\theta$ back onto the unit sphere after each step.
 
 To describe the prediction heads that ReLU-IPM controls, fix a smoothness index $\beta>0$ and let $k$ be the largest integer strictly smaller than $\beta$.  Let $\partial^{\mathbf{a}}$ denote the partial derivative indexed by a multi-index $\mathbf{a}\in\mathbb{N}_0^d$ of order $|\mathbf{a}|=a_1+\cdots+a_d$.  Then the $\beta$-H\"older norm of a $k$ times continuously differentiable function $v:\mathbb{B}^d\to\mathbb{R}$ and the $\beta$-H\"older ball on $\mathbb{B}^d$ are
 \begin{equation}
@@ -183,7 +182,7 @@ To describe the prediction heads that ReLU-IPM controls, fix a smoothness index 
 \end{aligned}
   \label{eq:holder-ball}
 \end{equation}
-and H\"older-IPM denotes $\operatorname{IPM}_{\mathcal{H}^{\beta}_d}$.  \citet{park2025relu} establish that, for $d\ge3$ and every $\beta>0$ with $\beta\ne(d+3)/2$, there exists a constant $C$ depending only on $d$ and $\beta$ such that, for all probability measures $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$,
+and H\"older-IPM denotes $\operatorname{IPM}_{\mathcal{H}^{\beta}_d}$.  \citet{park2025relu} prove that, for $d\ge3$ and every $\beta>0$ with $\beta\ne(d+3)/2$, there exists a constant $C$ depending only on $d$ and $\beta$ such that, for all probability measures $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$,
 \begin{equation}
   \operatorname{IPM}_{\mathcal{H}^{\beta}_d}(\mathbb{P},\mathbb{Q})
   \le C
@@ -205,12 +204,12 @@ A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\textwidth]{motivation.pdf}
+  \includegraphics[width=0.8\textwidth]{motivation.pdf}
   \caption{The conditional and the marginal distribution of the representation coincide at a typical sensitive value and differ at $s_0$, a sensitive value where few observations lie.}
   \label{fig:motivation}
 \end{figure}
 
-\citet{jiang2022gdp} define GDP for a continuous sensitive attribute as the average over $S$ of the absolute difference between the conditional and the marginal mean prediction.  For a bounded measurable function $g:\mathcal{X}\to\mathbb{R}$,
+For a bounded measurable function $g:\mathcal{X}\to\mathbb{R}$, \citet{jiang2022gdp} define GDP for a continuous sensitive attribute as
 \begin{equation}
   \operatorname{GDP}(g)
   :=\mathbb{E}_{S}\!\left[
@@ -222,7 +221,7 @@ A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
   \label{eq:gdp}
 \end{equation}
 
-Because Equation~(\ref{eq:gdp}) averages this discrepancy over $S$, a large discrepancy confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  Figure~\ref{fig:motivation} illustrates such a case: the discrepancy between the conditional and the marginal distribution is large at the worst value $s_0$, whose neighborhood contributes too little probability to affect the average over $S$.  Categorical DP, by contrast, imposes one fairness level on every group regardless of its probability.  An extension to a continuous sensitive attribute should meet the same standard at every sensitive value.  We therefore replace the average by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
+Because Equation~(\ref{eq:gdp}) averages over $S$, a large discrepancy confined to a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  Figure~\ref{fig:motivation} illustrates such a case: the discrepancy is large at $s_0$, whose neighborhood carries too little probability to affect the average.  We therefore replace the average by a supremum and define $L_{\infty}$-GDP, written $\operatorname{GDP}_{\infty}$, as
 \begin{equation}
   \operatorname{GDP}_{\infty}(g)
   :=\sup_{s\in\mathcal{S}}
@@ -239,18 +238,16 @@ We impose the following condition on the distribution of $S$.
 \label{as:positive-density}
 $S$ has a density $p_S$ with respect to the Lebesgue measure $\mathrm{Leb}$ on $\mathcal{S}$, and $0<c_S\le p_S(s)\le C_S<\infty$ for every $s\in\mathcal{S}$.
 \end{assumption}
-Following \citet{kong2025fair}, we assume Assumption~\ref{as:positive-density} throughout.  Let $p(\mathbf{x},s)$ be a joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$ for a $\sigma$-finite measure $\nu$ on $\mathcal{X}$.  Fixing a version of $p$ with $\int_{\mathcal{X}} p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})=p_S(s)$ for every $s\in\mathcal{S}$, we obtain a version of the conditional expectation that is defined at every $s$, namely
+Following \citet{kong2025fair}, we assume Assumption~\ref{as:positive-density} throughout.  Let $\nu$ be a $\sigma$-finite measure on $\mathcal{X}$ and let $p(\mathbf{x},s)$ be a joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$, chosen so that $\int_{\mathcal{X}} p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})=p_S(s)$ for every $s\in\mathcal{S}$.  Because a conditional expectation given $S=s$ is determined only up to a $\mathbb{P}_S$-null set of $s$, we define it pointwise through this density as
 \begin{equation}
   \mathbb{E}[g(\mathbf{X})\mid S=s]
   :=\frac{1}{p_S(s)}\int_{\mathcal{X}} g(\mathbf{x})\,p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
   \qquad s\in\mathcal{S},
   \label{eq:pointwise-conditional}
 \end{equation}
-and this version is used in what follows, in particular inside the supremum in Equation~(\ref{eq:linfty-gdp}).
+and use Equation~(\ref{eq:pointwise-conditional}) throughout, in particular inside the supremum in Equation~(\ref{eq:linfty-gdp}).
 
-The value $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed.  We therefore propose a criterion for the representation itself, which controls an entire class of prediction heads at once.  Such a criterion is  a discriminator class of the IPM .
-
-Because the discriminator classes of Section~\ref{sec:relu-ipm} are defined on $\mathbb{B}^d$, we map the representation $\mathbf{Z}=h_{\phi}(\mathbf{X})$ of the parameterized encoder $h_{\phi}$ in Section~\ref{sec:frem} into the unit ball by $\widetilde{\mathbf{Z}}:=\mathbf{Z}/\sqrt{\lVert\mathbf{Z}\rVert_2^2+1}\in\mathbb{B}^d$.  From here on, prediction heads and discriminator classes are defined on $\mathbb{B}^d$ and applied to $\widetilde{\mathbf{Z}}$.  The conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ is defined as in Equation~(\ref{eq:pointwise-conditional}).  For a discriminator class $\mathcal{V}$ on $\mathbb{B}^d$, we define
+The value $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed.  We therefore propose a criterion for the representation itself, which measures the discrepancy between the conditional and the marginal distribution of the representation at every $s$ through an IPM.  As in Section~\ref{sec:frem}, the discriminator class $\mathcal{V}$ of this IPM specifies the prediction heads that the criterion controls.  Because the discriminator classes of Section~\ref{sec:relu-ipm} are defined on the unit ball $\mathbb{B}^d$ whereas the representation $\mathbf{Z}=h_{\phi}(\mathbf{X})$ ranges over $\mathbb{R}^d$, we normalize the representation to $\widetilde{\mathbf{Z}}:=\mathbf{Z}/\sqrt{\lVert\mathbf{Z}\rVert_2^2+1}\in\mathbb{B}^d$, and hereafter prediction heads and discriminator classes are defined on $\mathbb{B}^d$ and applied to $\widetilde{\mathbf{Z}}$.  With the conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ defined as in Equation~(\ref{eq:pointwise-conditional}), we define, for a discriminator class $\mathcal{V}$ on $\mathbb{B}^d$,
 \begin{align}
   \operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)
   &:=\sup_{s\in\mathcal{S}}
@@ -263,16 +260,16 @@ Because the discriminator classes of Section~\ref{sec:relu-ipm} are defined on $
   \right|.
   \label{eq:supipm}
 \end{align}
-Equation~(\ref{eq:supipm}) is the representation-level counterpart of $\operatorname{GDP}_{\infty}$: it measures the largest discrepancy between the conditional and marginal distributions before a prediction head is chosen.
+Equation~(\ref{eq:supipm}) is the representation-level counterpart of $\operatorname{GDP}_{\infty}$, defined before a prediction head is chosen.
 
-By Equation~(\ref{eq:supipm}), the constraint $\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\rho$ for a fairness level $\rho\ge0$ bounds $\left|\mathbb{E}[v(\widetilde{\mathbf{Z}})\mid S=s]-\mathbb{E}[v(\widetilde{\mathbf{Z}})]\right|$ by $\rho$ for every discriminator $v\in\mathcal{V}$ and every $s\in\mathcal{S}$.  For comparison with EIPM, write $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$ for Equation~(\ref{eq:eipm}) with $\mathbf{Z}$ replaced by $\widetilde{\mathbf{Z}}$.  Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$, so a supIPM bound of $\rho$ implies an EIPM bound at the same fairness level.  The converse fails without further regularity in $s$.
+By Equation~(\ref{eq:supipm}), the constraint $\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\rho$ for a fairness level $\rho\ge0$ bounds $\left|\mathbb{E}[v(\widetilde{\mathbf{Z}})\mid S=s]-\mathbb{E}[v(\widetilde{\mathbf{Z}})]\right|$ by $\rho$ for every discriminator $v\in\mathcal{V}$ and every $s\in\mathcal{S}$.  For comparison with EIPM, write $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$ for Equation~(\ref{eq:eipm}) with $\mathbf{Z}$ replaced by $\widetilde{\mathbf{Z}}$.  Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)\le\operatorname{supIPM}_{\mathcal{V}}(\widetilde{\mathbf{Z}};S)$.  The converse fails without further regularity in $s$.
 
-It remains to choose the discriminator class $\mathcal{V}$.  Because $\mathcal{V}$ fixes the prediction heads that supIPM controls, a guarantee for every head of bounded H\"older norm calls for the H\"older ball $\mathcal{H}^{\beta}_d$.  The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in Equation~(\ref{eq:supipm}) is the ReLU-IPM.  The inequality in Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ and $\mathbb{P}_{\widetilde{\mathbf{Z}}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\widetilde{\mathbf{Z}};S)$.
+It remains to choose the discriminator class $\mathcal{V}$.  Because $\mathcal{V}$ fixes the prediction heads that supIPM controls, a guarantee for every head of bounded H\"older norm requires the H\"older ball $\mathcal{H}^{\beta}_d$.  The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in Equation~(\ref{eq:supipm}) is the ReLU-IPM.  The inequality in Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ and $\mathbb{P}_{\widetilde{\mathbf{Z}}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\widetilde{\mathbf{Z}};S)$.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
 
-For the sample $\mathcal{D}$ of Section~\ref{sec:frem}, let $\mathbf{Z}_i=h_{\phi}(\mathbf{X}_i)$ and $\widetilde{\mathbf{Z}}_i=\mathbf{Z}_i/\sqrt{\lVert\mathbf{Z}_i\rVert_2^2+1}$.  Estimating supIPM requires the conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ at every $s\in\mathcal{S}$, whereas FREM requires it only at the observed values $S_i$.  We therefore adapt the kernel-weighted construction of Equation~(\ref{eq:frem-conditional}) to an arbitrary $s$.  Because $s$ is no longer tied to an observation, the leave-one-out correction is not needed, and all $n$ observations are used in both the conditional and the marginal estimates:
+For the sample $\mathcal{D}$ of Section~\ref{sec:frem}, let $\mathbf{Z}_i=h_{\phi}(\mathbf{X}_i)$ and $\widetilde{\mathbf{Z}}_i=\mathbf{Z}_i/\sqrt{\lVert\mathbf{Z}_i\rVert_2^2+1}$.  Estimating supIPM requires the conditional distribution $\mathbb{P}_{\widetilde{\mathbf{Z}}\mid S=s}$ at every $s\in\mathcal{S}$, whereas FREM requires it only at the observed values $S_i$.  We therefore adapt the kernel-weighted construction of Equation~(\ref{eq:frem-conditional}) to an arbitrary $s$, for which the leave-one-out correction is not needed because $s$ is no longer tied to an observation:
 \begin{equation}
   \widehat{w}_{\gamma}(i;s)
   :=\frac{K_{\gamma}(S_i,s)}{\sum_{j=1}^n K_{\gamma}(S_j,s)},
@@ -285,7 +282,7 @@ For the sample $\mathcal{D}$ of Section~\ref{sec:frem}, let $\mathbf{Z}_i=h_{\ph
   :=\frac{1}{n}\sum_{i=1}^n\delta_{\widetilde{\mathbf{Z}}_i},
   \label{eq:supipm-estimators}
 \end{equation}
-where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$.  Observations whose sensitive values are close to $s$ receive larger weights.  The weights sum to one over $i$, so that $\widehat{\mathbb{P}}^{\gamma}_{\widetilde{\mathbf{Z}}\mid S=s}$ is a probability distribution.  Substituting the two empirical distributions into Equation~(\ref{eq:supipm}) yields
+where $K_{\gamma}$ is the kernel of Section~\ref{sec:frem}.  The weights sum to one over $i$, so that $\widehat{\mathbb{P}}^{\gamma}_{\widetilde{\mathbf{Z}}\mid S=s}$ is a probability distribution, and they place more weight on observations whose sensitive values are close to $s$.  Substituting the two empirical distributions into Equation~(\ref{eq:supipm}) yields
 \begin{align}
   \widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}
   (\widetilde{\mathbf{Z}};S)
@@ -302,7 +299,7 @@ where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$.  Obse
   \right|.
   \label{eq:empirical-supipm}
 \end{align}
-Whereas the EIPM estimator in Equation~(\ref{eq:eipm-estimator}) averages the discrepancy at the observed sensitive values, Equation~(\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy.  
+Unlike Equation~(\ref{eq:eipm-estimator}), Equation~(\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy.  
 % Section~\ref{sec:supipm-objective} performs this search during training.
 
 \subsection{Fair Representation Learning with supIPM}
@@ -318,9 +315,9 @@ We use the empirical supIPM as a penalty and train the encoder $h_{\phi}$ and th
   (\widetilde{\mathbf{Z}};S),
   \label{eq:supipm-penalized-objective}
 \end{equation}
-where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  Equation~(\ref{eq:supipm-penalized-objective}) is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)\le\rho$ for a fairness level $\rho\ge0$, as in Section~\ref{sec:supipm-criterion}.
+where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  Equation~(\ref{eq:supipm-penalized-objective}) is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)\le\rho$, as in Section~\ref{sec:supipm-criterion}.
 
-Minimizing Equation~(\ref{eq:supipm-penalized-objective}) requires evaluating the empirical supIPM in Equation~(\ref{eq:empirical-supipm}), which contains two suprema: an outer supremum over the sensitive value $s\in\mathcal{S}$ and an inner supremum over the discriminator parameter $(\theta,\mu)$.  For $s\in\mathcal{S}$ and $(\theta,\mu)\in\mathbb{S}^{d-1}\times[-1,1]$, let $\Delta(s;\theta,\mu)$ denote the discrepancy detected at $s$ by the discriminator $v_{\theta,\mu}$:
+The empirical supIPM in Equation~(\ref{eq:empirical-supipm}) contains an outer supremum over the sensitive value $s\in\mathcal{S}$ and an inner supremum over the discriminator parameter $(\theta,\mu)$.  For $s\in\mathcal{S}$ and $(\theta,\mu)\in\mathbb{S}^{d-1}\times[-1,1]$, let $\Delta(s;\theta,\mu)$ denote the discrepancy detected at $s$ by the discriminator $v_{\theta,\mu}$:
 \begin{equation}
   \Delta(s;\theta,\mu)
   :=\left|
@@ -332,48 +329,23 @@ Minimizing Equation~(\ref{eq:supipm-penalized-objective}) requires evaluating th
 \end{equation}
 Then $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\widetilde{\mathbf{Z}};S)=\sup_{s\in\mathcal{S}}\sup_{\theta\in\mathbb{S}^{d-1},\,\mu\in[-1,1]}\Delta(s;\theta,\mu)$, so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem, which we solve by alternating gradient descent in $(\phi,\psi)$ with projected gradient ascent in $s$ and in $(\theta,\mu)$.
 
-Because gradient ascent can converge to a local maximum, we follow \citet{park2025relu} and perform the ascent from several initial values in parallel, maintaining $T$ candidate sensitive values $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ and $M$ discriminators $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$, where $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$.  Let $s^{\star}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ be the candidate at which the largest discrepancy is detected.  The candidates and the discriminators are updated by gradient ascent on
+Because gradient ascent can converge to a local maximum, we follow \citet{park2025relu} and perform the ascent from several initial values in parallel, with $T$ candidate sensitive values $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ and $M$ discriminators $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$, where $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$.  Let $s^{\star}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ be the candidate at which the largest discrepancy is detected.  The candidates and the discriminators are updated by gradient ascent on
 \begin{equation}
   G(\mathbf{s}):=\sum_{t=1}^{T}\max_{m\in[M]}\Delta(s^{(t)};\theta_m,\mu_m),
   \qquad
   H(\mathbf{v}):=\sum_{m=1}^{M}\Delta(s^{\star};\theta_m,\mu_m),
   \label{eq:stacked-objectives}
 \end{equation}
-where $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $G$ and in $H$, respectively.  The $t$-th summand of $G$ depends on $\mathbf{s}$ only through $s^{(t)}$, and the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, so one ascent step on $G$ moves all $T$ candidates and one ascent step on $H$ moves all $M$ discriminators.  We write $\Pi_{A}$ for the projection onto a set $A$.  After each ascent step, $\Pi_{\mathcal{S}}$ returns each candidate to the sensitive domain, and $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ returns each $\theta_m$ to the unit sphere and each $\mu_m$ to $[-1,1]$.  The encoder and the prediction head are then updated by gradient descent on $\mathcal{L}(\phi,\psi)$ with the empirical supIPM replaced by $\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)$, that is, with the outer supremum taken over the $T$ candidates and the inner supremum over the $M$ discriminators.
+where $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $G$ and in $H$, respectively.  Since the $t$-th summand of $G$ depends on $\mathbf{s}$ only through $s^{(t)}$ and the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, one ascent step on $G$ moves all $T$ candidates and one ascent step on $H$ moves all $M$ discriminators.  The encoder and the prediction head are then updated by gradient descent on $\mathcal{L}(\phi,\psi)$ with the empirical supIPM replaced by $\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)$.  We name the resulting procedure supIPM-FRL.  Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discrepancy}) are built from sample averages, so the procedure applies unchanged when these averages are computed on the current minibatch.  The initialization of the candidates, the projections that follow each ascent step, the number and the order of the updates, and the step sizes are specified in Algorithm~\ref{alg:supipm-frl} of Appendix~\ref{app:algorithm}.
 
-Algorithm~\ref{alg:supipm-frl} assembles these three updates into $R$ iterations, and we name the resulting procedure supIPM-FRL.  Each iteration performs $J_v$ discriminator updates, each preceded by $J_s$ ascent steps of freshly initialized candidates, and closes with one descent step.  The discriminator updates, the candidate ascent steps and the descent step use the step sizes $\eta_v$, $\eta_s$ and $\eta$.
-
-\begin{algorithm}[H]
-\caption{supIPM-FRL}
-\label{alg:supipm-frl}
-\begin{algorithmic}[1]
-\REQUIRE sample $\mathcal{D}$, supervised loss $\ell$, kernel $K_{\gamma}$ with bandwidth $\gamma$, penalty parameter $\lambda$, number of candidates $T$, number of discriminators $M$
-\ENSURE encoder $h_{\phi}$ and prediction head $f_{\psi}$
-\STATE Initialize $\phi$, $\psi$, and $\mathbf{v}$ with $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]$
-\FOR{$r=1,\ldots,R$}
-  \FOR{$j=1,\ldots,J_v$}
-    \STATE Initialize $\mathbf{s}$ at $T$ distinct points of $\mathcal{S}$ \label{alg:s-init}
-    \FOR{$J_s$ steps}
-      \STATE $\mathbf{s}\leftarrow\Pi_{\mathcal{S}}\!\left(\mathbf{s}+\eta_s\,\nabla_{\mathbf{s}}G(\mathbf{s})\right)$
-    \ENDFOR
-    \STATE $s^{\star}\leftarrow\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ \label{alg:s-star}
-    \STATE $\mathbf{v}\leftarrow\Pi_{\mathbb{S}^{d-1}\times[-1,1]}\!\left(\mathbf{v}+\eta_v\,\nabla_{\mathbf{v}}H(\mathbf{v})\right)$
-  \ENDFOR
-  \STATE Recompute $s^{\star}$ by repeating lines~\ref{alg:s-init}--\ref{alg:s-star} with the updated $\mathbf{v}$
-  \STATE $(\phi,\psi)\leftarrow(\phi,\psi)-\eta\,\nabla_{(\phi,\psi)}\big[\tfrac{1}{n}\sum_{i=1}^n\ell(f_{\psi}(\widetilde{\mathbf{Z}}_i),Y_i)+\lambda\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)\big]$ \label{alg:encoder-step}
-\ENDFOR
-\RETURN $h_{\phi}$, $f_{\psi}$
-\end{algorithmic}
-\end{algorithm}
-
-Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:discriminator-discrepancy}) are built from sample averages, so the procedure applies unchanged when these averages are computed on the current minibatch.
+The representation learned in this way carries a fairness guarantee: with high probability, a small empirical supIPM implies, up to an estimation error, a small $L_{\infty}$-GDP for every prediction head of bounded H\"older norm, except near the endpoints of the sensitive domain.  Section~\ref{sec:theory} states and proves this guarantee.
 
 \section{Theoretical Analysis}
 \label{sec:theory}
 
-In Theorem~\ref{thm:uniform} below we show that the empirical supIPM estimates its population counterpart uniformly over a class of encoders.  Corollary~\ref{cor:certificate} converts this estimate into a bound on the worst discrepancy of every prediction head of bounded H\"older norm.
+In Theorem~\ref{thm:uniform} below we show that the empirical supIPM estimates its population counterpart uniformly over a class of encoders.  Corollary~\ref{cor:certificate} then bounds the $L_{\infty}$-GDP of every prediction head of bounded H\"older norm in terms of the empirical supIPM.
 
-Write $\mathcal{S}=[a,b]$ and let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$ map $\mathbb{R}^d$ into $\mathbb{B}^d$.  For an encoder $h:\mathcal{X}\to\mathbb{R}^d$ put $\widetilde{h}:=\tau\circ h$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$.  Both results are stated on the interior region $\mathcal{S}_n:=[a+\epsilon_n,\,b-\epsilon_n]$, where $0<\epsilon_n<\tfrac{1}{2}(b-a)$ and $\epsilon_n\to0$.  Restricting the supremum over $s$ in Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) to $\mathcal{S}_n$ gives
+Write $\mathcal{S}=[\underline{s},\overline{s}]$ and let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$ map $\mathbb{R}^d$ into $\mathbb{B}^d$.  For an encoder $h:\mathcal{X}\to\mathbb{R}^d$ put $\widetilde{h}:=\tau\circ h$, so that $\widetilde{\mathbf{Z}}=\tau(h_{\phi}(\mathbf{X}))$.  Both results are stated on the interior region $\mathcal{S}_n:=[\underline{s}+\epsilon_n,\,\overline{s}-\epsilon_n]$, where $0<\epsilon_n<\tfrac{1}{2}(\overline{s}-\underline{s})$ and $\epsilon_n\to0$.  Restricting the supremum over $s$ in Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) to $\mathcal{S}_n$ gives
 \begin{equation}
 \begin{aligned}
   \operatorname{GDP}_{\infty,n}(g)
@@ -394,7 +366,7 @@ Write $\mathcal{S}=[a,b]$ and let $\tau(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2
 \end{aligned}
   \label{eq:interior}
 \end{equation}
-Throughout, conditional expectations given $S=s$ are the versions in Equation~(\ref{eq:pointwise-conditional}), and $p(\mathbf{x},s)$ and $\nu$ are as in Section~\ref{sec:supipm-criterion}.  The bandwidth $\gamma_n$ is that of Equation~(\ref{eq:supipm-estimators}), and $\widehat{w}_{\gamma_n}(i;s)$ is set to zero when its denominator vanishes.
+Conditional expectations given $S=s$ are those of Equation~(\ref{eq:pointwise-conditional}), with $p(\mathbf{x},s)$ and $\nu$ as in Section~\ref{sec:supipm-criterion}.  The bandwidth $\gamma_n$ is that of Equation~(\ref{eq:supipm-estimators}), and $\widehat{w}_{\gamma_n}(i;s)$ is set to zero when its denominator vanishes.
 
 We impose three further conditions, stated in Appendix~\ref{app:proofs} together with the proofs.  Assumption~\ref{as:smooth-density} requires independent copies of $(\mathbf{X},S,Y)$ and a joint density twice continuously differentiable in $s$ for $\nu$-almost every $\mathbf{x}$, with envelopes $M_1,M_2\in L_1(\nu)$ for its first two derivatives.  Assumption~\ref{as:kernel} specifies $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ with a bounded, symmetric and Lipschitz probability density $K$ of finite second moment.  The bandwidth satisfies $\gamma_n\to0$, $\gamma_n\le\min\{\epsilon_n,1/2\}$ and a tail condition that bounds the kernel mass beyond $\mathcal{S}$ by $\gamma_n^2$ at every $s\in\mathcal{S}_n$.  Assumption~\ref{as:encoder} bounds the covering number of the encoder class $\mathcal{E}_n$ in the supremum norm by $(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.  For $0<\delta<1$, let
 \begin{equation}
@@ -415,15 +387,16 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist c
   \ \le\ C\,r_{n,\delta} .
   \label{eq:uniform}
 \end{equation}
+If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta:=\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
 \end{theorem}
 
-Theorem~\ref{thm:uniform} provides the convergence rate $r_{n,\delta}$ of the empirical supIPM.  The first term of $r_{n,\delta}$ is the bias of the local constant smoother in Equation~(\ref{eq:supipm-estimators}), of order $\gamma_n^2$.  The second term is a stochastic error of order $(n\gamma_n)^{-1/2}$ inflated by the entropy of $\mathcal{E}_n$.  The condition $\Gamma_{n,\delta}\le cn\gamma_n$ requires the effective sample size $n\gamma_n$ in a bandwidth window to dominate that entropy.  Because the encoder produced by Algorithm~\ref{alg:supipm-frl} is a function of the sample, the supremum over any class $\mathcal{E}_n$ containing it cannot be removed.  The ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ contributes only the $d+1$ coordinates of $(\theta,\mu)$ to the entropy, so the representation dimension enters $\Gamma_{n,\delta}$ linearly and leaves the order of $r_{n,\delta}$ in $n$ unchanged.
+Theorem~\ref{thm:uniform} provides the convergence rate $r_{n,\delta}$ of the empirical supIPM, uniformly over $\mathcal{E}_n$, and therefore applies to the encoder that supIPM-FRL learns from the same sample.  The first term of $r_{n,\delta}$ is the bias of the local constant smoother in Equation~(\ref{eq:supipm-estimators}), of order $\gamma_n^2$.  The second term is a stochastic error of order $(n\gamma_n)^{-1/2}$ inflated by the entropy of $\mathcal{E}_n$.  The condition $\Gamma_{n,\delta}\le cn\gamma_n$ requires the effective sample size $n\gamma_n$ in a bandwidth window to dominate that entropy.  The bandwidth $\gamma_n\asymp(\log n/n)^{1/5}$ balances the two terms and yields the rate $(\log n/n)^{2/5}$ stated in the theorem.  The ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ contributes only the $d+1$ coordinates of $(\theta,\mu)$ to the entropy, so the representation dimension enters $\Gamma_{n,\delta}$ linearly and leaves the order of $r_{n,\delta}$ in $n$ unchanged.
 
-For $B>0$ let $\mathcal{H}^{\beta}_d(B)$ be the H\"older ball of Equation~(\ref{eq:holder-ball}) with radius $B$.  Let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and exponent in Equation~(\ref{eq:relu-holder}), with $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $1$ for $\beta>(d+3)/2$.
+Theorem~\ref{thm:uniform} and the H\"older bound in Equation~(\ref{eq:relu-holder}) yield the following corollary.  For $B>0$ let $\mathcal{H}^{\beta}_d(B)$ be the H\"older ball of Equation~(\ref{eq:holder-ball}) with radius $B$, and let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and exponent in Equation~(\ref{eq:relu-holder}), so that $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $\alpha_{d,\beta}=1$ for $\beta>(d+3)/2$.
 
 \begin{corollary}
 \label{cor:certificate}
-Let the assumptions of Theorem~\ref{thm:uniform} hold, let $d\ge3$, and let $C$ and $c$ be the constants of Theorem~\ref{thm:uniform}.  For every $\delta\in(0,1)$ and  $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$, simultaneously for all  $h\in\mathcal{E}_n$,  $B>0$ and  $\beta>0$ with $\beta\ne(d+3)/2$,
+Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold, let $d\ge3$, and let $C$ and $c$ be the constants of Theorem~\ref{thm:uniform}.  For every $\delta\in(0,1)$ and  $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$, simultaneously for all  $h\in\mathcal{E}_n$,  $B>0$ and  $\beta>0$ with $\beta\ne(d+3)/2$,
 \begin{equation}
   \sup_{f\in\mathcal{H}^{\beta}_d(B)}
   \operatorname{GDP}_{\infty,n}(f\circ\widetilde{h})
@@ -431,10 +404,9 @@ Let the assumptions of Theorem~\ref{thm:uniform} hold, let $d\ge3$, and let $C$ 
   \left\{\widehat{D}_n(h)+Cr_{n,\delta}\right\}^{\alpha_{d,\beta}} .
   \label{eq:certificate}
 \end{equation}
-If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta:=\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
 \end{corollary}
 
-In Corollary~\ref{cor:certificate} the right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$.  A single evaluation of $\widehat{D}_n$ therefore certifies every H\"older prediction head at every sensitive value in $\mathcal{S}_n$.  The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and equals one when $\beta>(d+3)/2$.
+The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$, so the single quantity $\widehat{D}_n(h)$ controls the $L_{\infty}$-GDP of every H\"older prediction head over $\mathcal{S}_n$.  The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and equals one when $\beta>(d+3)/2$.
 
 
 \section{Experiments}
@@ -469,10 +441,12 @@ Adult,Crime,Income data set에서 GDP,inftyGPD 기타 등등 보여주고 baseli
 \section{Proof for main theorems}
 \label{app:proofs}
 
+This appendix states the assumptions of Section~\ref{sec:theory}, proves four auxiliary lemmas, and then proves Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate}.
+
 \subsection{Assumptions}
 \label{app:assumptions}
 
-Assumption~\ref{as:positive-density} of Section~\ref{sec:supipm-criterion} is maintained throughout, with $p(\mathbf{x},s)$ and $\nu$ as fixed there, and $\mathcal{S}=[a,b]$, $\mathcal{S}_n$, $\epsilon_n$ and $\gamma_n$ as in Section~\ref{sec:theory}.  We now state the three conditions imposed there.
+Assumption~\ref{as:positive-density} of Section~\ref{sec:supipm-criterion} is maintained throughout, with $p(\mathbf{x},s)$ and $\nu$ as fixed there, and $\mathcal{S}=[\underline{s},\overline{s}]$, $\mathcal{S}_n$, $\epsilon_n$ and $\gamma_n$ as in Section~\ref{sec:theory}.  We now state the three conditions imposed there.
 
 \begin{assumption}[Smooth joint density]
 \label{as:smooth-density}
@@ -486,19 +460,19 @@ Assumption~\ref{as:smooth-density} imposes no smoothness in $\mathbf{x}$.  The e
 $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ for a bounded, symmetric and Lipschitz function $K:\mathbb{R}\to[0,\infty)$ with $\int K=1$ and $\int t^2K(t)\,\mathrm{d}t<\infty$.  With $T_K(r):=\int_{|t|>r}K(t)\,\mathrm{d}t$ the tail mass of $K$, the bandwidth satisfies $\gamma_n\to0$, $0<\gamma_n\le\min\{\epsilon_n,1/2\}$ and $T_K(\epsilon_n/\gamma_n)\le\gamma_n^2$.
 \end{assumption}
 
-The tail condition of Assumption~\ref{as:kernel} bounds the kernel mass beyond $\mathcal{S}$ by $\gamma_n^2$ at every $s\in\mathcal{S}_n$.  It is vacuous for a kernel supported on $[-1,1]$.  For the Gaussian kernel it holds whenever $\epsilon_n\asymp1/\log n$ and $\gamma_n$ decays polynomially.
+The tail condition of Assumption~\ref{as:kernel} bounds the kernel mass beyond $\mathcal{S}$ by $\gamma_n^2$ at every $s\in\mathcal{S}_n$.  For a kernel supported on $[-1,1]$ it holds automatically, because $\epsilon_n/\gamma_n\ge1$ and hence $T_K(\epsilon_n/\gamma_n)=0$.  For the Gaussian kernel it holds whenever $\epsilon_n\asymp1/\log n$ and $\gamma_n$ decays polynomially.
 
 \begin{assumption}[Encoder class]
 \label{as:encoder}
 $\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1996weak} of measurable encoders $h:\mathcal{X}\to\mathbb{R}^d$ such that, with $\lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2$ and $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ the smallest number of $\lVert\cdot\rVert_\infty$-balls of radius $\eta$ covering a class $\mathcal{F}$, there exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ with $N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)\le(A_n/\eta)^{\mathfrak{v}_n}$ for $0<\eta\le1$.
 \end{assumption}
 
-Assumption~\ref{as:encoder} holds on a bounded $\mathcal{X}$ for ReLU networks of depth $L$ and width $H$ with bounded parameters.  For such networks $\mathfrak{v}_n$ is of the order of the number of parameters and $\log A_n$ of the order of $L\log H$ \citep{schmidthieber2020nonparametric}.
+Assumption~\ref{as:encoder} holds on a bounded $\mathcal{X}$ for ReLU networks with bounded parameters.  For such networks $\mathfrak{v}_n$ is of the order of the number of parameters and $\log A_n$ of the order of the depth times the logarithm of the width \citep{schmidthieber2020nonparametric}.
 
 \subsection{Notation}
 \label{app:notation}
 
-Throughout the appendix $\mathbb{E}$ denotes expectation under the joint distribution of $(\mathbf{X},S)$ and $\mathbb{E}_n$ the average over the sample, $\mathbb{E}_n\varphi:=n^{-1}\sum_{i=1}^n\varphi(\mathbf{X}_i,S_i)$.  We abbreviate $\gamma:=\gamma_n$ and $\epsilon:=\epsilon_n$.  We write $C$ for a finite positive constant depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, whose value may change from one occurrence to the next.  Since $p_S$ integrates to one and is bounded below by $c_S$, the length $b-a\le1/c_S$ of $\mathcal{S}$ is controlled by the same list.
+Throughout the appendix $\mathbb{E}$ denotes expectation under the joint distribution of $(\mathbf{X},S)$ and $\mathbb{E}_n$ the average over the sample, $\mathbb{E}_n\varphi:=n^{-1}\sum_{i=1}^n\varphi(\mathbf{X}_i,S_i)$.  We abbreviate $\gamma:=\gamma_n$ and $\epsilon:=\epsilon_n$.  We write $C$ for a finite positive constant depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, whose value may change from one occurrence to the next.  Since $p_S$ integrates to one and is bounded below by $c_S$, the length $\overline{s}-\underline{s}\le1/c_S$ of $\mathcal{S}$ is controlled by the same list.
 
 The encoder class $\mathcal{E}_n$ and the ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ induce the class
 \begin{equation}
@@ -533,26 +507,26 @@ where $m_g$ is the version of the conditional expectation fixed in Equation~(\re
 \end{equation}
 where the suprema run over $g=v\circ\widetilde{h}$ with $v\in\mathcal{V}_{\mathrm{R}}$ and over $s\in\mathcal{S}_n$.  Because $g$, $m_g$, $m_{g,\gamma}$ and $\widehat{m}_{g,\gamma}$ all take values in $[0,2]$, both quantities in Equation~(\ref{eq:D-in-scores}) lie in $[0,2]$.
 
-We use Bernstein's inequality in the following form \citep[e.g.,][Chapter~2]{boucheron2013concentration}.  If $W_1,\ldots,W_n$ are independent copies of a random variable $W$ with $0\le W\le M$ and $\operatorname{Var}(W)\le\sigma^2$, then
+We use Bernstein's inequality in the following form \citep[e.g.,][Chapter~2]{boucheron2013concentration}.  If $W_1,\ldots,W_n$ are independent copies of a random variable $W$ with $0\le W\le U$ and $\operatorname{Var}(W)\le\sigma^2$, then
 \begin{equation}
   \mathbb{P}\left(\left|\frac{1}{n}\sum_{i=1}^nW_i-\mathbb{E}W\right|\ge u\right)
-  \le2\exp\left(-\frac{nu^2}{2\sigma^2+2Mu/3}\right),
+  \le2\exp\left(-\frac{nu^2}{2\sigma^2+2Uu/3}\right),
   \qquad u>0 .
   \label{eq:bernstein}
 \end{equation}
 We also use the elementary inequality
 \begin{equation}
-  \left|\ \sup_{t\in T}|F(t)|-\sup_{t\in T}|G(t)|\ \right|
-  \le\sup_{t\in T}\left|F(t)-G(t)\right|,
+  \left|\ \sup_{t\in\mathcal{T}}|F_1(t)|-\sup_{t\in\mathcal{T}}|F_2(t)|\ \right|
+  \le\sup_{t\in\mathcal{T}}\left|F_1(t)-F_2(t)\right|,
   \label{eq:sup-diff}
 \end{equation}
-valid for any set $T$ and any bounded $F,G:T\to\mathbb{R}$: for every $t$, $|F(t)|\le|G(t)|+\sup_T|F-G|$, so $\sup_T|F|\le\sup_T|G|+\sup_T|F-G|$, and the roles of $F$ and $G$ may be exchanged.
+valid for any set $\mathcal{T}$ and any bounded $F_1,F_2:\mathcal{T}\to\mathbb{R}$: for every $t$, $|F_1(t)|\le|F_2(t)|+\sup_{\mathcal{T}}|F_1-F_2|$, so $\sup_{\mathcal{T}}|F_1|\le\sup_{\mathcal{T}}|F_2|+\sup_{\mathcal{T}}|F_1-F_2|$, and the roles of $F_1$ and $F_2$ may be exchanged.
 
 \subsection{Auxiliary lemmas}
 \label{app:lemmas}
 
 \begin{lemma}[Lipschitz continuity and entropy of the score class]
-\label{lem:entropy} 
+\label{lem:entropy}
 $ \\$
 \emph{(i)} The map $\tau$ is $1$-Lipschitz on $\mathbb{R}^d$.\\
 \emph{(ii)} For $\mathbf{z},\mathbf{z}'\in\mathbb{B}^d$, $\theta,\theta'\in\mathbb{S}^{d-1}$ and $\mu,\mu'\in[-1,1]$,
@@ -569,11 +543,43 @@ $ \\$
 \end{lemma}
 
 \begin{proof}
-(i) Write $u(\mathbf{z}):=(1+\lVert\mathbf{z}\rVert_2^2)^{1/2}$, so that $\tau(\mathbf{z})=\mathbf{z}/u(\mathbf{z})$.  Differentiating, $\partial\tau_i/\partial z_j=\delta_{ij}u^{-1}-z_iz_ju^{-3}$, that is
+(i) Recall that $\tau(\mathbf{z})=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{z}$, so that the $i$-th coordinate of $\tau$ is $\tau_i(\mathbf{z})=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}z_i$.  Since $\partial(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}/\partial z_j=-(1+\lVert\mathbf{z}\rVert_2^2)^{-3/2}z_j$, the product rule gives
 \[
-  J(\mathbf{z})=u(\mathbf{z})^{-1}\left(I_d-\frac{\mathbf{z}\mathbf{z}^\top}{u(\mathbf{z})^2}\right).
+  \frac{\partial\tau_i}{\partial z_j}(\mathbf{z})
+  =(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{1}\{i=j\}
+   -(1+\lVert\mathbf{z}\rVert_2^2)^{-3/2}z_iz_j .
 \]
-The matrix $J(\mathbf{z})$ is symmetric.  It has eigenvalue $u^{-1}(1-\lVert\mathbf{z}\rVert_2^2u^{-2})=u^{-3}$ in the direction $\mathbf{z}$ and eigenvalue $u^{-1}$ of multiplicity $d-1$ on the orthogonal complement of $\mathbf{z}$.  Since $u(\mathbf{z})\ge1$, all eigenvalues lie in $(0,1]$, so the operator norm of $J(\mathbf{z})$ is at most one for every $\mathbf{z}$.  As $\mathbb{R}^d$ is convex, the mean value inequality gives $\lVert\tau(\mathbf{z})-\tau(\mathbf{z}')\rVert_2\le\lVert\mathbf{z}-\mathbf{z}'\rVert_2$.
+Hence the Jacobian matrix $\nabla\tau(\mathbf{z}):=(\partial\tau_i/\partial z_j(\mathbf{z}))_{i,j\le d}$ is
+\[
+  \nabla\tau(\mathbf{z})
+  =(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{I}_d
+   -(1+\lVert\mathbf{z}\rVert_2^2)^{-3/2}\mathbf{z}\mathbf{z}^\top ,
+\]
+which is symmetric.  For $\mathbf{z}\ne\mathbf{0}$,
+\[
+\begin{aligned}
+  \nabla\tau(\mathbf{z})\mathbf{z}
+  &=(1+\lVert\mathbf{z}\rVert_2^2)^{-3/2}
+   \left\{(1+\lVert\mathbf{z}\rVert_2^2)-\lVert\mathbf{z}\rVert_2^2\right\}\mathbf{z}
+  =(1+\lVert\mathbf{z}\rVert_2^2)^{-3/2}\mathbf{z},
+  \\
+  \nabla\tau(\mathbf{z})\mathbf{w}
+  &=(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}\mathbf{w}
+  \qquad\text{for }\mathbf{w}\perp\mathbf{z},
+\end{aligned}
+\]
+so the eigenvalues of $\nabla\tau(\mathbf{z})$ are $(1+\lVert\mathbf{z}\rVert_2^2)^{-3/2}$, in the direction $\mathbf{z}$, and $(1+\lVert\mathbf{z}\rVert_2^2)^{-1/2}$, with multiplicity $d-1$ on the orthogonal complement of $\mathbf{z}$.  For $\mathbf{z}=\mathbf{0}$, $\nabla\tau(\mathbf{0})=\mathbf{I}_d$.  In every case all eigenvalues lie in $(0,1]$, so the operator norm of the symmetric matrix $\nabla\tau(\mathbf{z})$ is at most one for every $\mathbf{z}\in\mathbb{R}^d$.  For $\mathbf{z},\mathbf{z}'\in\mathbb{R}^d$ the fundamental theorem of calculus along the segment $t\mapsto\mathbf{z}'+t(\mathbf{z}-\mathbf{z}')$ gives
+\[
+  \tau(\mathbf{z})-\tau(\mathbf{z}')
+  =\int_0^1\nabla\tau\bigl(\mathbf{z}'+t(\mathbf{z}-\mathbf{z}')\bigr)(\mathbf{z}-\mathbf{z}')\,\mathrm{d}t ,
+\]
+and hence
+\[
+  \lVert\tau(\mathbf{z})-\tau(\mathbf{z}')\rVert_2
+  \le\int_0^1\bigl\lVert \nabla\tau\bigl(\mathbf{z}'+t(\mathbf{z}-\mathbf{z}')\bigr)\bigr\rVert_{\mathrm{op}}\,\mathrm{d}t\,
+    \lVert\mathbf{z}-\mathbf{z}'\rVert_2
+  \le\lVert\mathbf{z}-\mathbf{z}'\rVert_2 .
+\]
 
 (ii) The map $t\mapsto(t)_+$ is $1$-Lipschitz on $\mathbb{R}$, so
 \[
@@ -648,44 +654,90 @@ Extend $p(\mathbf{x},\cdot)$ and $p_S$ by zero outside $\mathcal{S}$, so that $a
   q_{\gamma}(s)=\int_{\mathbb{R}}K(t)\,p_S(s+\gamma t)\,\mathrm{d}t .
   \label{eq:change-of-variable}
 \end{equation}
-Fix $s\in\mathcal{S}_n$, set $r_n:=\epsilon/\gamma$ and $I_n:=[-r_n,r_n]$.  Since $\gamma\le\epsilon$ we have $r_n\ge1$, and $s+\gamma t\in[s-\epsilon,s+\epsilon]\subseteq\mathcal{S}$ for every $t\in I_n$.
+Fix $s\in\mathcal{S}_n$ and set $I_n:=[-\epsilon/\gamma,\epsilon/\gamma]$.  For every $t\in I_n$ we have $s+\gamma t\in[s-\epsilon,s+\epsilon]\subseteq\mathcal{S}$.  Write $\kappa_K:=\int_{\mathbb{R}}t^2K(t)\,\mathrm{d}t$, which is finite by Assumption~\ref{as:kernel}.
 
-\emph{The denominator.}  By Lemma~\ref{lem:regularity} and Assumption~\ref{as:positive-density}, $0\le p_S\le C_S$ everywhere after the extension, so $q_{\gamma}(s)\le C_S\int K=C_S$.  In addition, $p_S\ge c_S$ on $\mathcal{S}$ gives
+Since $m_g=a_g/p_S$ and $m_{g,\gamma}=b_{g,\gamma}/q_{\gamma}$, the difference to be bounded decomposes as
+\begin{equation}
+\begin{aligned}
+  m_{g,\gamma}(s)-m_g(s)
+  &=\frac{b_{g,\gamma}(s)}{q_{\gamma}(s)}-\frac{a_g(s)}{p_S(s)}
+  =\frac{b_{g,\gamma}(s)-a_g(s)}{q_{\gamma}(s)}
+   +\frac{a_g(s)}{p_S(s)}\cdot\frac{p_S(s)-q_{\gamma}(s)}{q_{\gamma}(s)}
+  \\
+  &=\frac{b_{g,\gamma}(s)-a_g(s)}{q_{\gamma}(s)}
+   +m_g(s)\,\frac{p_S(s)-q_{\gamma}(s)}{q_{\gamma}(s)} ,
+\end{aligned}
+  \label{eq:ratio-decomposition}
+\end{equation}
+where the second equality is checked by expanding the right-hand side.  Step~(i) bounds the denominator $q_{\gamma}(s)$ from above and below, Step~(ii) bounds the two smoothing biases $b_{g,\gamma}(s)-a_g(s)$ and $q_{\gamma}(s)-p_S(s)$, and Step~(iii) combines the bounds through Equation~(\ref{eq:ratio-decomposition}).
+
+\emph{(i) The denominator.}  By Lemma~\ref{lem:regularity} and Assumption~\ref{as:positive-density}, $0\le p_S\le C_S$ everywhere after the extension, so $q_{\gamma}(s)\le C_S\int K=C_S$.  In addition, $p_S\ge c_S$ on $\mathcal{S}$ gives
 \[
   q_{\gamma}(s)\ \ge\ \int_{I_n}K(t)p_S(s+\gamma t)\,\mathrm{d}t
-  \ \ge\ c_S\{1-T_K(r_n)\}
+  \ \ge\ c_S\int_{I_n}K(t)\,\mathrm{d}t
+  \ =\ c_S\{1-T_K(\epsilon/\gamma)\}
   \ \ge\ c_S(1-\gamma^2)\ \ge\ \tfrac{3}{4}c_S ,
 \]
-where the third inequality is the tail condition of Assumption~\ref{as:kernel} and the fourth uses $\gamma\le1/2$.
+where the third inequality is the tail condition $T_K(\epsilon/\gamma)\le\gamma^2$ of Assumption~\ref{as:kernel} and the last uses $\gamma\le1/2$.  This proves the first bound in Equation~(\ref{eq:denominator-bias}).
 
-\emph{The numerator.}  Write $\int_{\mathbb{R}}=\int_{I_n}+\int_{I_n^c}$ in the first identity of Equation~(\ref{eq:change-of-variable}).  Since $0\le a_g\le2C_S$ by Lemma~\ref{lem:regularity},
+\emph{(ii) The numerator.}  Write $\int_{\mathbb{R}}=\int_{I_n}+\int_{I_n^c}$ in the first identity of Equation~(\ref{eq:change-of-variable}).  Since $0\le a_g\le2C_S$ by Lemma~\ref{lem:regularity},
 \begin{equation}
   \left|\int_{I_n^c}K(t)a_g(s+\gamma t)\,\mathrm{d}t\right|
-  \le2C_ST_K(r_n)\le2C_S\gamma^2 .
+  \le2C_S\int_{I_n^c}K(t)\,\mathrm{d}t
+  =2C_ST_K(\epsilon/\gamma)\le2C_S\gamma^2 .
   \label{eq:tail-term}
 \end{equation}
-On $I_n$ the segment joining $s$ and $s+\gamma t$ is contained in $\mathcal{S}$, so Taylor's theorem and Lemma~\ref{lem:regularity} give
+On $I_n$ the segment joining $s$ and $s+\gamma t$ is contained in $\mathcal{S}$, so Taylor's theorem and the bound $\lVert a_g''\rVert_\infty\le2\lVert M_2\rVert_{L_1(\nu)}$ of Lemma~\ref{lem:regularity} give
 \[
   \left|a_g(s+\gamma t)-a_g(s)-\gamma t\,a_g'(s)\right|
   \le\frac{\gamma^2t^2}{2}\lVert a_g''\rVert_\infty
   \le\gamma^2t^2\lVert M_2\rVert_{L_1(\nu)},
   \qquad t\in I_n .
 \]
-Multiply by $K(t)$ and integrate over $I_n$.  Because $K$ and $I_n$ are symmetric about the origin, $\int_{I_n}tK(t)\,\mathrm{d}t=0$, and with $\int_{I_n}K=1-T_K(r_n)$ this gives
+Multiply by $K(t)$ and integrate over $I_n$.  Because $K$ and $I_n$ are symmetric about the origin, $\int_{I_n}tK(t)\,\mathrm{d}t=0$, and $\int_{I_n}K(t)\,\mathrm{d}t=1-T_K(\epsilon/\gamma)$, so
 \[
+\begin{aligned}
   \left|\int_{I_n}K(t)a_g(s+\gamma t)\,\mathrm{d}t-a_g(s)\right|
-  \le a_g(s)T_K(r_n)
-    +\gamma^2\lVert M_2\rVert_{L_1(\nu)}\int_{\mathbb{R}}t^2K(t)\,\mathrm{d}t .
+  &\le\left|\int_{I_n}K(t)\{a_g(s+\gamma t)-a_g(s)-\gamma ta_g'(s)\}\,\mathrm{d}t\right|
+  \\
+  &\qquad+a_g(s)\left|\int_{I_n}K(t)\,\mathrm{d}t-1\right|
+  \\
+  &\le\gamma^2\lVert M_2\rVert_{L_1(\nu)}\kappa_K+a_g(s)T_K(\epsilon/\gamma) .
+\end{aligned}
 \]
-Adding Equation~(\ref{eq:tail-term}), and using $T_K(r_n)\le\gamma^2$, $a_g\le2C_S$ and $\int t^2K<\infty$, gives the first bound in Equation~(\ref{eq:numerator-bias}).  The same argument with $g\equiv1$ gives the second bound in Equation~(\ref{eq:denominator-bias}).
+Adding Equation~(\ref{eq:tail-term}), and using $T_K(\epsilon/\gamma)\le\gamma^2$ and $a_g\le2C_S$, we obtain
+\begin{equation}
+\begin{aligned}
+  \left|b_{g,\gamma}(s)-a_g(s)\right|
+  &\le\left|\int_{I_n}K(t)a_g(s+\gamma t)\,\mathrm{d}t-a_g(s)\right|
+   +\left|\int_{I_n^c}K(t)a_g(s+\gamma t)\,\mathrm{d}t\right|
+  \\
+  &\le\left(4C_S+\lVert M_2\rVert_{L_1(\nu)}\kappa_K\right)\gamma^2 ,
+\end{aligned}
+  \label{eq:numerator-explicit}
+\end{equation}
+which is the first bound in Equation~(\ref{eq:numerator-bias}).  The same argument with $g\equiv1$, for which $a_g=p_S\le C_S$ and $\lVert p_S''\rVert_\infty\le\lVert M_2\rVert_{L_1(\nu)}$ by Lemma~\ref{lem:regularity}, so that the tail term, the term $p_S(s)T_K(\epsilon/\gamma)$ and the Taylor remainder are at most $C_S\gamma^2$, $C_S\gamma^2$ and $\tfrac12\gamma^2\lVert M_2\rVert_{L_1(\nu)}\kappa_K$, gives
+\begin{equation}
+  \left|q_{\gamma}(s)-p_S(s)\right|
+  \le\left(2C_S+\tfrac12\lVert M_2\rVert_{L_1(\nu)}\kappa_K\right)\gamma^2 ,
+  \label{eq:denominator-explicit}
+\end{equation}
+which is the second bound in Equation~(\ref{eq:denominator-bias}).
 
-\emph{The ratio.}  Since $m_g=a_g/p_S$ and $m_{g,\gamma}=b_{g,\gamma}/q_{\gamma}$,
+\emph{(iii) The ratio.}  Taking absolute values in Equation~(\ref{eq:ratio-decomposition}) and inserting $q_{\gamma}(s)\ge3c_S/4$ from Step~(i), Equations~(\ref{eq:numerator-explicit}) and (\ref{eq:denominator-explicit}) from Step~(ii), and $0\le m_g\le2$ from Lemma~\ref{lem:regularity},
 \[
-  m_{g,\gamma}(s)-m_g(s)
-  =\frac{b_{g,\gamma}(s)-a_g(s)}{q_{\gamma}(s)}
-   +m_g(s)\,\frac{p_S(s)-q_{\gamma}(s)}{q_{\gamma}(s)} ,
+\begin{aligned}
+  \left|m_{g,\gamma}(s)-m_g(s)\right|
+  &\le\frac{\left|b_{g,\gamma}(s)-a_g(s)\right|}{q_{\gamma}(s)}
+   +m_g(s)\,\frac{\left|p_S(s)-q_{\gamma}(s)\right|}{q_{\gamma}(s)}
+  \\
+  &\le\frac{4}{3c_S}\left\{\left(4C_S+\lVert M_2\rVert_{L_1(\nu)}\kappa_K\right)
+   +2\left(2C_S+\tfrac12\lVert M_2\rVert_{L_1(\nu)}\kappa_K\right)\right\}\gamma^2
+  \\
+  &=\frac{8\left(4C_S+\lVert M_2\rVert_{L_1(\nu)}\kappa_K\right)}{3c_S}\,\gamma^2 ,
+\end{aligned}
 \]
-as is checked by expanding the right-hand side.  Since $|m_g|\le2$ by Lemma~\ref{lem:regularity} and $q_{\gamma}\ge3c_S/4$ by Equation~(\ref{eq:denominator-bias}), inserting the two bias bounds just proved yields the second bound in Equation~(\ref{eq:numerator-bias}).  None of the constants depends on $g$ or on $s$.
+which is the second bound in Equation~(\ref{eq:numerator-bias}).  None of the constants depends on $g$ or on $s$.
 \end{proof}
 
 \begin{lemma}[Uniform stochastic error]
@@ -693,7 +745,7 @@ as is checked by expanding the right-hand side.  Since $|m_g|\le2$ by Lemma~\ref
 Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist constants $C_\ast,c>0$, depending only on $c_S$, $C_S$ and $K$, such that for every $\delta\in(0,1)$ and every $n$ with $\Gamma_{n,\delta}\le c\,n\gamma$ the event
 \begin{equation}
 \begin{aligned}
-  \mathcal{A}_n:=\Bigg\{
+  \Omega_n:=\Bigg\{
   &\sup_{g\in\mathcal{G}_n}\sup_{s\in\mathcal{S}_n}
    \left|(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\}\right|
    \le C_\ast\Lambda_n,\ \
@@ -705,53 +757,82 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist c
 \end{aligned}
   \label{eq:good-event}
 \end{equation}
-satisfies $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$, where $\Lambda_n:=\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}$.  Moreover, on the event $\mathcal{A}_n$, 
+satisfies $\mathbb{P}(\Omega_n)\ge1-\delta$, where $\Lambda_n:=\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}$.  Moreover, on the event $\Omega_n$,
 \begin{equation}
 \inf_{s\in\mathcal{S}_n}\mathbb{E}_nK_{\gamma}(S,s)\ge c_S/2
+\label{eq:denominator-lower}
 \end{equation}
 holds.
 
 \end{lemma}
 
 \begin{proof}
-Throughout, $c$ is taken small enough for the finitely many requirements below, all of which depend only on $c_S$, $C_S$ and $K$.  Since $\Gamma_{n,\delta}\ge1$ and $\gamma\le1$, the hypothesis $\Gamma_{n,\delta}\le cn\gamma$ gives
+The constants are determined in the following order.  Step~1 fixes a constant $C_0\ge1$ depending only on $c_S$ and $K$, Step~2 fixes $C_\ast\ge1$ depending only on $c_S$, $C_S$ and $K$, and $c$ is then defined by
 \begin{equation}
-  \gamma\ \ge\ \frac{1}{cn},
+  c:=\min\left\{\frac{1}{C_\ast^{2}},\ \frac{c_S^2}{16C_\ast^{2}}\right\},
+  \qquad\text{so that}\qquad
+  c\le1,\quad C_\ast\sqrt{c}\le1
+  \quad\text{and}\quad C_\ast\sqrt{c}\le\frac{c_S}{4} .
+  \label{eq:c-choice}
+\end{equation}
+Neither $C_0$ nor $C_\ast$ depends on $c$, and only the three consequences listed in Equation~(\ref{eq:c-choice}) are used below.
+
+Since $\mathfrak{v}_n\ge1$, $d\ge1$, $A_n\ge e$ and $\gamma\le1$, the definition in Equation~(\ref{eq:rate}) gives $\Gamma_{n,\delta}\ge(\mathfrak{v}_n+d)\log A_n\ge2$, and in particular $\Gamma_{n,\delta}\ge1$.  Combining this with the hypothesis $\Gamma_{n,\delta}\le cn\gamma$ and with $\gamma\le1$ and $n\ge1$,
+\begin{equation}
+  \gamma\ \ge\ \frac{\Gamma_{n,\delta}}{cn}\ \ge\ \frac{1}{cn},
   \qquad
-  \Lambda_n\ \ge\ \frac{1}{\sqrt{n}}\ \ge\ \frac{1}{n},
+  \Lambda_n=\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}\ \ge\ \sqrt{\frac{1}{n\gamma}}\ \ge\ \frac{1}{\sqrt{n}}\ \ge\ \frac{1}{n},
   \qquad
-  \Lambda_n\ \le\ \sqrt{c} .
+  \Lambda_n\ \le\ \sqrt{\frac{cn\gamma}{n\gamma}}\ =\ \sqrt{c} .
   \label{eq:lambda-range}
 \end{equation}
 
-\emph{Step 1: the numerator class.}  Let $u:=C_1\Lambda_n$ with $C_1\ge1$ to be chosen, and assume $c\le C_1^{-2}$, so that $n^{-1}\le u\le1$ by Equation~(\ref{eq:lambda-range}).  Let
-\[
-  \zeta_g:=\frac{\gamma u}{8\lVert K\rVert_\infty},
-  \qquad
-  \zeta_s:=\frac{\gamma^2u}{16L_K},
-\]
-where $L_K$ is the Lipschitz constant of $K$.  Replace $\zeta_g$ by $\min\{\zeta_g,1\}$ if necessary, which only refines the following net.  Lemma~\ref{lem:entropy}(iii) then provides a $\zeta_g$-net $g_1,\ldots,g_{N_1}$ of $\mathcal{G}_n$ in $\lVert\cdot\rVert_\infty$ with $0\le g_k\le2$.  Let $s_1,\ldots,s_{N_2}$ be a $\zeta_s$-net of $\mathcal{S}_n$ in $|\cdot|$.  Given $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$, choose $k$ and $j$ with $\lVert g-g_k\rVert_\infty\le\zeta_g$ and $|s-s_j|\le\zeta_s$.  Since $K$ is $L_K$-Lipschitz,
-\[
-  \left|K_{\gamma}(s',s)-K_{\gamma}(s',s_j)\right|
-  =\frac{1}{\gamma}\left|K\!\left(\frac{s'-s}{\gamma}\right)
-    -K\!\left(\frac{s'-s_j}{\gamma}\right)\right|
-  \le\frac{L_K}{\gamma^2}|s-s_j| ,
-\]
-so, using $K_{\gamma}\le\lVert K\rVert_\infty/\gamma$ and $0\le g_k\le2$,
+\emph{Step 1: the numerator class.}  Let $u:=C_\ast\Lambda_n$, where $C_\ast\ge1$ is the constant to be fixed in Step~2.  By Equation~(\ref{eq:lambda-range}) and the consequence $C_\ast\sqrt{c}\le1$ of Equation~(\ref{eq:c-choice}),
 \begin{equation}
-  \sup_{\mathbf{x}\in\mathcal{X},\,s'\in\mathcal{S}}
+  \frac{1}{n}\ \le\ \Lambda_n\ \le\ u\ \le\ C_\ast\sqrt{c}\ \le\ 1 .
+  \label{eq:u-range}
+\end{equation}
+Let $L_K>0$ be a Lipschitz constant of $K$ and put
+\[
+  \zeta_{\mathcal{G}}:=\min\left\{\frac{\gamma u}{8\lVert K\rVert_\infty},\,1\right\},
+  \qquad
+  \zeta_{\mathcal{S}}:=\frac{\gamma^2u}{16L_K} .
+\]
+Since $0<\zeta_{\mathcal{G}}\le1$, Lemma~\ref{lem:entropy}(iii) provides a $\zeta_{\mathcal{G}}$-net $g_1,\ldots,g_{N_1}$ of $\mathcal{G}_n$ in $\lVert\cdot\rVert_\infty$ with $0\le g_k\le2$.  Let $s_1,\ldots,s_{N_2}$ be a $\zeta_{\mathcal{S}}$-net of $\mathcal{S}_n$ in $|\cdot|$.  Given $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$, choose $k$ and $j$ with $\lVert g-g_k\rVert_\infty\le\zeta_{\mathcal{G}}$ and $|s-s_j|\le\zeta_{\mathcal{S}}$.  Since $K$ is $L_K$-Lipschitz, for every $s'\in\mathcal{S}$,
+\begin{equation}
+\begin{aligned}
+  \left|K_{\gamma}(s',s)-K_{\gamma}(s',s_j)\right|
+  &=\frac{1}{\gamma}\left|K\!\left(\frac{s'-s}{\gamma}\right)
+    -K\!\left(\frac{s'-s_j}{\gamma}\right)\right|
+  \\
+  &\le\frac{L_K}{\gamma}\cdot\frac{|s-s_j|}{\gamma}
+  \le\frac{L_K}{\gamma^2}\zeta_{\mathcal{S}}
+  =\frac{u}{16} .
+\end{aligned}
+  \label{eq:kernel-lipschitz}
+\end{equation}
+Hence, using $K_{\gamma}\le\lVert K\rVert_\infty/\gamma$, $0\le g_k\le2$ and $\zeta_{\mathcal{G}}\le\gamma u/(8\lVert K\rVert_\infty)$,
+\begin{equation}
+\begin{aligned}
+  &\sup_{\mathbf{x}\in\mathcal{X},\,s'\in\mathcal{S}}
   \left|K_{\gamma}(s',s)g(\mathbf{x})-K_{\gamma}(s',s_j)g_k(\mathbf{x})\right|
-  \le\frac{\lVert K\rVert_\infty}{\gamma}\zeta_g+\frac{2L_K}{\gamma^2}\zeta_s
-  \le\frac{u}{4} .
+  \\
+  &\qquad\le\sup_{s'\in\mathcal{S}}K_{\gamma}(s',s)\,\lVert g-g_k\rVert_\infty
+   +\sup_{s'\in\mathcal{S}}\left|K_{\gamma}(s',s)-K_{\gamma}(s',s_j)\right|\lVert g_k\rVert_\infty
+  \\
+  &\qquad\le\frac{\lVert K\rVert_\infty}{\gamma}\zeta_{\mathcal{G}}+\frac{2u}{16}
+  \le\frac{u}{8}+\frac{u}{8}
+  =\frac{u}{4} .
+\end{aligned}
   \label{eq:discretisation}
 \end{equation}
-Applying Equation~(\ref{eq:discretisation}) under $\mathbb{E}_n$ and under $\mathbb{E}$ gives
+Both $\mathbb{E}_n$ and $\mathbb{E}$ are averages, so the uniform bound in Equation~(\ref{eq:discretisation}) applies under each of them and gives
 \[
   \left|(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\}\right|
   \le\left|(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s_j)g_k(\mathbf{X})\}\right|
-    +\frac{u}{2} ,
+    +\frac{u}{4}+\frac{u}{4} ,
 \]
-and therefore, with the suprema running over $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$,
+so if the left-hand side exceeds $u$, then $|(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s_j)g_k(\mathbf{X})\}|>u/2$.  Therefore, with the suprema running over $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$,
 \begin{equation}
   \mathbb{P}\left(
     \sup_{g,s}
@@ -763,125 +844,225 @@ and therefore, with the suprema running over $g\in\mathcal{G}_n$ and $s\in\mathc
       >\tfrac{u}{2}\right).
   \label{eq:union-bound}
 \end{equation}
-The variable $W:=K_{\gamma}(S,s_j)g_k(\mathbf{X})$ satisfies $0\le W\le M:=2\lVert K\rVert_\infty/\gamma$ and, by $K_{\gamma}\le\lVert K\rVert_\infty/\gamma$ and $q_{\gamma}\le C_S$ from Lemma~\ref{lem:bias},
+The variable $W:=K_{\gamma}(S,s_j)g_k(\mathbf{X})$ satisfies $0\le W\le U:=2\lVert K\rVert_\infty/\gamma$ and, by $K_{\gamma}\le\lVert K\rVert_\infty/\gamma$, $g_k\le2$ and $q_{\gamma}\le C_S$ from Lemma~\ref{lem:bias},
 \[
   \operatorname{Var}(W)\le\mathbb{E}W^2
+  =\mathbb{E}\{K_{\gamma}(S,s_j)^2g_k(\mathbf{X})^2\}
   \le\frac{4\lVert K\rVert_\infty}{\gamma}\,\mathbb{E}K_{\gamma}(S,s_j)
   \le\frac{4\lVert K\rVert_\infty C_S}{\gamma}=:\sigma^2 .
 \]
-By Equation~(\ref{eq:bernstein}) at $u/2$, each summand in Equation~(\ref{eq:union-bound}) is at most $2\exp\{-nu^2/(8\sigma^2+4Mu/3)\}$.  The right-hand side of Equation~(\ref{eq:union-bound}) is therefore bounded by $\delta/3$, provided that
+By Equation~(\ref{eq:bernstein}) with $u/2$ in place of $u$, each summand in Equation~(\ref{eq:union-bound}) is at most
+\[
+  2\exp\left\{-\frac{n(u/2)^2}{2\sigma^2+2U(u/2)/3}\right\}
+  =2\exp\left\{-\frac{nu^2}{8\sigma^2+4Uu/3}\right\} ,
+\]
+so the right-hand side of Equation~(\ref{eq:union-bound}) is at most $2N_1N_2\exp\{-nu^2/(8\sigma^2+4Uu/3)\}$, which is at most $\delta/3$ if and only if
 \begin{equation}
-  \frac{nu^2}{8\sigma^2+4Mu/3}\ \ge\ \ell,
+  \frac{nu^2}{8\sigma^2+4Uu/3}\ \ge\ \Xi,
   \qquad
-  \ell:=\log\frac{6N_1N_2}{\delta} .
+  \Xi:=\log\frac{6N_1N_2}{\delta} .
   \label{eq:bernstein-requirement}
 \end{equation}
-Equation~(\ref{eq:bernstein-requirement}) holds whenever $nu^2\ge16\ell\sigma^2$ and $nu^2\ge8\ell Mu/3$, that is whenever
+If $nu^2\ge16\Xi\sigma^2$ and $nu^2\ge8\Xi Uu/3$, then $8\sigma^2\le nu^2/(2\Xi)$ and $4Uu/3\le nu^2/(2\Xi)$, so $8\sigma^2+4Uu/3\le nu^2/\Xi$ and Equation~(\ref{eq:bernstein-requirement}) holds.  With $\sigma^2=4\lVert K\rVert_\infty C_S/\gamma$ and $U=2\lVert K\rVert_\infty/\gamma$, these two conditions read
 \begin{equation}
-  u\ \ge\ 8\sqrt{\frac{\lVert K\rVert_\infty C_S\ell}{n\gamma}}
+  u\ \ge\ 4\sigma\sqrt{\frac{\Xi}{n}}
+  =8\sqrt{\frac{\lVert K\rVert_\infty C_S\Xi}{n\gamma}}
   \qquad\text{and}\qquad
-  u\ \ge\ \frac{16\lVert K\rVert_\infty\ell}{3n\gamma} .
+  u\ \ge\ \frac{8\Xi U}{3n}
+  =\frac{16\lVert K\rVert_\infty\Xi}{3n\gamma} .
   \label{eq:u-requirement}
 \end{equation}
-It remains to bound $\ell$.  (iii) of Lemma~\ref{lem:entropy} with $\eta=\zeta_g$ and the bound $N_2\le1+(b-a)/(2\zeta_s)$ give
+It remains to bound $\Xi$.  By Lemma~\ref{lem:entropy}(iii) with $\eta=\zeta_{\mathcal{G}}$, and since $1/\zeta_{\mathcal{G}}=\max\{8\lVert K\rVert_\infty/(\gamma u),1\}\le(8\lVert K\rVert_\infty+1)/(\gamma u)$ by $\gamma u\le1$,
 \[
-  \log N_1\le(\mathfrak{v}_n+d+1)
-    \log\frac{72\lVert K\rVert_\infty A_n}{\gamma u},
-  \qquad
-  \log N_2\le\log\left(1+\frac{8L_K(b-a)}{\gamma^2u}\right).
+  \log N_1
+  \le(\mathfrak{v}_n+d+1)\log\frac{9A_n}{\zeta_{\mathcal{G}}}
+  \le(\mathfrak{v}_n+d+1)\log\frac{9(8\lVert K\rVert_\infty+1)A_n}{\gamma u} .
 \]
-Since $u\ge n^{-1}$, $\gamma\ge1/(cn)$, $b-a\le1/c_S$, $A_n\ge e$, $\mathfrak{v}_n\ge1$ and $d\ge1$, both logarithms are bounded by a multiple of $\log(A_nn/\gamma)$ with a factor depending only on $c_S$ and $K$.  Hence
+A $\zeta_{\mathcal{S}}$-net of the interval $\mathcal{S}_n$, whose length is at most $\overline{s}-\underline{s}$, needs at most $1+(\overline{s}-\underline{s})/(2\zeta_{\mathcal{S}})$ points, so
+\[
+  \log N_2\le\log\left(1+\frac{b-a}{2\zeta_{\mathcal{S}}}\right)
+  =\log\left(1+\frac{8L_K(\overline{s}-\underline{s})}{\gamma^2u}\right).
+\]
+We now use $u\ge n^{-1}$ from Equation~(\ref{eq:u-range}), which gives $\log(1/u)\le\log n$.  Since $A_n\ge e$ and $\gamma\le1$, $\log(A_nn/\gamma)=\log A_n+\log n+\log(1/\gamma)\ge1$, and since $\overline{s}-\underline{s}\le1/c_S$ and $\gamma^2u\le1$, $1+8L_K(\overline{s}-\underline{s})/(\gamma^2u)\le(1+8L_K/c_S)/(\gamma^2u)$.  Hence
+\[
+\begin{aligned}
+  \log\frac{9(8\lVert K\rVert_\infty+1)A_n}{\gamma u}
+  &\le\log\{9(8\lVert K\rVert_\infty+1)\}+\log A_n+\log\frac{1}{\gamma}+\log n
+  \\
+  &\le\left[1+\log\{9(8\lVert K\rVert_\infty+1)\}\right]\log\frac{A_nn}{\gamma},
+  \\
+  \log\left(1+\frac{8L_K(\overline{s}-\underline{s})}{\gamma^2u}\right)
+  &\le\log\left(1+\frac{8L_K}{c_S}\right)+2\log\frac{1}{\gamma}+\log n
+  \\
+  &\le\left[2+\log\left(1+\frac{8L_K}{c_S}\right)\right]\log\frac{A_nn}{\gamma} .
+\end{aligned}
+\]
+Since $\mathfrak{v}_n+d+1\le2(\mathfrak{v}_n+d)$ and $\mathfrak{v}_n+d\ge1$, we conclude that $\Xi=\log6+\log N_1+\log N_2+\log(1/\delta)$ satisfies
 \begin{equation}
-  \ell\ \le\ C_0\left\{(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma}+\log\frac{1}{\delta}\right\}
-  \ =\ C_0\,\Gamma_{n,\delta}
+\begin{aligned}
+  \Xi
+  &\le C_0\left\{(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma}+\log\frac{1}{\delta}\right\}
+  =C_0\,\Gamma_{n,\delta},
+  \\
+  C_0&:=4+2\log\{36(8\lVert K\rVert_\infty+1)\}+\log\left(1+\frac{8L_K}{c_S}\right)+\log6 ,
+\end{aligned}
   \label{eq:entropy-bound}
 \end{equation}
-for a constant $C_0$ depending only on $c_S$ and $K$.  Since $\Gamma_{n,\delta}\le cn\gamma$, we have $\Gamma_{n,\delta}/(n\gamma)\le\sqrt{c}\,\Lambda_n$.  Both requirements in Equation~(\ref{eq:u-requirement}) are therefore met by $u=C_1\Lambda_n$ once $C_1$ is a large enough multiple of $\max\{\sqrt{\lVert K\rVert_\infty C_SC_0},\,\lVert K\rVert_\infty C_0\}$ and $c\le1$.  Fixing such a $C_1$ and then $c\le C_1^{-2}$ completes Step~1: the first bound in Equation~(\ref{eq:good-event}) fails with probability at most $\delta/3$.
+where $C_0\ge1$ depends only on $c_S$ and $K$, and where the factor $36$ in place of $9$ is chosen so that the same $C_0$ serves in Step~2.  Finally, by Equation~(\ref{eq:entropy-bound}) and $\Lambda_n^2=\Gamma_{n,\delta}/(n\gamma)$, together with $\Lambda_n\le\sqrt{c}\le1$ from Equations~(\ref{eq:lambda-range}) and (\ref{eq:c-choice}),
+\[
+  8\sqrt{\frac{\lVert K\rVert_\infty C_S\Xi}{n\gamma}}
+  \le8\sqrt{\lVert K\rVert_\infty C_SC_0}\,\Lambda_n ,
+  \qquad
+  \frac{16\lVert K\rVert_\infty\Xi}{3n\gamma}
+  \le\frac{16\lVert K\rVert_\infty C_0}{3}\Lambda_n^2
+  \le\frac{16\lVert K\rVert_\infty C_0}{3}\Lambda_n .
+\]
+Both requirements in Equation~(\ref{eq:u-requirement}) are therefore met by $u=C_\ast\Lambda_n$ as soon as
+\begin{equation}
+  C_\ast\ \ge\ 8\sqrt{\lVert K\rVert_\infty C_SC_0}
+  \qquad\text{and}\qquad
+  C_\ast\ \ge\ \frac{16\lVert K\rVert_\infty C_0}{3} ,
+  \label{eq:cstar-step1}
+\end{equation}
+and under Equation~(\ref{eq:cstar-step1}) the first bound in Equation~(\ref{eq:good-event}) fails with probability at most $\delta/3$.
 
-\emph{Step 2: the denominator and the marginal.}  The class $\{s'\mapsto K_{\gamma}(s',s):s\in\mathcal{S}_n\}$ is handled by the same argument with $N_1=1$, where the $\zeta_s$-net alone controls the discretization error.  This gives the second bound in Equation~(\ref{eq:good-event}) with probability at least $1-\delta/3$.  For the class $\mathcal{G}_n$ the variables $W:=g_k(\mathbf{X})$ satisfy $0\le W\le2$ and $\operatorname{Var}(W)\le1$.  Only the $\zeta_g$-net is needed, with $\zeta_g$ replaced by $u/4$.  The same computation, together with $\gamma\le1$, gives the third bound with probability at least $1-\delta/3$.  A union bound over the three events yields $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$, where $C_\ast$ is the largest of the three constants $C_1$ obtained.
+\emph{Step 2: the denominator and the marginal.}  For the second bound in Equation~(\ref{eq:good-event}), fix $s\in\mathcal{S}_n$ and choose $j$ with $|s-s_j|\le\zeta_{\mathcal{S}}$.  By Equation~(\ref{eq:kernel-lipschitz}), applied under $\mathbb{E}_n$ and under $\mathbb{E}$,
+\[
+  \left|(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s)\right|
+  \le\left|(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s_j)\right|+\frac{u}{8} ,
+\]
+so
+\[
+  \mathbb{P}\left(\sup_{s\in\mathcal{S}_n}\left|(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s)\right|>u\right)
+  \le\sum_{j=1}^{N_2}\mathbb{P}\left(\left|(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s_j)\right|>\tfrac{u}{2}\right).
+\]
+The variable $W':=K_{\gamma}(S,s_j)$ satisfies $0\le W'\le\lVert K\rVert_\infty/\gamma\le U$ and $\operatorname{Var}(W')\le\mathbb{E}W'^2\le(\lVert K\rVert_\infty/\gamma)\,q_{\gamma}(s_j)\le\lVert K\rVert_\infty C_S/\gamma\le\sigma^2$.  Equation~(\ref{eq:bernstein}) with $u/2$ in place of $u$ therefore bounds each summand by $2\exp\{-nu^2/(8\sigma^2+4Uu/3)\}$, exactly as in Step~1, and the right-hand side is at most $2N_2\exp(-\Xi)\le\delta/3$ by Equation~(\ref{eq:bernstein-requirement}) and $N_1\ge1$.  Hence, under Equation~(\ref{eq:cstar-step1}), the second bound in Equation~(\ref{eq:good-event}) fails with probability at most $\delta/3$.
 
-\emph{Step 3: the denominator is bounded away from zero.}  On $\mathcal{A}_n$, for $s\in\mathcal{S}_n$,
+For the third bound, let $g'_1,\ldots,g'_{N_3}$ be a $(u/4)$-net of $\mathcal{G}_n$ in $\lVert\cdot\rVert_\infty$ with $0\le g'_k\le2$.  Since $u/4\le1$, Lemma~\ref{lem:entropy}(iii) gives $N_3\le(36A_n/u)^{\mathfrak{v}_n+d+1}$.  For $g\in\mathcal{G}_n$ choose $k$ with $\lVert g-g'_k\rVert_\infty\le u/4$, so that $|(\mathbb{E}_n-\mathbb{E})g|\le|(\mathbb{E}_n-\mathbb{E})g'_k|+u/2$, and hence
+\[
+  \mathbb{P}\left(\sup_{g\in\mathcal{G}_n}\left|(\mathbb{E}_n-\mathbb{E})g\right|>u\right)
+  \le\sum_{k=1}^{N_3}\mathbb{P}\left(\left|(\mathbb{E}_n-\mathbb{E})g'_k\right|>\tfrac{u}{2}\right).
+\]
+The variable $W'':=g'_k(\mathbf{X})$ satisfies $0\le W''\le2$ and $\operatorname{Var}(W'')\le1$, so Equation~(\ref{eq:bernstein}) with $u/2$ in place of $u$, $U=2$ and $\sigma^2=1$ bounds each summand by $2\exp\{-nu^2/(8+8u/3)\}$.  As in Step~1, the right-hand side is at most $\delta/3$ provided that $nu^2\ge16\Xi_3$ and $nu^2\ge16\Xi_3u/3$, where $\Xi_3:=\log(6N_3/\delta)$, that is provided that
+\[
+  u\ \ge\ 4\sqrt{\frac{\Xi_3}{n}}
+  \qquad\text{and}\qquad
+  u\ \ge\ \frac{16\Xi_3}{3n} .
+\]
+Since $u\ge n^{-1}$ and $\log(A_nn/\gamma)\ge1$, we have $\log N_3\le(\mathfrak{v}_n+d+1)\log(36A_nn)\le2(\mathfrak{v}_n+d)(1+\log36)\log(A_nn/\gamma)$, so $\Xi_3\le C_0\Gamma_{n,\delta}$ with the constant $C_0$ of Equation~(\ref{eq:entropy-bound}).  Using $\gamma\le1$ and $\Lambda_n\le1$,
+\[
+  4\sqrt{\frac{\Xi_3}{n}}
+  \le4\sqrt{\frac{C_0\Gamma_{n,\delta}}{n\gamma}}
+  =4\sqrt{C_0}\,\Lambda_n ,
+  \qquad
+  \frac{16\Xi_3}{3n}
+  \le\frac{16C_0\Gamma_{n,\delta}}{3n\gamma}
+  =\frac{16C_0}{3}\Lambda_n^2
+  \le\frac{16C_0}{3}\Lambda_n ,
+\]
+so both conditions hold for $u=C_\ast\Lambda_n$ as soon as $C_\ast\ge4\sqrt{C_0}$ and $C_\ast\ge16C_0/3$.  We now fix
+\begin{equation}
+  C_\ast:=\max\left\{
+    8\sqrt{\lVert K\rVert_\infty C_SC_0},\
+    \frac{16\lVert K\rVert_\infty C_0}{3},\
+    4\sqrt{C_0},\
+    \frac{16C_0}{3}\right\},
+  \label{eq:cstar-choice}
+\end{equation}
+which is at least $16/3>1$ because $C_0\ge1$, and which depends only on $c_S$, $C_S$ and $K$.  With this choice each of the three bounds in Equation~(\ref{eq:good-event}) fails with probability at most $\delta/3$, and a union bound over the three events yields $\mathbb{P}(\Omega_n)\ge1-\delta$.
+
+\emph{Step 3: the denominator is bounded away from zero.}  On $\Omega_n$, for $s\in\mathcal{S}_n$, the second bound in Equation~(\ref{eq:good-event}), the lower bound $q_{\gamma}(s)\ge3c_S/4$ of Lemma~\ref{lem:bias}, the bound $\Lambda_n\le\sqrt{c}$ of Equation~(\ref{eq:lambda-range}) and $C_\ast\sqrt{c}\le c_S/4$ from Equation~(\ref{eq:c-choice}) give
 \[
   \mathbb{E}_nK_{\gamma}(S,s)
-  \ \ge\ q_{\gamma}(s)-C_\ast\Lambda_n
-  \ \ge\ \frac{3c_S}{4}-C_\ast\sqrt{c}
-  \ \ge\ \frac{c_S}{2}
+  \ge q_{\gamma}(s)-\left|(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s)\right|
+  \ge q_{\gamma}(s)-C_\ast\Lambda_n
+  \ge\frac{3c_S}{4}-C_\ast\sqrt{c}
+  \ge\frac{3c_S}{4}-\frac{c_S}{4}
+  =\frac{c_S}{2} ,
 \]
-by Lemma~\ref{lem:bias} and Equation~(\ref{eq:lambda-range}), provided $c$ is small enough that $C_\ast\sqrt{c}\le c_S/4$.
+which is Equation~(\ref{eq:denominator-lower}).
 \end{proof}
 
 \subsection{Proof of Theorem~\ref{thm:uniform}}
 \label{app:proof-uniform}
 
 \begin{proof}
-Let $C_\ast$ and $c$ be the constants of Lemma~\ref{lem:stochastic} and let $\mathcal{A}_n$ be the event in Equation~(\ref{eq:good-event}), so that $\mathbb{P}(\mathcal{A}_n)\ge1-\delta$ whenever $\Gamma_{n,\delta}\le cn\gamma$.  We show that Equation~(\ref{eq:uniform}) holds on $\mathcal{A}_n$.
+Let $C_\ast$ and $c$ be the constants of Lemma~\ref{lem:stochastic} and let $\Omega_n$ be the event in Equation~(\ref{eq:good-event}), so that $\mathbb{P}(\Omega_n)\ge1-\delta$ whenever $\Gamma_{n,\delta}\le cn\gamma$.  We show that Equation~(\ref{eq:uniform}) holds on $\Omega_n$.
 
-On $\mathcal{A}_n$ fix $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$.  By Lemma~\ref{lem:stochastic} the denominator $\mathbb{E}_nK_{\gamma}(S,s)$ is at least $c_S/2$, so $\widehat{m}_{g,\gamma}(s)$ is well defined and the zero convention for $\widehat{w}_{\gamma}(i;s)$ in Section~\ref{sec:theory} is never invoked.  Write
+On $\Omega_n$ fix $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$, and write $\widehat{b}_{g,\gamma}(s):=\mathbb{E}_n\{K_{\gamma}(S,s)g(\mathbf{X})\}$ and $\widehat{q}_{\gamma}(s):=\mathbb{E}_nK_{\gamma}(S,s)$ for the numerator and the denominator of $\widehat{m}_{g,\gamma}(s)$ in Equation~(\ref{eq:app-notation}), so that
 \[
-  A_{g,s}:=(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\},
+  \widehat{b}_{g,\gamma}(s)-b_{g,\gamma}(s)=(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\},
   \qquad
-  B_s:=(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s) .
+  \widehat{q}_{\gamma}(s)-q_{\gamma}(s)=(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s) .
 \]
-Since $\widehat{m}_{g,\gamma}=(b_{g,\gamma}+A_{g,s})/(q_{\gamma}+B_s)$ and $m_{g,\gamma}=b_{g,\gamma}/q_{\gamma}$, clearing denominators gives the identity
+By Equation~(\ref{eq:denominator-lower}), $\widehat{q}_{\gamma}(s)\ge c_S/2$, so $\widehat{m}_{g,\gamma}(s)$ is well defined and the zero convention for $\widehat{w}_{\gamma}(i;s)$ in Section~\ref{sec:theory} is never invoked.  Since $\widehat{m}_{g,\gamma}=\widehat{b}_{g,\gamma}/\widehat{q}_{\gamma}$ and $m_{g,\gamma}=b_{g,\gamma}/q_{\gamma}$, bringing the two fractions to the common denominator $q_{\gamma}(s)\widehat{q}_{\gamma}(s)$ gives
 \begin{equation}
+\begin{aligned}
   \widehat{m}_{g,\gamma}(s)-m_{g,\gamma}(s)
-  =\frac{A_{g,s}-m_{g,\gamma}(s)B_s}{\mathbb{E}_nK_{\gamma}(S,s)} .
+  &=\frac{q_{\gamma}(s)\widehat{b}_{g,\gamma}(s)-b_{g,\gamma}(s)\widehat{q}_{\gamma}(s)}
+        {q_{\gamma}(s)\widehat{q}_{\gamma}(s)}
+  \\
+  &=\frac{q_{\gamma}(s)\{\widehat{b}_{g,\gamma}(s)-b_{g,\gamma}(s)\}
+         -b_{g,\gamma}(s)\{\widehat{q}_{\gamma}(s)-q_{\gamma}(s)\}}
+        {q_{\gamma}(s)\widehat{q}_{\gamma}(s)}
+  \\
+  &=\frac{\{\widehat{b}_{g,\gamma}(s)-b_{g,\gamma}(s)\}
+          -m_{g,\gamma}(s)\{\widehat{q}_{\gamma}(s)-q_{\gamma}(s)\}}
+         {\widehat{q}_{\gamma}(s)} ,
+\end{aligned}
   \label{eq:ratio-identity}
 \end{equation}
-Since $0\le g\le2$ and $K_{\gamma}\ge0$, we have $0\le b_{g,\gamma}(s)\le2q_{\gamma}(s)$ and hence $0\le m_{g,\gamma}(s)\le2$.  Equation~(\ref{eq:ratio-identity}), the bound $\mathbb{E}_nK_{\gamma}(S,s)\ge c_S/2$ and the first two bounds in Equation~(\ref{eq:good-event}) then give
+where the second equality adds and subtracts $q_{\gamma}(s)b_{g,\gamma}(s)$ in the numerator, and the last divides the numerator and the denominator by $q_{\gamma}(s)$ and uses $m_{g,\gamma}(s)=b_{g,\gamma}(s)/q_{\gamma}(s)$.  Since $0\le g\le2$ and $K_{\gamma}\ge0$, we have $0\le b_{g,\gamma}(s)\le2q_{\gamma}(s)$ and hence $0\le m_{g,\gamma}(s)\le2$.  On $\Omega_n$ the first two bounds in Equation~(\ref{eq:good-event}) give $|\widehat{b}_{g,\gamma}(s)-b_{g,\gamma}(s)|\le C_\ast\Lambda_n$ and $|\widehat{q}_{\gamma}(s)-q_{\gamma}(s)|\le C_\ast\Lambda_n$, so Equation~(\ref{eq:ratio-identity}) and $\widehat{q}_{\gamma}(s)\ge c_S/2$ yield
 \[
+\begin{aligned}
   \left|\widehat{m}_{g,\gamma}(s)-m_{g,\gamma}(s)\right|
-  \le\frac{2}{c_S}\left(|A_{g,s}|+2|B_s|\right)
-  \le\frac{6C_\ast}{c_S}\Lambda_n .
+  &\le\frac{|\widehat{b}_{g,\gamma}(s)-b_{g,\gamma}(s)|
+            +m_{g,\gamma}(s)\,|\widehat{q}_{\gamma}(s)-q_{\gamma}(s)|}{\widehat{q}_{\gamma}(s)}
+  \\
+  &\le\frac{2}{c_S}\left(|\widehat{b}_{g,\gamma}(s)-b_{g,\gamma}(s)|
+                        +2|\widehat{q}_{\gamma}(s)-q_{\gamma}(s)|\right)
+  \\
+  &\le\frac{2}{c_S}\left(C_\ast\Lambda_n+2C_\ast\Lambda_n\right)
+  =\frac{6C_\ast}{c_S}\Lambda_n .
+\end{aligned}
 \]
-Combining this with the bias bound of Lemma~\ref{lem:bias} and with the definition of $r_{n,\delta}$ in Equation~(\ref{eq:rate}),
+By the triangle inequality, the second bound in Equation~(\ref{eq:numerator-bias}), the definition of $r_{n,\delta}$ in Equation~(\ref{eq:rate}) and the convention of Appendix~\ref{app:notation} that the value of $C$ may change from one occurrence to the next,
 \begin{equation}
+\begin{aligned}
   \sup_{g\in\mathcal{G}_n}\sup_{s\in\mathcal{S}_n}
   \left|\widehat{m}_{g,\gamma}(s)-m_g(s)\right|
-  \le C\gamma^2+\frac{6C_\ast}{c_S}\Lambda_n
+  &\le\sup_{g,s}\left|\widehat{m}_{g,\gamma}(s)-m_{g,\gamma}(s)\right|
+   +\sup_{g,s}\left|m_{g,\gamma}(s)-m_g(s)\right|
+  \\
+  &\le\frac{6C_\ast}{c_S}\Lambda_n+C\gamma^2
   \le C\,r_{n,\delta} .
+\end{aligned}
   \label{eq:conditional-mean-uniform}
 \end{equation}
 
-Now fix $h\in\mathcal{E}_n$.  Apply Equation~(\ref{eq:sup-diff}) with index set $T=\mathcal{V}_{\mathrm{R}}\times\mathcal{S}_n$ and, for $t=(v,s)$ and $g=v\circ\widetilde{h}\in\mathcal{G}_n$,
+Now fix $h\in\mathcal{E}_n$.  Apply Equation~(\ref{eq:sup-diff}) with index set $\mathcal{T}=\mathcal{V}_{\mathrm{R}}\times\mathcal{S}_n$ and, for $t=(v,s)$ and $g=v\circ\widetilde{h}\in\mathcal{G}_n$,
 \[
-  F(t):=\widehat{m}_{g,\gamma}(s)-\mathbb{E}_ng,
+  F_1(t):=\widehat{m}_{g,\gamma}(s)-\mathbb{E}_ng,
   \qquad
-  G(t):=m_g(s)-\mathbb{E}g ,
+  F_2(t):=m_g(s)-\mathbb{E}g ,
 \]
-both bounded by $2$ in absolute value.  By Equation~(\ref{eq:D-in-scores}), $\sup_T|F|=\widehat{D}_n(h)$ and $\sup_T|G|=D_n(h)$, so
+both bounded by $2$ in absolute value.  By Equation~(\ref{eq:D-in-scores}), $\sup_{\mathcal{T}}|F_1|=\widehat{D}_n(h)$ and $\sup_{\mathcal{T}}|F_2|=D_n(h)$.  Since $F_1(t)-F_2(t)=\{\widehat{m}_{g,\gamma}(s)-m_g(s)\}-(\mathbb{E}_n-\mathbb{E})g$,
 \[
+\begin{aligned}
   \left|\widehat{D}_n(h)-D_n(h)\right|
-  \le\sup_{t\in T}|F(t)-G(t)|
-  \le\sup_{g\in\mathcal{G}_n}\sup_{s\in\mathcal{S}_n}
+  &\le\sup_{t\in\mathcal{T}}|F_1(t)-F_2(t)|
+  \\
+  &\le\sup_{g\in\mathcal{G}_n}\sup_{s\in\mathcal{S}_n}
      \left|\widehat{m}_{g,\gamma}(s)-m_g(s)\right|
-    +\sup_{g\in\mathcal{G}_n}\left|(\mathbb{E}_n-\mathbb{E})g\right| .
+    +\sup_{g\in\mathcal{G}_n}\left|(\mathbb{E}_n-\mathbb{E})g\right|
+  \\
+  &\le Cr_{n,\delta}+C_\ast\Lambda_n
+  \le Cr_{n,\delta} ,
+\end{aligned}
 \]
-The first term is at most $Cr_{n,\delta}$ by Equation~(\ref{eq:conditional-mean-uniform}) and the second at most $C_\ast\Lambda_n\le C_\ast r_{n,\delta}$ by Equation~(\ref{eq:good-event}).  The resulting bound does not depend on $h$, so it also bounds $\sup_{h\in\mathcal{E}_n}\left|\widehat{D}_n(h)-D_n(h)\right|$.  This proves Equation~(\ref{eq:uniform}) on $\mathcal{A}_n$, and hence with probability at least $1-\delta$.
-\end{proof}
+where the third inequality uses Equation~(\ref{eq:conditional-mean-uniform}) and the third bound in Equation~(\ref{eq:good-event}), and the last uses $\Lambda_n\le r_{n,\delta}$.  The resulting bound does not depend on $h$, so it also bounds $\sup_{h\in\mathcal{E}_n}\left|\widehat{D}_n(h)-D_n(h)\right|$.  This proves Equation~(\ref{eq:uniform}) on $\Omega_n$, and hence with probability at least $1-\delta$.
 
-\subsection{Proof of Corollary~\ref{cor:certificate}}
-\label{app:proof-certificate}
-
-\begin{proof}
-Let $\mathcal{A}_n$ be the event of Lemma~\ref{lem:stochastic}, on which Equation~(\ref{eq:uniform}) holds for every $h\in\mathcal{E}_n$ simultaneously, so that
-\begin{equation}
-  D_n(h)\le\widehat{D}_n(h)+Cr_{n,\delta},
-  \qquad h\in\mathcal{E}_n .
-  \label{eq:population-from-empirical}
-\end{equation}
-Fix $h\in\mathcal{E}_n$, $B>0$, $\beta>0$ with $\beta\ne(d+3)/2$, and $s\in\mathcal{S}_n$.  Write $\mathbb{P}_s:=\mathbb{P}_{\widetilde{h}(\mathbf{X})\mid S=s}$ and $\mathbb{P}_0:=\mathbb{P}_{\widetilde{h}(\mathbf{X})}$, which are probability measures on $\mathbb{B}^d$ because $\tau$ takes values in $\mathbb{B}^d$.  For $f\in\mathcal{H}^{\beta}_d(B)$ we have $f/B\in\mathcal{H}^{\beta}_d$, and since $d\ge3$ and $\beta\ne(d+3)/2$, Theorem~2 of \citet{park2025relu}, restated in Equation~(\ref{eq:relu-holder}), gives
-\begin{equation}
-  \left|\mathbb{E}\!\left[f(\widetilde{h}(\mathbf{X}))\mid S=s\right]
-        -\mathbb{E}\!\left[f(\widetilde{h}(\mathbf{X}))\right]\right|
-  \le B\operatorname{IPM}_{\mathcal{H}^{\beta}_d}(\mathbb{P}_s,\mathbb{P}_0)
-  \le C_{d,\beta}B\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}
-     (\mathbb{P}_s,\mathbb{P}_0)^{\alpha_{d,\beta}} .
-  \label{eq:pointwise-transfer}
-\end{equation}
-The map $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$, and $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le D_n(h)$ by Equation~(\ref{eq:interior}).  The right-hand side of Equation~(\ref{eq:pointwise-transfer}) is therefore at most $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, which depends on neither $s$ nor $f$.  Taking the supremum over $s\in\mathcal{S}_n$ and then over $f\in\mathcal{H}^{\beta}_d(B)$ bounds the left-hand side of Equation~(\ref{eq:certificate}) by $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$.  Equation~(\ref{eq:population-from-empirical}) and the same monotonicity then give Equation~(\ref{eq:certificate}).  The event $\mathcal{A}_n$ depends on neither $h$, nor $B$, nor $\beta$, so the bound holds simultaneously for all of them.
-
-For the rate, the boundedness of $A_n$ and $\mathfrak{v}_n$, together with $\delta_n=n^{-c_1}$, gives $\Gamma_{n,\delta_n}\asymp\log(n/\gamma_n)\asymp\log n$ for $\gamma_n\asymp(\log n/n)^{1/5}$.  With this bandwidth,
+For the rate, suppose that $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta_n=n^{-c_1}$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$.  Then $\log(A_nn/\gamma_n)=\log A_n+\log n+\tfrac{1}{5}\log(n/\log n)+O(1)\asymp\log n$ and $\log(1/\delta_n)=c_1\log n$, so $\Gamma_{n,\delta_n}\asymp\log n$.  With this bandwidth,
 \[
   \gamma_n^2\asymp\left(\frac{\log n}{n}\right)^{2/5},
   \qquad
@@ -892,7 +1073,62 @@ For the rate, the boundedness of $A_n$ and $\mathfrak{v}_n$, together with $\del
 so $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.  The condition $\Gamma_{n,\delta_n}\le cn\gamma_n$ reads $\log n=O\{n^{4/5}(\log n)^{1/5}\}$, and $\gamma_n\le\epsilon_n$ reads $(\log n/n)^{1/5}=O(1/\log n)$.  Both hold for all large $n$.
 \end{proof}
 
+\subsection{Proof of Corollary~\ref{cor:certificate}}
+\label{app:proof-certificate}
+
+\begin{proof}
+Let $\Omega_n$ be the event of Lemma~\ref{lem:stochastic}, on which Equation~(\ref{eq:uniform}) holds for every $h\in\mathcal{E}_n$ simultaneously, so that
+\begin{equation}
+  D_n(h)\le\widehat{D}_n(h)+Cr_{n,\delta},
+  \qquad h\in\mathcal{E}_n .
+  \label{eq:population-from-empirical}
+\end{equation}
+Fix $h\in\mathcal{E}_n$, $B>0$, $\beta>0$ with $\beta\ne(d+3)/2$, and $s\in\mathcal{S}_n$.  Write $\mathbb{P}_s:=\mathbb{P}_{\widetilde{h}(\mathbf{X})\mid S=s}$ and $\mathbb{P}_0:=\mathbb{P}_{\widetilde{h}(\mathbf{X})}$, which are probability measures on $\mathbb{B}^d$ because $\tau$ takes values in $\mathbb{B}^d$.  Let $f\in\mathcal{H}^{\beta}_d(B)$.  Then $B^{-1}f\in\mathcal{H}^{\beta}_d$, and the difference between the conditional and the marginal mean of $f(\widetilde{h}(\mathbf{X}))$ equals $B$ times the corresponding difference for $B^{-1}f$, which by the definition of the IPM is at most $\operatorname{IPM}_{\mathcal{H}^{\beta}_d}(\mathbb{P}_s,\mathbb{P}_0)$.  Since $d\ge3$ and $\beta\ne(d+3)/2$, Theorem~2 of \citet{park2025relu}, restated in Equation~(\ref{eq:relu-holder}), then gives
+\begin{equation}
+  \left|\mathbb{E}\!\left[f(\widetilde{h}(\mathbf{X}))\mid S=s\right]
+        -\mathbb{E}\!\left[f(\widetilde{h}(\mathbf{X}))\right]\right|
+  \le B\operatorname{IPM}_{\mathcal{H}^{\beta}_d}(\mathbb{P}_s,\mathbb{P}_0)
+  \le C_{d,\beta}B\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}
+     (\mathbb{P}_s,\mathbb{P}_0)^{\alpha_{d,\beta}} .
+  \label{eq:pointwise-transfer}
+\end{equation}
+The map $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$, and $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le D_n(h)$ by the definition of $D_n(h)$ in Equation~(\ref{eq:interior}).  The right-hand side of Equation~(\ref{eq:pointwise-transfer}) is therefore at most $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, which depends on neither $s$ nor $f$.  Take the supremum over $s\in\mathcal{S}_n$ and then over $f\in\mathcal{H}^{\beta}_d(B)$ on the left-hand side of Equation~(\ref{eq:pointwise-transfer}).  By Equation~(\ref{eq:interior}) the result is $\sup_{f}\operatorname{GDP}_{\infty,n}(f\circ\widetilde{h})$, and applying Equation~(\ref{eq:population-from-empirical}) together with the monotonicity of $t\mapsto t^{\alpha_{d,\beta}}$ gives
+\[
+  \sup_{f\in\mathcal{H}^{\beta}_d(B)}
+  \operatorname{GDP}_{\infty,n}(f\circ\widetilde{h})
+  \le C_{d,\beta}B\,D_n(h)^{\alpha_{d,\beta}}
+  \le C_{d,\beta}B\left\{\widehat{D}_n(h)+Cr_{n,\delta}\right\}^{\alpha_{d,\beta}} ,
+\]
+which is Equation~(\ref{eq:certificate}).  The event $\Omega_n$ depends on neither $h$, nor $B$, nor $\beta$, so the bound holds simultaneously for all of them.
+\end{proof}
+
 \section{Algorithm of supIPM-FRL}
+\label{app:algorithm}
+
+Algorithm~\ref{alg:supipm-frl} assembles the three updates of Section~\ref{sec:supipm-objective} into $R$ iterations.  We write $\Pi_{A}$ for the projection onto a set $A$.  After each ascent step, $\Pi_{\mathcal{S}}$ returns each candidate to the sensitive domain, and $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ returns each $\theta_m$ to the unit sphere and each $\mu_m$ to $[-1,1]$.  Each iteration performs $J_v$ discriminator updates, each preceded by $J_s$ ascent steps of freshly initialized candidates, and closes with one descent step.  The discriminator updates, the candidate ascent steps and the descent step use the step sizes $\alpha_v$, $\alpha_s$ and $\alpha$.
+
+\begin{algorithm}[H]
+\caption{supIPM-FRL}
+\label{alg:supipm-frl}
+\begin{algorithmic}[1]
+\REQUIRE sample $\mathcal{D}$, supervised loss $\ell$, kernel $K_{\gamma}$ with bandwidth $\gamma$, penalty parameter $\lambda$, number of candidates $T$, number of discriminators $M$
+\ENSURE encoder $h_{\phi}$ and prediction head $f_{\psi}$
+\STATE Initialize $\phi$, $\psi$, and $\mathbf{v}$ with $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]$
+\FOR{$r=1,\ldots,R$}
+  \FOR{$j=1,\ldots,J_v$}
+    \STATE Initialize $\mathbf{s}$ at $T$ distinct points of $\mathcal{S}$ \label{alg:s-init}
+    \FOR{$J_s$ steps}
+      \STATE $\mathbf{s}\leftarrow\Pi_{\mathcal{S}}\!\left(\mathbf{s}+\alpha_s\,\nabla_{\mathbf{s}}G(\mathbf{s})\right)$
+    \ENDFOR
+    \STATE $s^{\star}\leftarrow\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ \label{alg:s-star}
+    \STATE $\mathbf{v}\leftarrow\Pi_{\mathbb{S}^{d-1}\times[-1,1]}\!\left(\mathbf{v}+\alpha_v\,\nabla_{\mathbf{v}}H(\mathbf{v})\right)$
+  \ENDFOR
+  \STATE Recompute $s^{\star}$ by repeating lines~\ref{alg:s-init}--\ref{alg:s-star} with the updated $\mathbf{v}$
+  \STATE $(\phi,\psi)\leftarrow(\phi,\psi)-\alpha\,\nabla_{(\phi,\psi)}\big[\tfrac{1}{n}\sum_{i=1}^n\ell(f_{\psi}(\widetilde{\mathbf{Z}}_i),Y_i)+\lambda\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)\big]$ \label{alg:encoder-step}
+\ENDFOR
+\RETURN $h_{\phi}$, $f_{\psi}$
+\end{algorithmic}
+\end{algorithm}
 
 \section{Experiments for synthetic dataset}
 
