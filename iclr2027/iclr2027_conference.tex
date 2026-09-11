@@ -250,9 +250,11 @@ From this, a conditional expectation given $S=s$ is as follows
   \qquad s\in\mathcal{S}.
   \label{eq:pointwise-conditional}
 \end{equation}
-Equation~(\ref{eq:pointwise-conditional}) makes $\operatorname{GDP}_{\infty}(g)$ in Equation~(\ref{eq:linfty-gdp}) well defined for every bounded measurable $g$.  For fair representation learning, however, $\operatorname{GDP}_{\infty}$ alone does not suffice, because $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed, whereas a representation must serve prediction heads that are unknown when it is learned.
+Equation~(\ref{eq:pointwise-conditional}) makes $\operatorname{GDP}_{\infty}(g)$ in Equation~(\ref{eq:linfty-gdp}) well defined for every bounded measurable $g$.  For fair representation learning, however, $\operatorname{GDP}_{\infty}$ does not suffice, because $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed, whereas a representation must accommodate prediction heads that are unknown when it is learned.
 
-We therefore propose a criterion for the representation itself, which measures the discrepancy between the conditional and the marginal distribution of the representation at every $s$ through an IPM.  As in Section~\ref{sec:frem}, the discriminator class $\mathcal{V}$ of this IPM specifies the prediction heads that the criterion controls.  With the conditional distribution $\mathbb{P}_{\mathbf{Z}\mid S=s}$ defined as in Equation~(\ref{eq:pointwise-conditional}), we define, for a discriminator class $\mathcal{V}$ on $\mathcal{Z}$,
+We therefore propose a criterion for the representation itself, which measures the discrepancy between the conditional and the marginal distribution of the representation at every $s$ through an IPM.  
+% As in Section~\ref{sec:frem}, the discriminator class $\mathcal{V}$ of this IPM specifies the prediction heads that the criterion controls.  
+With the conditional distribution $\mathbb{P}_{\mathbf{Z}\mid S=s}$ defined as in Equation~(\ref{eq:pointwise-conditional}), we define, for a discriminator class $\mathcal{V}$ on $\mathcal{Z}$,
 \begin{align}
   \operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)
   &:=\sup_{s\in\mathcal{S}}
@@ -266,10 +268,12 @@ We therefore propose a criterion for the representation itself, which measures t
   \label{eq:supipm}
 \end{align}
 Equation~(\ref{eq:supipm}) is the representation-level counterpart of $\operatorname{GDP}_{\infty}$, defined before a prediction head is chosen.
+By definition, the constraint $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\rho$ for a fairness level $\rho\ge0$ bounds $\left|\mathbb{E}[v(\mathbf{Z})\mid S=s]-\mathbb{E}[v(\mathbf{Z})]\right|$ by $\rho$ for every discriminator $v\in\mathcal{V}$ and every $s\in\mathcal{S}$.  Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so a representation with a small supIPM has a small EIPM as well.
+% The converse fails without further regularity in $s$.
 
-By Equation~(\ref{eq:supipm}), the constraint $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\rho$ for a fairness level $\rho\ge0$ bounds $\left|\mathbb{E}[v(\mathbf{Z})\mid S=s]-\mathbb{E}[v(\mathbf{Z})]\right|$ by $\rho$ for every discriminator $v\in\mathcal{V}$ and every $s\in\mathcal{S}$.  Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$.  The converse fails without further regularity in $s$.
-
-It remains to choose the discriminator class $\mathcal{V}$.  Because $\mathcal{V}$ fixes the prediction heads that supIPM controls, a guarantee for every head of bounded H\"older norm requires the H\"older ball $\mathcal{H}^{\beta}_d$.  The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in Equation~(\ref{eq:supipm}) is the ReLU-IPM.  Since $\mathcal{V}_{\mathrm{R}}$ and $\mathcal{H}^{\beta}_d$ are defined on $\mathbb{B}^d$, we restrict the encoder to take values in $\mathbb{B}^d$ hereafter, so that $\mathbf{Z}=h(\mathbf{X})\in\mathbb{B}^d$.  In practice the restriction is imposed by normalizing the output of the encoder network, as described in Appendix~\ref{app:ascent}.  The inequality in Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$.
+It remains to choose the discriminator class $\mathcal{V}$.  Because $\mathcal{V}$ fixes the prediction heads that supIPM controls, a guarantee for every head of bounded H\"older norm requires the H\"older ball $\mathcal{H}^{\beta}_d$.  The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in Equation~(\ref{eq:supipm}) is the ReLU-IPM.  Since $\mathcal{V}_{\mathrm{R}}$ and $\mathcal{H}^{\beta}_d$ are defined on $\mathbb{B}^d$, we restrict the encoder to take values in $\mathbb{B}^d$ hereafter, so that $\mathbf{Z}=h(\mathbf{X})\in\mathbb{B}^d$.  
+% In practice the restriction is imposed by normalizing the output of the encoder network, as described in Appendix~\ref{app:ascent}.  
+The inequality in Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
@@ -304,7 +308,8 @@ where $K_{\gamma}$ is the kernel of Section~\ref{sec:frem}.  The weights sum to 
   \right|.
   \label{eq:empirical-supipm}
 \end{align}
-Unlike Equation~(\ref{eq:eipm-estimator}), Equation~(\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can search for the largest discrepancy.  Section~\ref{sec:supipm-objective} performs this search during training.
+Unlike Equation~(\ref{eq:eipm-estimator}), Equation~(\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can maximize the discrepancy. 
+Section~\ref{sec:supipm-objective} learns a fair representation with this empirical supIPM.
 
 \subsection{Fair Representation Learning with supIPM}
 \label{sec:supipm-objective}
