@@ -1332,7 +1332,34 @@ For a frozen representation and a norm bound $c$, the supremum in Equation~(\ref
   \label{fig:app-supipm}
 \end{figure}
 
-\paragraph{Other fairness measures.}  Figures~\ref{fig:app-gdp}--\ref{fig:app-supipm} replace the disparity axis by the kernel estimate of GDP \citep{jiang2022gdp}, the HGR maximal correlation \citep{mary2019continuous}, and the empirical supIPM of Equation~(\ref{eq:empirical-supipm}) evaluated on the test split.  Under GDP, the average over $S$ that FREM penalizes, the curves of supIPM-FRL and FREM coincide on all three datasets, so the supremum penalty loses nothing under the average criterion.  Under HGR, Reg-HGR, which penalizes an estimate of this quantity, is lowest on Adult and Crime, and supIPM-FRL is comparable to FREM on every dataset.  Under the empirical supIPM, supIPM-FRL is lowest by a wide margin on Adult and Crime, so the value that its penalty minimizes on the training split carries over to the test split, consistent with Theorem~\ref{thm:uniform}.  On ACSIncome, where supIPM-FRL is trained with $J_v=2$, FREM attains a smaller empirical supIPM; this agrees with Appendix~\ref{app:ablation-discriminator}, where $J_v=2$ leaves the discriminators short of the supremum, so the penalty acts on an underestimate.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_adult_gdp_wo_kernel.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_crime_gdp_wo_kernel.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_acs_gdp_wo_kernel.pdf}
+  \caption{GDP over the observed values of $S$ against test utility on Adult, Crime and ACSIncome.}
+  \label{fig:app-gdp-binned}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_adult_mi_y_s.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_crime_mi_y_s.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_acs_mi_y_s.pdf}
+  \caption{Mutual information $I(\hat{Y};S)$ between the fitted prediction and $S$ against test utility on Adult, Crime and ACSIncome.}
+  \label{fig:app-mi-y}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_adult_mi_z_s.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_crime_mi_z_s.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_acs_mi_z_s.pdf}
+  \caption{Mutual information $I(\mathbf{Z};S)$ between the representation and $S$ against test utility on Adult, Crime and ACSIncome.}
+  \label{fig:app-mi-z}
+\end{figure}
+
+\paragraph{Other fairness measures.}  Figures~\ref{fig:app-gdp}--\ref{fig:app-mi-z} replace the disparity axis by the kernel estimate of GDP \citep{jiang2022gdp}, the HGR maximal correlation \citep{mary2019continuous}, the empirical supIPM of Equation~(\ref{eq:empirical-supipm}) evaluated on the test split, the GDP of Equation~(\ref{eq:gdp}) evaluated over the observed values of $S$ without kernel smoothing, and the mutual information $I(\hat{Y};S)$ between the prediction and $S$ and $I(\mathbf{Z};S)$ between the representation and $S$, both estimated with the nearest-neighbor estimator used by \citet{kong2025fair}.  Under both versions of GDP, the average over $S$ that FREM penalizes, the curves of supIPM-FRL and FREM coincide on Adult and Crime and are close on ACSIncome, so the supremum penalty loses nothing under the average criterion.  Under HGR and $I(\hat{Y};S)$, Reg-HGR, which penalizes an estimate of the maximal correlation, is lowest, and supIPM-FRL is comparable to FREM.  Under the empirical supIPM, supIPM-FRL is lowest by a wide margin on Adult and Crime, so the value that its penalty minimizes on the training split carries over to the test split, consistent with Theorem~\ref{thm:uniform}; on ACSIncome, where supIPM-FRL is trained with $J_v=2$, FREM attains a smaller empirical supIPM, in agreement with Appendix~\ref{app:ablation-discriminator}, where $J_v=2$ leaves the discriminators short of the supremum.  Under $I(\mathbf{Z};S)$, FREM is lower than supIPM-FRL on Adult and the two are close on Crime and ACSIncome.  The ReLU discriminators of supIPM control a downstream head of bounded H\"older norm through the exponent $\alpha_{d,\beta}$ of Equation~(\ref{eq:relu-holder}), whereas the mutual information counts every form of dependence; supIPM-FRL thus removes the dependence that such a head can exploit rather than all statistical dependence, and the MMD penalty of FREM, which acts on every moment of the conditional distributions on average, attains the lower $I(\mathbf{Z};S)$.
 
 \begin{figure}[t]
   \centering

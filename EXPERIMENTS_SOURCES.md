@@ -17,7 +17,7 @@ Written 2026-09-12. Every figure/table in `iclr2027/iclr2027_conference.tex` Sec
 | fig:app-prediction-level | `fig2_own_head_crime.pdf`, `fig2_own_head_acs.pdf` | `results_summary/main/` |
 | fig:app-c4, fig:app-c16 | `figA2_worst_head_budgets_{adult,crime,acs}_c{4,16}.pdf` | `results_summary/appendix/` |
 | fig:app-norm-bound | `figA1_gain_budget_curve.pdf` | `results_summary/appendix/` (utility floors Adult 0.840, Crime 0.855, ACSIncome 0.775, Simulation 0.900) |
-| fig:app-gdp / fig:app-hgr / fig:app-supipm | `figA6_other_measures_{adult,crime,acs}_{gdp_w_kernel,hgr,sup_ipm}.pdf` | `results_summary/appendix/` (mi_y_s, mi_z_s, gdp_wo_kernel not used) |
+| fig:app-gdp / fig:app-hgr / fig:app-supipm / fig:app-gdp-binned / fig:app-mi-y / fig:app-mi-z | `figA6_other_measures_{adult,crime,acs}_{gdp_w_kernel,hgr,sup_ipm,gdp_wo_kernel,mi_y_s,mi_z_s}.pdf` | `results_summary/appendix_paper/` (all six measures; MI via the k-NN estimator ported from FREM, `src/evaluate.py:compute_MI`; binned GDP = FREM's `gdp_wo_kernel` over the observed values of S) |
 | fig:app-graph | `figA7_graph_own_head.pdf`, `figA7_graph_worst_head.pdf` | `results_summary/appendix/` |
 | fig:app-discriminator | `figA4_critic_ablation.pdf` | `results_summary/appendix/` (SynthC) |
 | fig:app-bandwidth | `figA5_bandwidth.pdf` | `results_summary/appendix/` |
