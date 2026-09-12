@@ -110,3 +110,5 @@ Section labels: `§1` = Introduction, `App D` = "Experiments for real dataset",
 - **A DOI for `kohavi1996scaling`.** ACM DL shows a 10.5555 identifier, which is
   the reserved non-resolving prefix rather than a registered DOI; the entry
   points at the AAAI KDD-96 PDF instead.
+
+**Update (2026-09-12, later):** the appendix section "Additional related work" was removed at the author's request; the new references are now cited inside existing sentences of Sections 1, 2 and 5 and in Appendix D. The following verified entries had no natural place in the existing text and were removed from bibliography.bib (their verification rows below are kept for reference): `chzhen2022minimax`, `agarwal2019fair`, `chzhen2020wasserstein`, `komiyama2018nonconvex`, `marx2020predictive`, `fisher2019all`, `breiman2001statistical`, `kearns2018preventing`, `hebertjohnson2018multicalibration`, `calders2010three`, `feldman2015certifying`, `ni2025kernel`, `jones2025rethinking`, `zhao2022inherent`, `gupta2021controllable`, `oh2022distributional`, `guo2024distance`, `louppe2017pivot`, `arjovsky2017wasserstein`.
