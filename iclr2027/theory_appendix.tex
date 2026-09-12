@@ -1,0 +1,190 @@
+% =====================================================================
+% iclr2027/theory_appendix.tex  --  proofs for Section~\ref{sec:theory}.
+% \input this file after \appendix in iclr2027_conference.tex.
+% =====================================================================
+\section{Proofs for Section~\ref{sec:theory}}
+\label{app:proofs}
+
+Throughout the appendix, $\mathbb{E}$ and $\mathbb{E}_n$ denote population and empirical averaging, $\mathbb{E}_n g:=n^{-1}\sum_{i=1}^n g(\mathbf{X}_i,S_i)$, and $C$ denotes a constant depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, whose value may change from line to line.  To lighten notation we write
+\[
+  D_n(h):=\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(\widetilde{\mathbf{Z}}_h;S),
+  \qquad
+  \widehat{D}_n(h):=\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(\widetilde{\mathbf{Z}}_h;S),
+\]
+and $\gamma:=\gamma_n$.
+
+\subsection{Proof of Theorem~\ref{thm:transfer}}
+
+Fix $s\in\mathcal{S}_n$ and write $\mathbb{P}_s:=\mathbb{P}_{\widetilde{\mathbf{Z}}_h\mid S=s}$ and $\mathbb{P}_0:=\mathbb{P}_{\widetilde{\mathbf{Z}}_h}$, both probability measures on $\mathbb{B}^d$.  For $f\in\mathcal{H}^{\beta}_d(B)$, $f/B\in\mathcal{H}^{\beta}_d$, so Equation~\ref{eq:relu-holder} \citep[Theorem~2]{park2025relu}, whose proof requires $d\ge3$, yields
+\[
+  \left|\int f\,\mathrm{d}\mathbb{P}_s-\int f\,\mathrm{d}\mathbb{P}_0\right|
+  \le B\operatorname{IPM}_{\mathcal{H}^{\beta}_d}(\mathbb{P}_s,\mathbb{P}_0)
+  \le C_{d,\beta}\,B\,
+     \operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)^{\alpha_{d,\beta}}
+  \le C_{d,\beta}\,B\,D_n(h)^{\alpha_{d,\beta}},
+\]
+where the last step uses $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le D_n(h)$.  Taking the supremum over $s\in\mathcal{S}_n$ and then over $f$ proves Equation~\ref{eq:transfer}.  The bound for $v\in\mathcal{V}_{\mathrm{R}}$ is immediate from Equation~\ref{eq:trimmed-supipm}.  Finally, ReLU-IPM separates probability distributions on $\mathbb{B}^d$ \citep[Proposition~1]{park2025relu}, so $D_n(h)=0$ forces $\mathbb{P}_s=\mathbb{P}_0$ for every $s\in\mathcal{S}_n$.
+\qed
+
+\subsection{Proof of Theorem~\ref{thm:uniform}}
+\label{app:proof-uniform}
+
+Let $\mathcal{G}_n:=\{\mathbf{x}\mapsto v(\widetilde{h}(\mathbf{x})):h\in\mathcal{E}_n,\ v\in\mathcal{V}_{\mathrm{R}}\}$, so that $0\le g\le2$ for $g\in\mathcal{G}_n$.  For $g\in\mathcal{G}_n$ and $s\in\mathcal{S}$ set
+\[
+  a_g(s):=\int_{\mathcal{X}}g(\mathbf{x})p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
+  \qquad
+  m_g(s):=\mathbb{E}[g(\mathbf{X})\mid S=s]=\frac{a_g(s)}{p_S(s)},
+\]
+which is the pointwise version in Equation~\ref{eq:pointwise-conditional}, and
+\begin{align*}
+  b_{g,\gamma}(s)&:=\mathbb{E}\{K_{\gamma}(S,s)g(\mathbf{X})\},&
+  q_\gamma(s)&:=\mathbb{E}K_{\gamma}(S,s),\\
+  m_{g,\gamma}(s)&:=\frac{b_{g,\gamma}(s)}{q_\gamma(s)},&
+  \widehat{m}_{g,\gamma}(s)
+  &:=\frac{\mathbb{E}_n\{K_{\gamma}(S,s)g(\mathbf{X})\}}{\mathbb{E}_nK_{\gamma}(S,s)}
+   =\sum_{i=1}^n\widehat{w}_{\gamma}(i;s)\,g(\mathbf{X}_i).
+\end{align*}
+With this notation, $\widehat{D}_n(h)=\sup_{s,v}|\widehat{m}_{g,\gamma}(s)-\mathbb{E}_ng|$ and $D_n(h)=\sup_{s,v}|m_g(s)-\mathbb{E}g|$ for $g=v\circ\widetilde{h}$, the suprema running over $s\in\mathcal{S}_n$ and $v\in\mathcal{V}_{\mathrm{R}}$.
+
+\paragraph{Step 0: entropy of the induced classes.}
+The map $\tau$ is $1$-Lipschitz (its Jacobian is symmetric with eigenvalues in $(0,1]$), and for $\mathbf{z},\mathbf{z}'\in\mathbb{B}^d$,
+$|v_{\theta,\mu}(\mathbf{z})-v_{\theta',\mu'}(\mathbf{z}')|\le\lVert\mathbf{z}-\mathbf{z}'\rVert_2+\lVert\theta-\theta'\rVert_2+|\mu-\mu'|$.  Hence
+$\lVert v_{\theta,\mu}\circ\widetilde{h}-v_{\theta',\mu'}\circ\widetilde{h}'\rVert_\infty\le\lVert h-h'\rVert_\infty+\lVert\theta-\theta'\rVert_2+|\mu-\mu'|$, and covering $\mathbb{S}^{d-1}\times[-1,1]$ at scale $\eta/2$ gives
+\[
+  N(2\eta,\mathcal{G}_n,\lVert\cdot\rVert_\infty)
+  \le N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)\left(\frac{C_0}{\eta}\right)^{d+1}
+  \le\left(\frac{A_n\vee C_0}{\eta}\right)^{\mathfrak{v}_n+d+1},
+  \qquad 0<\eta\le1,
+\]
+for an absolute constant $C_0$.  Since $L_2(Q)$-distances are dominated by sup-norm distances and $\mathcal{G}_n$ has constant envelope $2$, $\mathcal{G}_n$ is VC-type with constants $(A_n\vee C_0,\ \mathfrak{v}_n+d+1)$.  By Assumption~\ref{as:kernel} and \citet[Lemma~22]{nolan1987u}, the class $\mathcal{K}_n:=\{s'\mapsto K_{\gamma}(s',s):s\in\mathcal{S}_n\}$ has envelope $\lVert K\rVert_\infty/\gamma$ and is VC-type with constants $(A_K,\mathfrak{v}_K)$ depending only on $K$.  By the product-covering inequality \citep[Corollary~A.1(i)]{chernozhukov2014gaussian},
+\[
+  \mathcal{F}_n:=\{(\mathbf{x},s')\mapsto K_{\gamma}(s',s)g(\mathbf{x}):
+   g\in\mathcal{G}_n,\ s\in\mathcal{S}_n\}
+\]
+has envelope $2\lVert K\rVert_\infty/\gamma$ and is VC-type with exponent $\mathfrak{v}_n+d+1+\mathfrak{v}_K$ and constant $C(A_n\vee A_K\vee C_0)$.  Since $A_n\ge e$, $\gamma\le1$ and $\mathfrak{v}_n\ge1$, the resulting entropy factors satisfy
+\begin{equation}
+  (\mathfrak{v}_n+d+1+\mathfrak{v}_K)
+  \log\frac{C(A_n\vee A_K\vee C_0)}{\gamma}
+  \le C\,(\mathfrak{v}_n+d)\log\frac{A_n}{\gamma}
+  =:C\,\Gamma_{n}^{0},
+  \label{eq:entropy-factor}
+\end{equation}
+with $C$ depending only on $K$; note $\Gamma_n^0\ge2$.
+
+\paragraph{Step 1: uniform second-order bias.}
+Let $s\in\mathcal{S}_n$, $r_n:=\epsilon_n/\gamma_n\ge1$ and $I_n:=[-r_n,r_n]$, so that $s+\gamma t\in\mathcal{S}$ for every $t\in I_n$.  Extending $p(\mathbf{x},\cdot)$ and $p_S$ by zero outside $\mathcal{S}$, the substitution $s'=s+\gamma t$ gives
+\begin{equation}
+  b_{g,\gamma}(s)=\int_{\mathbb{R}}K(t)\,a_g(s+\gamma t)\,\mathrm{d}t,
+  \qquad
+  q_\gamma(s)=\int_{\mathbb{R}}K(t)\,p_S(s+\gamma t)\,\mathrm{d}t .
+  \label{eq:full-mass}
+\end{equation}
+Since $0\le a_g\le2p_S\le2C_S$, the contribution of $t\notin I_n$ to either integral is at most $2C_ST_K(r_n)\le2C_S\gamma^2$ by Equation~\ref{eq:tail}; in particular $q_\gamma(s)\ge c_S\{1-T_K(r_n)\}\ge3c_S/4$ because $\gamma\le1/2$.  By dominated differentiation under Assumption~\ref{as:smooth-density}, $a_g$ and $p_S$ are twice continuously differentiable on $\mathcal{S}$ with
+\begin{equation}
+  \sup_{g\in\mathcal{G}_n}\lVert a_g''\rVert_\infty
+  \le2\lVert M_2\rVert_{L_1(\nu)},
+  \qquad
+  \lVert p_S''\rVert_\infty\le\lVert M_2\rVert_{L_1(\nu)} .
+  \label{eq:second-derivatives}
+\end{equation}
+On the symmetric interval $I_n$ a second-order Taylor expansion of $a_g(s+\gamma t)$ about $s$ gives
+\[
+  \int_{I_n}K(t)\,a_g(s+\gamma t)\,\mathrm{d}t-a_g(s)
+  =-a_g(s)\,T_K(r_n)
+   +\gamma\,a_g'(s)\int_{I_n}tK(t)\,\mathrm{d}t
+   +\frac{\gamma^2}{2}\int_{I_n}t^2K(t)\,a_g''(\xi_t)\,\mathrm{d}t,
+\]
+where the middle term vanishes by symmetry.  Combining with the tail bound and Equation~\ref{eq:second-derivatives}, and arguing identically for $p_S$, we obtain uniformly over $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$
+\begin{equation}
+  |b_{g,\gamma}(s)-a_g(s)|\le C\gamma^2,
+  \qquad
+  |q_\gamma(s)-p_S(s)|\le C\gamma^2 .
+  \label{eq:bias}
+\end{equation}
+Because $0\le a_g\le2p_S$,
+\begin{equation}
+  |m_{g,\gamma}(s)-m_g(s)|
+  \le\frac{|b_{g,\gamma}(s)-a_g(s)|}{q_\gamma(s)}
+     +\frac{2\,|q_\gamma(s)-p_S(s)|}{q_\gamma(s)}
+  \le C\gamma^2 .
+  \label{eq:ratio-bias}
+\end{equation}
+
+\paragraph{Step 2: uniform stochastic error.}
+For $f\in\mathcal{F}_n$, $\mathbb{E}f^2\le4\sup_{s}\mathbb{E}K_{\gamma}(S,s)^2\le4C_S\lVert K\rVert_\infty/\gamma$, so $\mathcal{F}_n$ has variance proxy $\sigma_n^2\asymp\gamma^{-1}$ and envelope of order $\gamma^{-1}$ (enlarging the envelope by a constant factor depending only on $K$ and $C_S$ if necessary, so that $\sigma_n$ does not exceed the $L_2$ norm of the envelope).  The maximal inequality of \citet[Corollary~5.1]{chernozhukov2014gaussian} and Equation~\ref{eq:entropy-factor} yield
+\[
+  \mathbb{E}\sup_{f\in\mathcal{F}_n}|(\mathbb{E}_n-\mathbb{E})f|
+  \le C\left\{\sqrt{\frac{\Gamma_n^0}{n\gamma}}+\frac{\Gamma_n^0}{n\gamma}\right\}.
+\]
+Applying Bousquet's inequality \citep[Theorem~2.3]{bousquet2002bennett} to the uniformly bounded class $\mathcal{F}_n$ with $x=\log(3/\delta)$, and absorbing $\log3\le\Gamma_n^0$ into the constant, we obtain with probability at least $1-\delta/3$
+\begin{equation}
+  \sup_{\substack{g\in\mathcal{G}_n\\ s\in\mathcal{S}_n}}
+  \left|(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\}\right|
+  \le C\left\{\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}+\frac{\Gamma_{n,\delta}}{n\gamma}\right\}
+  \le C\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}},
+  \label{eq:num-stoch}
+\end{equation}
+where the last inequality uses $\Gamma_{n,\delta}\le c\,n\gamma$.  The same argument applied to $\mathcal{K}_n$ (no score factor) and to $\mathcal{G}_n$ (envelope $2$, variance proxy $4$, and $\gamma\le1$) gives, on an event of probability at least $1-\delta$ containing that of Equation~\ref{eq:num-stoch},
+\begin{equation}
+  \sup_{s\in\mathcal{S}_n}|(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s)|
+  \le C\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}},
+  \qquad
+  \sup_{g\in\mathcal{G}_n}|(\mathbb{E}_n-\mathbb{E})g|
+  \le C\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}} .
+  \label{eq:den-marg-stoch}
+\end{equation}
+By the lower bound $q_\gamma\ge3c_S/4$ from Step~1 and Equation~\ref{eq:den-marg-stoch}, choosing $c$ small enough that $C\sqrt{c}\le c_S/4$ ensures on this event
+\begin{equation}
+  \inf_{s\in\mathcal{S}_n}\mathbb{E}_nK_{\gamma}(S,s)\ \ge\ \frac{c_S}{2} .
+  \label{eq:den-lower}
+\end{equation}
+With $A_{g,s}:=(\mathbb{E}_n-\mathbb{E})\{K_{\gamma}(S,s)g(\mathbf{X})\}$ and $B_s:=(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s)$, the ratio identity
+\[
+  \widehat{m}_{g,\gamma}(s)-m_{g,\gamma}(s)
+  =\frac{A_{g,s}-m_{g,\gamma}(s)\,B_s}{\mathbb{E}_nK_{\gamma}(S,s)},
+  \qquad 0\le m_{g,\gamma}(s)\le2,
+\]
+together with Equations~\ref{eq:num-stoch}--\ref{eq:den-lower} and \ref{eq:ratio-bias} yields
+\begin{equation}
+  \sup_{\substack{g\in\mathcal{G}_n\\ s\in\mathcal{S}_n}}
+  |\widehat{m}_{g,\gamma}(s)-m_g(s)|
+  \le C\left\{\gamma^2+\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma}}\right\}
+  =C\,r_{n,\delta} .
+  \label{eq:cond-mean-uniform}
+\end{equation}
+
+\paragraph{Step 3: conclusion.}
+By the elementary inequality $|\sup_t|F(t)|-\sup_t|G(t)||\le\sup_t|F(t)-G(t)|$, for every $h\in\mathcal{E}_n$,
+\[
+  |\widehat{D}_n(h)-D_n(h)|
+  \le\sup_{g,s}|\widehat{m}_{g,\gamma}(s)-m_g(s)|
+     +\sup_{g}|(\mathbb{E}_n-\mathbb{E})g|
+  \le C\,r_{n,\delta},
+\]
+by Equations~\ref{eq:cond-mean-uniform} and \ref{eq:den-marg-stoch}.  This proves Equation~\ref{eq:uniform}; the inclusions in Equation~\ref{eq:sandwich} follow from Equation~\ref{eq:uniform} on the same event.
+\qed
+
+\subsection{Proof of Corollary~\ref{cor:certificate}}
+
+On the event of Theorem~\ref{thm:uniform}, $D_n(\widehat{h}_n)\le\widehat{D}_n(\widehat{h}_n)+Cr_{n,\delta}$, because Equation~\ref{eq:uniform} is uniform over $\mathcal{E}_n$ and hence applies to the data-dependent $\widehat{h}_n$.  Inserting this bound into Equation~\ref{eq:transfer} and using that $t\mapsto t^{\alpha_{d,\beta}}$ is increasing gives Equation~\ref{eq:certificate}.  For the rate, bounded $(A_n,\mathfrak{v}_n)$ and $\delta_n=n^{-c_1}$ give $\Gamma_{n,\delta_n}\asymp\log n$, so with $\gamma_n\asymp(\log n/n)^{1/5}$ both terms of $r_{n,\delta_n}$ are of order $(\log n/n)^{2/5}$; the conditions $\Gamma_{n,\delta_n}\le c\,n\gamma_n$ and $\gamma_n\le\epsilon_n\asymp1/\log n$ hold for all large $n$.
+\qed
+
+\subsection{Proof of Remark~\ref{rem:untrimmed}}
+\label{app:untrimmed}
+
+Let $\epsilon_n=0$ and $s\in\mathcal{S}$.  Put $T_s:=\{t\in\mathbb{R}:s+\gamma t\in\mathcal{S}\}$ and $\kappa(s):=\int_{T_s}K(t)\,\mathrm{d}t$.  The interval $T_s$ contains $[0,(b-a)/(2\gamma)]$ or $[-(b-a)/(2\gamma),0]$, so by symmetry $\kappa(s)\ge1/2-T_K\{(b-a)/(2\gamma)\}\ge1/4$ for all $n$ large enough that $T_K\{(b-a)/(2\gamma_n)\}\le1/4$ (for compactly supported $K$, as soon as $\gamma_n\le(b-a)/2$).  A first-order expansion with $\lVert a_g'\rVert_\infty\le2\lVert M_1\rVert_{L_1(\nu)}$ and $\lVert p_S'\rVert_\infty\le\lVert M_1\rVert_{L_1(\nu)}$ gives
+\[
+  b_{g,\gamma}(s)=\kappa(s)a_g(s)+R_b,\qquad
+  q_\gamma(s)=\kappa(s)p_S(s)+R_q,
+\]
+with $|R_b|\vee|R_q|\le2\lVert M_1\rVert_{L_1(\nu)}\,\gamma\int|t|K(t)\,\mathrm{d}t$,
+where $\int|t|K<\infty$ by Assumption~\ref{as:kernel}, and $q_\gamma(s)\ge c_S\kappa(s)\ge c_S/4$.  Hence
+\[
+  |m_{g,\gamma}(s)-m_g(s)|
+  =\frac{|R_b\,p_S(s)-a_g(s)\,R_q|}{p_S(s)\,q_\gamma(s)}
+  \le\frac{|R_b|+2|R_q|}{q_\gamma(s)}
+  \le\frac{4\,(|R_b|+2|R_q|)}{c_S}
+  \le C\gamma,
+\]
+uniformly over $g\in\mathcal{G}_n$ and $s\in\mathcal{S}$.  Steps~0,~2 and~3 of Appendix~\ref{app:proof-uniform} are unchanged (with $\mathcal{S}_n$ replaced by $\mathcal{S}$ and $c_S/2$ replaced by $c_S/8$ in Equation~\ref{eq:den-lower}), so the untrimmed estimator satisfies Equation~\ref{eq:uniform} with $\gamma_n^2$ replaced by $\gamma_n$ in $r_{n,\delta}$.
+\qed

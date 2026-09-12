@@ -1,0 +1,178 @@
+% =====================================================================
+% iclr2027/theory.tex  --  body of \section{Theoretical Analysis}
+%
+% Usage in iclr2027_conference.tex:
+%     \section{Theoretical Analysis}
+%     \input{theory}
+% and, after \appendix:
+%     \input{theory_appendix}
+%
+% Preamble additions (iclr2027_conference.tex already defines `assumption'):
+%     \newtheorem{theorem}{Theorem}
+%     \newtheorem{corollary}[theorem]{Corollary}
+%     \theoremstyle{remark}\newtheorem{remark}{Remark}
+% Bib entries to append to bibliography.bib: see theory_refs.bib.
+% Notation follows Sections 2-3 of the main text (bold vectors, \mathbb{P},
+% supIPM / \widehat{supIPM}^{\gamma}, GDP_\infty, \widehat{w}_\gamma(i;s),
+% \mathcal{H}^\beta_d, Assumption~\ref{as:positive-density}).
+% =====================================================================
+\label{sec:theory}
+
+We establish two properties of supIPM with the ReLU discriminator class.  First, a small population supIPM controls $\operatorname{GDP}_{\infty}$ of every prediction head of bounded H\"older norm (Theorem~\ref{thm:transfer}).  Second, the empirical supIPM in Equation~\ref{eq:empirical-supipm} converges to the population supIPM in Equation~\ref{eq:supipm} uniformly over the encoder class, so the empirical and population fairness constraints are asymptotically equivalent and the fairness level attained on the sample transfers to the population (Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate}).  Proofs are given in Appendix~\ref{app:proofs}.
+
+\subsection{Trimmed criteria}
+\label{sec:theory-setup}
+
+Write $\mathcal{S}=[a,b]$ and $\tau(\mathbf{z}):=\mathbf{z}/\sqrt{\lVert\mathbf{z}\rVert_2^2+1}$.  For an encoder $h:\mathcal{X}\to\mathbb{R}^d$ let $\widetilde{h}:=\tau\circ h$ and $\widetilde{\mathbf{Z}}_h:=\widetilde{h}(\mathbf{X})\in\mathbb{B}^d$, so that $\widetilde{\mathbf{Z}}_{h_\phi}$ is the normalized representation of Section~\ref{sec:supipm-criterion}.  As there, prediction heads $f:\mathbb{B}^d\to\mathbb{R}$ and discriminators are applied to $\widetilde{\mathbf{Z}}_h$, and conditional expectations given $S=s$ are the pointwise versions in Equation~\ref{eq:pointwise-conditional}.  Every $v\in\mathcal{V}_{\mathrm{R}}$ satisfies $0\le v\le2$ on $\mathbb{B}^d$.
+
+The kernel weights $\widehat{w}_{\gamma}(i;s)$ in Equation~\ref{eq:supipm-estimators} are a local-constant smoother in $s$.  Within distance $\gamma$ of an endpoint of $\mathcal{S}$ such a smoother receives only part of the kernel mass and incurs a bias of first order in $\gamma$, whereas in the interior the bias is of second order.  We therefore state the finite-sample results on the expanding interior region
+\begin{equation}
+  \mathcal{S}_n:=[a+\epsilon_n,\,b-\epsilon_n],
+  \qquad 0<\epsilon_n<\tfrac{b-a}{2},\quad \epsilon_n\to0,
+  \label{eq:trimmed-domain}
+\end{equation}
+and write $\operatorname{GDP}_{\infty,n}$, $\operatorname{supIPM}_{\mathcal{V},n}$ and $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}},n}$ for Equations~\ref{eq:linfty-gdp}, \ref{eq:supipm} and \ref{eq:empirical-supipm} with the supremum over $s\in\mathcal{S}$ replaced by the supremum over $s\in\mathcal{S}_n$.  Explicitly,
+\begin{align}
+  \operatorname{GDP}_{\infty,n}(f\circ\widetilde{h})
+  &:=\sup_{s\in\mathcal{S}_n}
+     \left|\mathbb{E}[f(\widetilde{\mathbf{Z}}_h)\mid S=s]
+           -\mathbb{E}[f(\widetilde{\mathbf{Z}}_h)]\right|,
+  \label{eq:trimmed-gdp}\\
+  \operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(\widetilde{\mathbf{Z}}_h;S)
+  &:=\sup_{s\in\mathcal{S}_n}
+     \operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}
+     \left(\mathbb{P}_{\widetilde{\mathbf{Z}}_h\mid S=s},
+           \mathbb{P}_{\widetilde{\mathbf{Z}}_h}\right),
+  \label{eq:trimmed-supipm}\\
+  \widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}},n}
+  (\widetilde{\mathbf{Z}}_h;S)
+  &:=\sup_{s\in\mathcal{S}_n}
+     \sup_{v\in\mathcal{V}_{\mathrm{R}}}
+     \left|\sum_{i=1}^n
+       \left(\widehat{w}_{\gamma}(i;s)-\frac1n\right)
+       v\big(\widetilde{h}(\mathbf{X}_i)\big)\right|,
+  \label{eq:trimmed-empirical-supipm}
+\end{align}
+with the convention $0/0:=0$ in $\widehat{w}_{\gamma}(i;s)$.  Since $\epsilon_n\to0$, every fixed $s\in(a,b)$ belongs to $\mathcal{S}_n$ for all large $n$; Remark~\ref{rem:untrimmed} describes what is lost when $\epsilon_n=0$.
+
+\subsection{Assumptions}
+\label{sec:theory-assumptions}
+
+Assumption~\ref{as:positive-density} is in force throughout.  Let $p(\mathbf{x},s)$ be the joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$ fixed in Section~\ref{sec:supipm-criterion}, with $p_S(s)=\int_{\mathcal{X}}p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})$ for every $s\in\mathcal{S}$.
+
+\begin{assumption}[Smooth joint density]
+\label{as:smooth-density}
+$\mathcal{D}=\{(\mathbf{X}_i,S_i,Y_i)\}_{i=1}^n$ consists of i.i.d.\ copies of $(\mathbf{X},S,Y)$.  For $\nu$-almost every $\mathbf{x}$, the map $s\mapsto p(\mathbf{x},s)$ is twice continuously differentiable on $\mathcal{S}$, and there exist $M_1,M_2\in L_1(\nu)$ such that $\sup_{s\in\mathcal{S}}|\partial_s^{j}p(\mathbf{x},s)|\le M_j(\mathbf{x})$ for $j\in\{1,2\}$.
+\end{assumption}
+
+Assumption~\ref{as:smooth-density} is the counterpart of Assumption~3 of \citet{kong2025fair}, stated with integrable rather than pointwise envelopes; the envelopes are exactly what is needed to differentiate $s\mapsto\int g(\mathbf{x})p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})$ under the integral sign uniformly over bounded $g$.  No smoothness in $\mathbf{x}$ is required.
+
+\begin{assumption}[Kernel and tuning sequences]
+\label{as:kernel}
+$K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$ for a function $K:\mathbb{R}\to[0,\infty)$ that is bounded, symmetric, continuous and of bounded variation, with $\int K=1$ and $\int t^2K(t)\,\mathrm{d}t<\infty$.  Writing $T_K(r):=\int_{|t|>r}K(t)\,\mathrm{d}t$ for its tail mass, the bandwidth and trimming width satisfy $0<\gamma_n\le\min\{\epsilon_n,1/2\}$, $\gamma_n\to0$, and
+\begin{equation}
+  T_K(\epsilon_n/\gamma_n)\le\gamma_n^2 .
+  \label{eq:tail}
+\end{equation}
+\end{assumption}
+
+The factor $\gamma^{-1}$ in $K_{\gamma}$ cancels in the weights $\widehat{w}_{\gamma}(i;s)$ and is a normalization for the proofs.  The tail condition in Equation~\ref{eq:tail} says that, for $s\in\mathcal{S}_n$, the kernel mass falling outside $[s-\epsilon_n,s+\epsilon_n]\subseteq\mathcal{S}$ is of the order of the squared-bandwidth bias.  For compactly supported kernels such as the Epanechnikov and biweight kernels it holds trivially, since $T_K(\epsilon_n/\gamma_n)=0$ whenever $\gamma_n\le\epsilon_n$.  For the Gaussian kernel $T_K(r)\le e^{-r^2/2}$ for $r\ge1$, so Equation~\ref{eq:tail} holds whenever $\epsilon_n/\gamma_n\ge2\sqrt{\log(1/\gamma_n)}$; with $\epsilon_n\asymp1/\log n$ this is satisfied by every polynomially decaying bandwidth.  Bounded variation of $K$ makes the class $\{s'\mapsto K_{\gamma}(s',s):s\in\mathcal{S}_n\}$ VC-type with constants $(A_K,\mathfrak{v}_K)$ depending only on $K$ \citep[Lemma~22]{nolan1987u}.
+
+\begin{assumption}[Encoder class]
+\label{as:encoder}
+$\mathcal{E}_n$ is a class of measurable encoders $h:\mathcal{X}\to\mathbb{R}^d$ such that, with $\lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2$, there exist $A_n\ge e$ and $\mathfrak{v}_n\ge1$ with
+\begin{equation}
+  N(\eta,\mathcal{E}_n,\lVert\cdot\rVert_\infty)
+  \le\left(\frac{A_n}{\eta}\right)^{\mathfrak{v}_n},
+  \qquad 0<\eta\le1 .
+  \label{eq:encoder-entropy}
+\end{equation}
+\end{assumption}
+
+Assumption~\ref{as:encoder} is the sup-norm entropy condition that also enters Theorem~5 of \citet{kong2025fair}.  It holds for the parameterized encoders $h_{\phi}$ of Algorithm~\ref{alg:supipm-frl} when $h_{\phi}$ is a ReLU network of depth $L$ and width $H$ with parameters bounded by a constant, with $\mathfrak{v}_n$ of the order of the number of parameters and $\log A_n$ of the order of $L\log H$ \citep[e.g.][Lemma~5]{schmidthieber2020nonparametric}.\footnote{To avoid measurability issues we assume, as usual, that all function classes appearing below are pointwise measurable \citep[Section~2.3.3]{vaart1996weak}.}  For $0<\delta<1$ define
+\begin{equation}
+  \Gamma_{n,\delta}
+  :=(\mathfrak{v}_n+d)\log\frac{A_n}{\gamma_n}+\log\frac{1}{\delta},
+  \qquad
+  r_{n,\delta}
+  :=\gamma_n^2+\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma_n}} .
+  \label{eq:rate}
+\end{equation}
+
+\subsection{Fairness transfer}
+\label{sec:theory-transfer}
+
+For $B>0$ let $\mathcal{H}^{\beta}_d(B):=\{f\in C^{k}(\mathbb{B}^d):\lVert f\rVert_{\mathcal{H}^{\beta}}\le B\}$ be the H\"older ball of radius $B$ in Equation~\ref{eq:holder-ball}, so that $\mathcal{H}^{\beta}_d=\mathcal{H}^{\beta}_d(1)$, and for $\beta\ne(d+3)/2$ let $\alpha_{d,\beta}:=2\beta/(d+3)$ if $\beta<(d+3)/2$ and $\alpha_{d,\beta}:=1$ if $\beta>(d+3)/2$ be the exponent in Equation~\ref{eq:relu-holder}.
+
+\begin{theorem}[Fairness transfer]
+\label{thm:transfer}
+Let $d\ge3$,\footnote{The restriction $d\ge3$ is inherited from the ReLU approximation result underlying Equation~\ref{eq:relu-holder} \citep[Theorem~2]{park2025relu}.} and let $h:\mathcal{X}\to\mathbb{R}^d$ be measurable.  For every $\beta>0$ with $\beta\ne(d+3)/2$ there is a constant $C_{d,\beta}$, depending only on $d$ and $\beta$, such that for every $B>0$
+\begin{equation}
+  \sup_{f\in\mathcal{H}^{\beta}_d(B)}
+  \operatorname{GDP}_{\infty,n}(f\circ\widetilde{h})
+  \le C_{d,\beta}\,B\,
+  \operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(\widetilde{\mathbf{Z}}_h;S)^{\alpha_{d,\beta}} .
+  \label{eq:transfer}
+\end{equation}
+Moreover, $\operatorname{GDP}_{\infty,n}(v\circ\widetilde{h})\le\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(\widetilde{\mathbf{Z}}_h;S)$ for every $v\in\mathcal{V}_{\mathrm{R}}$, and $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(\widetilde{\mathbf{Z}}_h;S)=0$ implies $\mathbb{P}_{\widetilde{\mathbf{Z}}_h\mid S=s}=\mathbb{P}_{\widetilde{\mathbf{Z}}_h}$ for every $s\in\mathcal{S}_n$.
+\end{theorem}
+
+Theorem~\ref{thm:transfer} is the $L_{\infty}$ analogue of Theorems~1--2 of \citet{kong2025fair}: the bound holds at every $s\in\mathcal{S}_n$ rather than on average over $S$, and it covers every prediction head of bounded H\"older norm rather than the discriminators alone.  For heads smoother than $(d+3)/2$ the control is linear in supIPM.  With $\epsilon_n=0$ the same statement holds on all of $\mathcal{S}$ for the untrimmed criteria of Section~\ref{sec:supipm-criterion}.
+
+\subsection{Uniform convergence and certificate}
+\label{sec:theory-uniform}
+
+\begin{theorem}[Uniform convergence]
+\label{thm:uniform}
+Let Assumptions~\ref{as:smooth-density}--\ref{as:encoder} hold.  There are constants $C,c>0$, depending only on $c_S$, $C_S$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, such that whenever $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$,
+\begin{equation}
+  \sup_{h\in\mathcal{E}_n}
+  \left|
+    \widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}
+    (\widetilde{\mathbf{Z}}_h;S)
+    -\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}
+    (\widetilde{\mathbf{Z}}_h;S)
+  \right|
+  \le C\,r_{n,\delta} .
+  \label{eq:uniform}
+\end{equation}
+Consequently, on the same event, for every fairness level $\rho\ge Cr_{n,\delta}$,
+\begin{equation}
+  \mathcal{E}_n(\rho-Cr_{n,\delta})
+  \subseteq\widehat{\mathcal{E}}_n(\rho)
+  \subseteq\mathcal{E}_n(\rho+Cr_{n,\delta}),
+  \label{eq:sandwich}
+\end{equation}
+where $\mathcal{E}_n(t):=\{h\in\mathcal{E}_n:\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(\widetilde{\mathbf{Z}}_h;S)\le t\}$ and $\widehat{\mathcal{E}}_n(t):=\{h\in\mathcal{E}_n:\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(\widetilde{\mathbf{Z}}_h;S)\le t\}$.
+\end{theorem}
+
+The rate $r_{n,\delta}$ has the usual kernel-smoothing form: a squared-bandwidth bias and a variance term of order $(n\gamma_n)^{-1/2}$ inflated by the entropy of the encoder class.  The representation dimension $d$ enters only through the $d+1$ parameters of the ReLU discriminator, so there is no curse of dimensionality in $\mathcal{Z}$, as in the discussion following Theorem~4 of \citet{kong2025fair}.  For a single fixed encoder ($\mathcal{E}_n=\{h\}$, $\mathfrak{v}_n=1$, $A_n=e$) Equation~\ref{eq:uniform} is the analogue of their Theorem~4, and Equation~\ref{eq:sandwich} of their Theorem~5: every encoder that satisfies the empirical constraint $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}\le\rho$ satisfies the population constraint at level $\rho+Cr_{n,\delta}$.
+
+\begin{corollary}[Certificate for the learned encoder]
+\label{cor:certificate}
+Let the assumptions of Theorems~\ref{thm:transfer} and \ref{thm:uniform} hold and let $\widehat{h}_n\in\mathcal{E}_n$ be any encoder, possibly depending on $\mathcal{D}$, such as the output $h_{\phi}$ of Algorithm~\ref{alg:supipm-frl}.  On the event of Theorem~\ref{thm:uniform}, simultaneously for all $B>0$ and all $\beta>0$ with $\beta\ne(d+3)/2$,
+\begin{equation}
+  \sup_{f\in\mathcal{H}^{\beta}_d(B)}
+  \operatorname{GDP}_{\infty,n}(f\circ\tau\circ\widehat{h}_n)
+  \le C_{d,\beta}\,B\,
+  \Big\{
+    \widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}
+    (\widetilde{\mathbf{Z}}_{\widehat{h}_n};S)
+    +Cr_{n,\delta}
+  \Big\}^{\alpha_{d,\beta}} .
+  \label{eq:certificate}
+\end{equation}
+If, in addition, $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$, and $\epsilon_n$ satisfies Assumption~\ref{as:kernel} (for instance $\epsilon_n\asymp1/\log n$, which works for both compactly supported and Gaussian kernels), then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
+\end{corollary}
+
+Equation~\ref{eq:certificate} is the operational content of the theory: the empirical supIPM of the learned encoder bounds the population worst-case disparity of every H\"older prediction head on $\mathcal{S}_n$, up to $Cr_{n,\delta}$.
+
+\begin{remark}[Estimation without trimming]
+\label{rem:untrimmed}
+If $\epsilon_n=0$, so that the suprema run over all of $\mathcal{S}$ as in Equations~\ref{eq:supipm} and \ref{eq:empirical-supipm}, the proof of Theorem~\ref{thm:uniform} goes through with one change: for $s$ within $\gamma_n$ of an endpoint the kernel mass inside $\mathcal{S}$ is only partial, so the first-order Taylor term no longer cancels and the bias becomes $O(\gamma_n)$ instead of $O(\gamma_n^2)$ (Appendix~\ref{app:untrimmed}).  The untrimmed estimator therefore converges uniformly over $\mathcal{S}$ at rate $\gamma_n+\sqrt{\Gamma_{n,\delta}/(n\gamma_n)}$, that is $O\{(\log n/n)^{1/3}\}$ for $\gamma_n\asymp(\log n/n)^{1/3}$.  Trimming affects the rate but not consistency.
+\end{remark}
+
+\begin{remark}[Numerical supremum and held-out evaluation]
+\label{rem:practical}
+Theorem~\ref{thm:uniform} concerns the exact supremum in Equation~\ref{eq:trimmed-empirical-supipm}.  The value $\max_{m\in[M]}\Delta_m(\hat{s})$ returned by Algorithm~\ref{alg:supipm-frl} is a lower bound, and Equation~\ref{eq:certificate} applies to it after adding a verified optimization gap.  If, alternatively, Equation~\ref{eq:trimmed-empirical-supipm} is evaluated on an independent sample of size $m$ after training, the encoder class conditional on $\mathcal{D}$ is the singleton $\{\widehat{h}_n\}$, and Theorem~\ref{thm:uniform} applies with $n$ replaced by $m$ and $\Gamma_{m,\delta}=(d+1)\log(e/\gamma_m)+\log(1/\delta)$, irrespective of the architecture or the number of parameters of $\widehat{h}_n$.
+\end{remark}

@@ -407,21 +407,42 @@ The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the se
 
 
 \section{Experiments}
+\label{sec:experiments}
 
+Section~\ref{sec:exp-simulation} realizes Figure~\ref{fig:motivation} with a generator whose localized dependence on $S$ is known, and Section~\ref{sec:exp-real} compares supIPM-FRL with seven baselines on three tabular datasets, contrasting the head trained with the encoder against the worst head of bounded complexity that Corollary~\ref{cor:certificate} controls; Appendices~\ref{app:synth-experiments}--\ref{app:ablation-studies} give additional results, the graph benchmarks and the ablation studies.
 
 \subsection{Simulation study}
-supIPM vs FREM 의 stress test 실험
-기존 plot + 특정 mse 하나 딱 찝고 거기서 DP(s)를 찍어서 보여주기 x축이 s이고 y축이 DP(s)로
+\label{sec:exp-simulation}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.75\textwidth]{main/fig1_simulation.pdf}
+  \caption{Simulation.  Left: test $1-\mathrm{MAE}$ (horizontal) against the worst-head $L_{\infty}$-GDP at $c=1$, $R_1$ (vertical, lower is better); one point per penalty value (seed means, 2023--2025), Pareto fronts joined, circles at the matched operating point.  Right: $\widehat{\Delta}(s)$ of that worst head, mean $\pm1$ s.e.\ over seeds; the dotted line marks $s_0$.  Training kernel width $0.25\,\mathrm{sd}(S)$ in both panels.}
+  \label{fig:simulation}
+\end{figure}
+
+The generator realizes Figure~\ref{fig:motivation}.  $S$ is uniform on a bounded interval, and the outcome $Y$ and one input column depend on $S$ through a Gaussian bump centered at $s_0$ whose width is $0.087$ in the $[0,1]$ coordinate of the sensitive domain, so that the neighborhood of $s_0$ carries little $\mathbb{P}_S$-probability.  A second input column and $Y$ also depend on $S$ linearly, so an average over $S$ is dominated by this broad term while the localized term remains.  We compare supIPM-FRL with FREM under the protocol of Section~\ref{sec:exp-real} without weight decay; the formulas and sample sizes are given in Appendix~\ref{app:synth-experiments}.
+
+The left panel of Figure~\ref{fig:simulation} plots the test $1-\mathrm{MAE}$ against the worst-head $L_{\infty}$-GDP at gain budget $c=1$, written $R_1$: the largest $\operatorname{GDP}_{\infty}$ that any head $\sigma(\mathbf{w}^\top\mathbf{z}+b)$ with $\lVert\mathbf{w}\rVert_2\le1$ attains on the frozen representation (Section~\ref{sec:exp-real}).  The right panel shows the profile $\widehat{\Delta}(s):=|\widehat{\mathbb{E}}[f(\mathbf{Z})\mid S=s]-\widehat{\mathbb{E}}[f(\mathbf{Z})]|$ of the worst head $f$ at a matched operating point fixed in advance, a quarter of the jointly spanned utility range below the model trained with $\lambda=0$.  Both profiles peak near $s_0$, where the localized dependence was injected, and the peak of FREM is markedly higher at the same utility, while the V-shaped remainder of both profiles reflects the linear term.  This is Figure~\ref{fig:motivation} realized in data: the discrepancy at $s_0$ contributes little to the average in Equation~(\ref{eq:eipm-estimator}), so an EIPM penalty leaves it in place, whereas the supremum in Equation~(\ref{eq:empirical-supipm}) is driven by it.  Both panels use the training kernel width $0.25\,\mathrm{sd}(S)$, since the Silverman width cannot resolve the bump; the choice moves every value by about a factor of $1.3$ and changes no ranking (Appendix~\ref{app:ablation-studies}).
+
 \subsection{Real data analysis}
+\label{sec:exp-real}
 
-Adult,Crime,Income data set에서 GDP,inftyGPD 기타 등등 보여주고 baseline들하고 비교.
-그리고 FREM하고 비교할건데 이거 Adult data에서 bad한경우 비교. 이런식으로 해야될것같음.. 여유 가능하면 다른 데이터셋들에서도 다 해보고.
-그리고 ablation으로 뭐 lamda차이 기타 등등 실험 짱박아 넣으면될듯 table도 appendix에 집어넣고..
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.82\textwidth]{main/fig2_own_head_adult.pdf}\\[1pt]
+  \includegraphics[width=0.82\textwidth]{main/fig3_worst_head_adult.pdf}
+  \caption{Adult.  Top: $L_{\infty}$-GDP of the head trained with the encoder (own head).  Bottom: worst-head $L_{\infty}$-GDP $R_1$ ($c=1$).  Disparity is horizontal and accuracy vertical, so the upper left is better; panels group the methods by the sensitive attribute they consume, with FREM and supIPM-FRL in every panel.  Points are seed means (2023--2027) with $\pm1$ sd whiskers, curves are Pareto fronts over all configurations of a method, and the black dot is the model trained with $\lambda=0$.}
+  \label{fig:adult-own-worst}
+\end{figure}
 
+\paragraph{Datasets, baselines and protocol.}  We use Adult (binary classification of income, $n\approx45{,}000$, $S=$ age), Crime (regression of the violent crime rate, $n\approx2{,}000$, $S=$ the Black population share of a community) and ACSIncome (binary classification of income, $n=20{,}000$ from the 2018 Folktables person survey of California, $S=$ age), with $S$ min--max scaled to $[0,1]$ on the training split throughout; the graph benchmarks Pokec-z and Pokec-n are described in Appendix~\ref{app:real-experiments}.  We compare supIPM-FRL with FREM \citep{kong2025fair}, Reg-GDP \citep{jiang2022gdp}, Reg-HGR \citep{mary2019continuous}, the adversarial baseline ADV of \citet{kong2025fair}, and three methods for a binary sensitive attribute, LAFTR \citep{madras2018adversarially}, MMD \citep{deka2023mmdbfair} and sIPM-LFR \citep{kim2022parametric}, given $S$ binarized at the median or the mean of the training split.  Every method uses the encoder MLP($d\to50\to50$, SELU) with the normalization of Appendix~\ref{app:ascent}, a linear prediction head, and Adam for 200 epochs; supIPM-FRL uses $\gamma=0.25\,\mathrm{sd}(S)$ and $M=100$ discriminators.  Each figure shows, per method, the Pareto front over all of its configurations (penalty value, binarization variant, kernel width of FREM), and runs whose encoder collapsed to a constant predictor are dropped for every method alike (Appendix~\ref{app:real-experiments}).
 
-메인실험은 어느정도됐는데.. 이제 근거 support할 실험하고..ablation을 해야할듯..
+\paragraph{Measures.}  Utility is the test accuracy on Adult and ACSIncome and the test $1-\mathrm{MAE}$ on Crime.  Two disparities are computed on the test split of the frozen representation over the interior region between the $5\%$ and $95\%$ sample quantiles of $S$ (the $\mathcal{S}_n$ of Section~\ref{sec:theory}), with the conditional expectation in Equation~(\ref{eq:linfty-gdp}) estimated by the Nadaraya--Watson estimator at the Silverman bandwidth and the supremum taken over a grid.  The own-head $L_{\infty}$-GDP is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ for the head trained jointly with the encoder, the quantity the FRL literature reports.  The worst-head $L_{\infty}$-GDP at gain budget $c>0$ is $R_c(h_{\phi}):=\sup\{\operatorname{GDP}_{\infty}(f\circ h_{\phi}):f(\mathbf{z})=\sigma(\mathbf{w}^\top\mathbf{z}+b),\ \lVert\mathbf{w}\rVert_2\le c\}$ with the logistic function $\sigma$, obtained by gradient ascent over $(\mathbf{w},b)$ on the frozen representation without any label, so that it is a property of the representation alone (Appendix~\ref{app:real-experiments}).  $R_c$ is the empirical counterpart of the left-hand side of Equation~(\ref{eq:certificate}) for heads of bounded gain, and because $(\theta^\top\mathbf{z}+1)_+=\theta^\top\mathbf{z}+1$ on $\mathbb{B}^d$, a linear head of gain $c$ has worst disparity at most $c\cdot\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$, so $c=1$ is the headline budget; $c=16$ contains the gain of 13 to 27 that a jointly trained head uses.
 
+\paragraph{Own head against worst head.}  Figure~\ref{fig:adult-own-worst} shows both measures on Adult; the numbers below read each method at its configuration within $0.004$ of a matched utility level with the lowest disparity (Appendix~\ref{app:real-experiments}).  Under the own-head measure supIPM-FRL and FREM are close: at accuracy $0.835$ they attain $0.0238$ and $0.0320$, with sIPM-LFR at $0.0299$ between them.  Under $R_1$ they separate by an order of magnitude: supIPM-FRL attains $0.0006$ at accuracy $0.8335$, FREM $0.0077$ at $0.8378$, and every other baseline $0.0110$ or more; at the level $0.842$ the values are $0.0014$ against $0.0086$.  The rankings differ because the own-head measure certifies the single head $f_{\psi}$, whereas Corollary~\ref{cor:certificate} bounds $\operatorname{GDP}_{\infty}$ simultaneously over the H\"older ball, which $R_1$ probes.  A penalty tied to the trained head, or averaged over $S$, can leave directions of $\mathbf{Z}$ that this head does not use but another head of the same accuracy does; FREM remains second under $R_1$.
 
+\paragraph{Other datasets and budgets.}  On Crime supIPM-FRL has the lowest $R_1$ over the upper part of the utility range, $0.0131$ at the matched level $0.866$ against $0.0494$ (Reg-HGR), $0.0763$ (Reg-GDP) and $0.0850$ (ADV), the only other methods reaching that level, whereas at the lowest level $0.834$ the fronts meet (MMD $0.0036$, sIPM-LFR $0.0044$, supIPM-FRL $0.0050$).  On ACSIncome supIPM-FRL and FREM are within $0.0004$ of each other at the level $0.760$ ($0.0024$ against $0.0020$) and separate at $0.780$ ($0.0023$ against $0.0088$); the supIPM-FRL runs on this dataset used the weak discriminator schedule $J_v=2$, $\alpha_v=10^{-3}$ examined in Appendix~\ref{app:ablation-studies}, rather than $J_v=20$, $\alpha_v=10^{-2}$ as on Adult and Crime.  On Pokec-z and Pokec-n, reported in Appendix~\ref{app:real-experiments} for reasons of space, the two methods are within $0.001$ of each other at every matched level.  The lead of supIPM-FRL on Adult persists through $c=32$ ($0.0629$ against $0.0748$), whereas on ACSIncome and the graphs the two methods are within $0.0004$ at $c=1$ and FREM is lower at $c=16$ and $c=32$.  Under kernel GDP, which supIPM-FRL does not optimize, its front is close to that of FREM on every dataset (Appendix~\ref{app:real-experiments}).
 
 \section{Conclusion}
 
@@ -1129,7 +1150,71 @@ Algorithm~\ref{alg:supipm-frl} assembles the three updates of Appendix~\ref{app:
 \end{algorithm}
 
 \section{Experiments for synthetic dataset}
+\label{app:synth-experiments}
 
+This appendix gives the generative process behind Section~\ref{sec:exp-simulation}, the training and evaluation protocol specific to the simulation, and the additional simulation figures.  The discriminator-strength and kernel-bandwidth studies, which use the same generators, are given in Appendix~\ref{app:ablation-studies}.
+
+\subsection{Generative process}
+\label{app:synth-generative}
+
+Two generators are used, which differ only in the dependence on $S$ that they inject.  Both draw
+\begin{equation}
+\begin{aligned}
+  S&\sim\mathrm{Uniform}(-\sqrt{3},\sqrt{3}),\qquad
+  \mathbf{X}_{\mathrm{task}}\sim N(\mathbf{0},\mathbf{I}_4),\qquad
+  \mathbf{X}_{\mathrm{noise}}\sim N(\mathbf{0},\mathbf{I}_3),\\
+  \omega(S)&:=\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\},\qquad s_0=1.2,\quad \tau=0.30,\\
+  X_{\mathrm{leak}}&:=3\,\omega(S)+0.5\,\varepsilon_1,
+\end{aligned}
+\label{eq:synth-common}
+\end{equation}
+where $\varepsilon_1,\varepsilon_2,\varepsilon_3\sim N(0,1)$ and all random quantities are drawn independently, so that $S$ has mean $0$ and standard deviation $1$ and $\omega$ is a Gaussian bump of width $\tau$ centred at $s_0$.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$.  The \emph{bump-only} generator sets
+\begin{equation}
+  Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+\omega(S)+0.3\,\varepsilon_2\right),
+  \qquad
+  \mathbf{X}:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{leak}},\mathbf{X}_{\mathrm{noise}})\in\mathbb{R}^{8},
+  \label{eq:synth-bump}
+\end{equation}
+where $\sigma$ is the logistic function, so that the outcome and one input column depend on $S$ through the bump alone.  The generator of Section~\ref{sec:exp-simulation} adds a broad linear dependence to both:
+\begin{equation}
+\begin{aligned}
+  Y&:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+0.5\,S+\omega(S)+0.3\,\varepsilon_2\right),\\
+  \mathbf{X}&:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{leak}},\mathbf{X}_{\mathrm{noise}},X_{\mathrm{lin}})\in\mathbb{R}^{9},
+  \qquad
+  X_{\mathrm{lin}}:=S+0.5\,\varepsilon_3 .
+\end{aligned}
+  \label{eq:synth-bump-linear}
+\end{equation}
+Since $Y\in(0,1)$, the task is regression: the prediction head is followed by the logistic function and trained with the squared-error loss, and utility is the test $1-\mathrm{MAE}$.  For each seed in $\{2023,2024,2025\}$, training, validation and test samples of sizes $n_{\mathrm{train}}=n_{\mathrm{test}}=5{,}000$ and $n_{\mathrm{val}}=1{,}000$ are drawn independently.  As on the real datasets, $S$ is min--max scaled to $[0,1]$ on the training split, and in this coordinate the bump is centred at $s_0=(1.2+\sqrt{3})/(2\sqrt{3})=0.846$ with width $\tau/(2\sqrt{3})=0.087$; Figure~\ref{fig:simulation} marks this $s_0$.
+
+The second generator realizes Figure~\ref{fig:motivation}.  Under the uniform $S$, an interval of length $\tau$ centred at $s_0$ carries $\mathbb{P}_S$-probability $0.087$, so the conditional distribution of $\mathbf{Z}$ differs from the marginal distribution on a set of small probability whenever the encoder retains $X_{\mathrm{leak}}$.  An average over $S$ weights this set by its probability, whereas the linear dependence is present at every $s$.  For a function of $S$ that is linear, $|\mathbb{E}[\,\cdot\mid S=s]-\mathbb{E}[\,\cdot\,]|$ is V-shaped in $s$, with its minimum at the mean of $S$ and its maximum at the two ends of the domain, so an average such as EIPM or GDP is dominated by the linear term.  In Figure~\ref{fig:simulation} the profile of the worst head peaks near $s_0$ for both methods, so the supremum in Equation~(\ref{eq:supipm}) is driven by the bump.  Both dependences enter $Y$, so removing either one costs utility.  The two penalties differ in which dependence they remove first.  The bump-only generator is used in the discriminator-strength study of Appendix~\ref{app:ablation-studies}, where a single localized violation isolates whether the discriminators find the supremum.
+
+\subsection{Training and evaluation protocol}
+\label{app:synth-protocol}
+
+Every method uses the architecture and optimizer of Appendix~\ref{app:real-experiments}: the encoder MLP($d\to50\to50$) with SELU activations and the normalization of Appendix~\ref{app:ascent}, a linear prediction head, and Adam with learning rate $10^{-3}$, moment parameters $(0.5,0.999)$, minibatches of size $200$ and $200$ epochs.  The weight decay is $0$ rather than the $10^{-2}$ of the real datasets, so that the columns $X_{\mathrm{leak}}$ and $X_{\mathrm{lin}}$ are not removed by regularization alone.
+
+supIPM-FRL uses the bandwidth $\gamma=0.25\,\mathrm{sd}(S)$, $M=100$ discriminators, and the interior region between the $5\%$ and $95\%$ sample quantiles of the training $S$ for the supremum over $s$.  Each descent step of Algorithm~\ref{alg:supipm-frl} is preceded by $J_v=20$ discriminator updates.  An update consists of an Adam step of size $\alpha_v=10^{-2}$, with the gradient norm clipped at $5$, and the projection of Appendix~\ref{app:ascent}.  On the generator of Section~\ref{sec:exp-simulation} the candidate ascent is switched off ($J_s=0$), and $s^{\star}$ is the maximizer over a grid of $33$ equally spaced points of the interior region.  For the bump-only generator, the grid maximizer seeds one of $T=8$ candidates, the remaining seven are drawn uniformly from the interior region, and each candidate takes $J_s=20$ ascent steps with $\alpha_s=0.1$.  The penalty parameter runs over $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$.  FREM runs over $\lambda\in\{0.01,0.05,0.1,0.2,0.5,1,2,3\}$ for each of the three width parameters $0.03$, $0.05$ and $0.07$ of its Gaussian kernel on $S$ in Equation~(\ref{eq:frem-conditional}), in the $[0,1]$ coordinate of $S$, with the width parameter of the Gaussian kernel of its RKHS discriminator class set to $1.0$; its Pareto front is taken over all $24$ configurations.  With three seeds, each generator has $93$ runs, $21$ of supIPM-FRL and $72$ of FREM.  Of these, $84$ on the generator of Section~\ref{sec:exp-simulation} and $78$ on the bump-only generator pass the collapse rule of Appendix~\ref{app:real-experiments}, and every run that passes carries a worst-head measurement, so the fronts under $R_c$ and under the own-head measure are computed from the same runs.
+
+The profile and the frontier of Figure~\ref{fig:simulation} estimate the conditional expectation with the training width $0.25\,\mathrm{sd}(S)$, that is, $0.25/(2\sqrt{3})\approx0.072$ in the $[0,1]$ coordinate, in place of the Silverman width used on the real datasets.  At $n=5{,}000$ the Silverman width $(3n/4)^{-1/5}=0.193$ is $2.2$ times the bump width, and an estimate at that width places the maximum of the profile at the end of the domain, where the linear term is largest, rather than at $s_0$.  Appendix~\ref{app:ablation-studies} quantifies the effect of this choice on the frontier.
+
+The matched operating point circled in Figure~\ref{fig:simulation} is fixed by a rule chosen before the results were inspected.  Let $u_0$ be the utility of the model trained with $\lambda=0$ and $u_{\mathrm{lo}}$ the larger of the minimum utilities of the two fronts, so that $[u_{\mathrm{lo}},u_0]$ is the utility range that both fronts span.  The target utility is $u_0-\tfrac14(u_0-u_{\mathrm{lo}})$, and the circled pair consists of one front point per method, chosen to minimize the larger of the two distances from the target.  The profile in the right panel is that of the worst head at $c=1$ of each circled configuration, averaged over the three seeds.
+
+\subsection{The frontier under alternative utility axes}
+\label{app:synth-axes}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{appendix/figA3_axis_variants.pdf}
+  \caption{Simulation, $c=1$.  The frontier of the generator of Section~\ref{sec:exp-simulation} under three horizontal axes: the test $1-\mathrm{MAE}$ of the head trained with the encoder (left), of the head fitted on the frozen representation under $\lVert\mathbf{w}\rVert_2\le1$ by the supervised loss alone (centre, labelled $\lambda_h=0$), and of the worst head attaining $R_1$ (right).  The vertical axis is $R_1$ at the Silverman bandwidth in every panel; configurations off a method's front are drawn faded.}
+  \label{fig:app-axis-variants}
+\end{figure}
+
+The horizontal axis of Figure~\ref{fig:simulation} is the test $1-\mathrm{MAE}$ of the head trained with the encoder.  Two other utilities become available once the worst head has been fitted, and Figure~\ref{fig:app-axis-variants} shows the $c=1$ frontier under each of them.  The centre panel uses the utility of the head fitted on the frozen representation under the gain budget $\lVert\mathbf{w}\rVert_2\le1$ by the supervised loss alone, the unpenalized end of the ladder that yields $R_c$ in Appendix~\ref{app:real-experiments}, and the right panel uses the utility of the worst head itself.  The vertical axis is $R_1$ throughout, here at the Silverman bandwidth of the reported estimator, as on the real datasets.
+
+A head of gain at most $1$ recovers only part of the utility that the representation carries.  Measured as the utility of this head above the trivial predictor relative to that of the head trained with the encoder above the trivial predictor, the recovery at $c=1$ is $7.7\%$ for supIPM-FRL and $13.7\%$ for FREM.  Under the centre and right axes the horizontal position of a configuration therefore reflects how much utility a gain-limited head can extract from the representation rather than how fair the representation is, and the displacement differs between the two methods.  Corollary~\ref{cor:certificate} bounds the disparity of every head in a class and places no constraint on the utility of those heads, and the utility available to a practitioner is that of the head fitted for prediction on the encoder, so the main figures use the left axis.
+
+The frontier of the bump-only generator is given in Appendix~\ref{app:ablation-studies}, where it is used for the discriminator-strength study.
 
 \section{Experiments for real dataset}
 
