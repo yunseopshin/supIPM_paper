@@ -11,6 +11,7 @@
 \usepackage[capitalize,noabbrev]{cleveref}
 \usepackage{url}
 \usepackage{graphicx}
+\usepackage{booktabs}
 \graphicspath{{../figures/}{figures/}}
 \usepackage{algorithm}
 \usepackage{algorithmic}
@@ -409,40 +410,55 @@ The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the se
 \section{Experiments}
 \label{sec:experiments}
 
-Section~\ref{sec:exp-simulation} realizes Figure~\ref{fig:motivation} with a generator whose localized dependence on $S$ is known, and Section~\ref{sec:exp-real} compares supIPM-FRL with seven baselines on three tabular datasets, contrasting the head trained with the encoder against the worst head of bounded complexity that Corollary~\ref{cor:certificate} controls; Appendices~\ref{app:synth-experiments}--\ref{app:ablation-studies} give additional results, the graph benchmarks and the ablation studies.
+This section evaluates supIPM-FRL on simulated data, in which the location of a localized dependence on $S$ is known, and on three tabular datasets against seven existing methods.  Results on two graph datasets, further measures and the ablation studies are given in Appendices~\ref{app:synth-experiments}--\ref{app:ablation-studies}.
+
+\paragraph{Measures.}  Utility is the test accuracy for classification and the test $1-\mathrm{MAE}$ for regression.  We report two disparities of a learned representation, both on the test data over the interior region $\mathcal{S}_n$ of Section~\ref{sec:theory}.  The first is the prediction-level disparity $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ of the head trained with the encoder.  The second is the largest disparity that a downstream head can attain on the representation, the quantity that Corollary~\ref{cor:certificate} controls.  For $c>0$ let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$, where $\sigma$ is the logistic function, and define the worst-case downstream disparity
+\begin{equation}
+  \operatorname{GDP}_{\infty}(h;\mathcal{F}_c):=\sup_{f\in\mathcal{F}_c}\operatorname{GDP}_{\infty}(f\circ h),
+  \label{eq:worst-case-gdp}
+\end{equation}
+which is computed by gradient ascent over $(\mathbf{w},b)$ on the frozen training representation (Appendix~\ref{app:worst-case}).  Since $\mathcal{F}_c$ is contained in a H\"older ball whose radius grows with $c$, Equation~(\ref{eq:worst-case-gdp}) is the empirical counterpart of the left-hand side of Equation~(\ref{eq:certificate}) for this subclass; evaluating fairness over a class of downstream models rather than for a single fitted model follows \citet{jovanovic2023fare}, \citet{coston2021characterizing} and \citet{langlade2025fairness}.  We report $c=1$ here and other values of $c$ in Appendix~\ref{app:real-experiments}.  For a head $f$ we write $\Delta(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$, so that $\operatorname{GDP}_{\infty}(f\circ h)=\sup_{s}\Delta(s)$.
 
 \subsection{Simulation study}
 \label{sec:exp-simulation}
 
-\begin{figure}[t]
+\begin{figure}[!t]
   \centering
-  \includegraphics[width=0.75\textwidth]{main/fig1_simulation.pdf}
-  \caption{Simulation.  Left: test $1-\mathrm{MAE}$ (horizontal) against the worst-head $L_{\infty}$-GDP at $c=1$, $R_1$ (vertical, lower is better); one point per penalty value (seed means, 2023--2025), Pareto fronts joined, circles at the matched operating point.  Right: $\widehat{\Delta}(s)$ of that worst head, mean $\pm1$ s.e.\ over seeds; the dotted line marks $s_0$.  Training kernel width $0.25\,\mathrm{sd}(S)$ in both panels.}
+  \includegraphics[width=0.7\textwidth]{main/fig1_simulation.pdf}
+  \caption{Simulation study.  Left: worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$ against utility (the lower right is favorable).  Right: $\Delta(s)$ of the least fair head in $\mathcal{F}_1$ at the circled points.}
   \label{fig:simulation}
 \end{figure}
 
-The generator realizes Figure~\ref{fig:motivation}.  $S$ is uniform on a bounded interval, and the outcome $Y$ and one input column depend on $S$ through a Gaussian bump centered at $s_0$ whose width is $0.087$ in the $[0,1]$ coordinate of the sensitive domain, so that the neighborhood of $s_0$ carries little $\mathbb{P}_S$-probability.  A second input column and $Y$ also depend on $S$ linearly, so an average over $S$ is dominated by this broad term while the localized term remains.  We compare supIPM-FRL with FREM under the protocol of Section~\ref{sec:exp-real} without weight decay; the formulas and sample sizes are given in Appendix~\ref{app:synth-experiments}.
+\paragraph{Setup.}  $S$ is uniform on an interval; the outcome $Y$ and one input variable depend on $S$ through a term concentrated near a value $s_0$, so that this dependence is confined to a set of small $\mathbb{P}_S$-probability, and $Y$ and a second input variable also depend on $S$ linearly (Appendix~\ref{app:synth-experiments}).  We compare supIPM-FRL with FREM over a grid of penalty parameters, with the worst-case downstream disparity over $\mathcal{F}_1$ as the fairness measure.
 
-The left panel of Figure~\ref{fig:simulation} plots the test $1-\mathrm{MAE}$ against the worst-head $L_{\infty}$-GDP at gain budget $c=1$, written $R_1$: the largest $\operatorname{GDP}_{\infty}$ that any head $\sigma(\mathbf{w}^\top\mathbf{z}+b)$ with $\lVert\mathbf{w}\rVert_2\le1$ attains on the frozen representation (Section~\ref{sec:exp-real}).  The right panel shows the profile $\widehat{\Delta}(s):=|\widehat{\mathbb{E}}[f(\mathbf{Z})\mid S=s]-\widehat{\mathbb{E}}[f(\mathbf{Z})]|$ of the worst head $f$ at a matched operating point fixed in advance, a quarter of the jointly spanned utility range below the model trained with $\lambda=0$.  Both profiles peak near $s_0$, where the localized dependence was injected, and the peak of FREM is markedly higher at the same utility, while the V-shaped remainder of both profiles reflects the linear term.  This is Figure~\ref{fig:motivation} realized in data: the discrepancy at $s_0$ contributes little to the average in Equation~(\ref{eq:eipm-estimator}), so an EIPM penalty leaves it in place, whereas the supremum in Equation~(\ref{eq:empirical-supipm}) is driven by it.  Both panels use the training kernel width $0.25\,\mathrm{sd}(S)$, since the Silverman width cannot resolve the bump; the choice moves every value by about a factor of $1.3$ and changes no ranking (Appendix~\ref{app:ablation-studies}).
+\paragraph{Results.}  In the left panel of Figure~\ref{fig:simulation} the curve of supIPM-FRL lies below that of FREM, so at the same utility it leaves a smaller worst-case disparity.  The right panel shows where the difference arises: at the circled points, which have comparable utility, $\Delta(s)$ of the least fair head in $\mathcal{F}_1$ peaks near $s_0$ for both methods, and the peak of FREM is markedly higher.  This is the situation of Figure~\ref{fig:motivation}.  The neighborhood of $s_0$ enters the average in Equation~(\ref{eq:eipm}) only in proportion to its small probability, so the penalty of FREM leaves the dependence there largely in place, whereas the supremum in Equation~(\ref{eq:supipm}) is attained near $s_0$ and the penalty of supIPM-FRL acts on it directly.
 
 \subsection{Real data analysis}
 \label{sec:exp-real}
 
-\begin{figure}[t]
+\begin{figure}[!t]
   \centering
-  \includegraphics[width=0.82\textwidth]{main/fig2_own_head_adult.pdf}\\[1pt]
-  \includegraphics[width=0.82\textwidth]{main/fig3_worst_head_adult.pdf}
-  \caption{Adult.  Top: $L_{\infty}$-GDP of the head trained with the encoder (own head).  Bottom: worst-head $L_{\infty}$-GDP $R_1$ ($c=1$).  Disparity is horizontal and accuracy vertical, so the upper left is better; panels group the methods by the sensitive attribute they consume, with FREM and supIPM-FRL in every panel.  Points are seed means (2023--2027) with $\pm1$ sd whiskers, curves are Pareto fronts over all configurations of a method, and the black dot is the model trained with $\lambda=0$.}
-  \label{fig:adult-own-worst}
+  \includegraphics[width=0.74\textwidth]{main/fig2_own_head_adult.pdf}\\[1pt]
+  \includegraphics[width=0.74\textwidth]{main/fig3_worst_head_adult.pdf}
+  \caption{Adult: test accuracy against the prediction-level $L_{\infty}$-GDP (top) and the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$ (bottom); the upper left is favorable.}
+  \label{fig:adult}
 \end{figure}
 
-\paragraph{Datasets, baselines and protocol.}  We use Adult (binary classification of income, $n\approx45{,}000$, $S=$ age), Crime (regression of the violent crime rate, $n\approx2{,}000$, $S=$ the Black population share of a community) and ACSIncome (binary classification of income, $n=20{,}000$ from the 2018 Folktables person survey of California, $S=$ age), with $S$ min--max scaled to $[0,1]$ on the training split throughout; the graph benchmarks Pokec-z and Pokec-n are described in Appendix~\ref{app:real-experiments}.  We compare supIPM-FRL with FREM \citep{kong2025fair}, Reg-GDP \citep{jiang2022gdp}, Reg-HGR \citep{mary2019continuous}, the adversarial baseline ADV of \citet{kong2025fair}, and three methods for a binary sensitive attribute, LAFTR \citep{madras2018adversarially}, MMD \citep{deka2023mmdbfair} and sIPM-LFR \citep{kim2022parametric}, given $S$ binarized at the median or the mean of the training split.  Every method uses the encoder MLP($d\to50\to50$, SELU) with the normalization of Appendix~\ref{app:ascent}, a linear prediction head, and Adam for 200 epochs; supIPM-FRL uses $\gamma=0.25\,\mathrm{sd}(S)$ and $M=100$ discriminators.  Each figure shows, per method, the Pareto front over all of its configurations (penalty value, binarization variant, kernel width of FREM), and runs whose encoder collapsed to a constant predictor are dropped for every method alike (Appendix~\ref{app:real-experiments}).
+\begin{figure}[!t]
+  \centering
+  \includegraphics[width=0.74\textwidth]{main/fig3_worst_head_crime.pdf}\\[1pt]
+  \includegraphics[width=0.74\textwidth]{main/fig3_worst_head_acs.pdf}
+  \caption{Crime (top) and ACSIncome (bottom): test utility against the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$; the upper left is favorable.}
+  \label{fig:crime-acs}
+\end{figure}
 
-\paragraph{Measures.}  Utility is the test accuracy on Adult and ACSIncome and the test $1-\mathrm{MAE}$ on Crime.  Two disparities are computed on the test split of the frozen representation over the interior region between the $5\%$ and $95\%$ sample quantiles of $S$ (the $\mathcal{S}_n$ of Section~\ref{sec:theory}), with the conditional expectation in Equation~(\ref{eq:linfty-gdp}) estimated by the Nadaraya--Watson estimator at the Silverman bandwidth and the supremum taken over a grid.  The own-head $L_{\infty}$-GDP is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ for the head trained jointly with the encoder, the quantity the FRL literature reports.  The worst-head $L_{\infty}$-GDP at gain budget $c>0$ is $R_c(h_{\phi}):=\sup\{\operatorname{GDP}_{\infty}(f\circ h_{\phi}):f(\mathbf{z})=\sigma(\mathbf{w}^\top\mathbf{z}+b),\ \lVert\mathbf{w}\rVert_2\le c\}$ with the logistic function $\sigma$, obtained by gradient ascent over $(\mathbf{w},b)$ on the frozen representation without any label, so that it is a property of the representation alone (Appendix~\ref{app:real-experiments}).  $R_c$ is the empirical counterpart of the left-hand side of Equation~(\ref{eq:certificate}) for heads of bounded gain, and because $(\theta^\top\mathbf{z}+1)_+=\theta^\top\mathbf{z}+1$ on $\mathbb{B}^d$, a linear head of gain $c$ has worst disparity at most $c\cdot\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$, so $c=1$ is the headline budget; $c=16$ contains the gain of 13 to 27 that a jointly trained head uses.
+\paragraph{Datasets.}  We use Adult ($Y$: income above \$50k, $S$: age), Crime ($Y$: violent crime rate of a community, $S$: share of its Black population) and ACSIncome ($Y$: income of a respondent to the 2018 American Community Survey, $S$: age); Adult and ACSIncome are classification tasks and Crime is a regression task.  Table~\ref{tab:datasets} in Appendix~\ref{app:real-experiments} lists their sizes, and the results on the graph datasets Pokec-z and Pokec-n are given there.
 
-\paragraph{Own head against worst head.}  Figure~\ref{fig:adult-own-worst} shows both measures on Adult; the numbers below read each method at its configuration within $0.004$ of a matched utility level with the lowest disparity (Appendix~\ref{app:real-experiments}).  Under the own-head measure supIPM-FRL and FREM are close: at accuracy $0.835$ they attain $0.0238$ and $0.0320$, with sIPM-LFR at $0.0299$ between them.  Under $R_1$ they separate by an order of magnitude: supIPM-FRL attains $0.0006$ at accuracy $0.8335$, FREM $0.0077$ at $0.8378$, and every other baseline $0.0110$ or more; at the level $0.842$ the values are $0.0014$ against $0.0086$.  The rankings differ because the own-head measure certifies the single head $f_{\psi}$, whereas Corollary~\ref{cor:certificate} bounds $\operatorname{GDP}_{\infty}$ simultaneously over the H\"older ball, which $R_1$ probes.  A penalty tied to the trained head, or averaged over $S$, can leave directions of $\mathbf{Z}$ that this head does not use but another head of the same accuracy does; FREM remains second under $R_1$.
+\paragraph{Baselines.}  For a continuous $S$ we compare with FREM \citep{kong2025fair}, the regularization methods Reg-GDP \citep{jiang2022gdp} and Reg-HGR \citep{mary2019continuous}, and the adversarial method ADV of \citet{kong2025fair}; for a binary $S$, with LAFTR \citep{madras2018adversarially}, MMD \citep{deka2023mmdbfair} and sIPM-LFR \citep{kim2022parametric}, given $S$ binarized at its median or at its mean.  All methods share the encoder and the prediction head of Appendix~\ref{app:ascent}, use five random seeds, and are swept over their penalty parameters; each curve in the figures is the Pareto front of a method over its configurations, and FREM and supIPM-FRL are repeated in every panel.  The settings are given in Appendix~\ref{app:real-experiments}.
 
-\paragraph{Other datasets and budgets.}  On Crime supIPM-FRL has the lowest $R_1$ over the upper part of the utility range, $0.0131$ at the matched level $0.866$ against $0.0494$ (Reg-HGR), $0.0763$ (Reg-GDP) and $0.0850$ (ADV), the only other methods reaching that level, whereas at the lowest level $0.834$ the fronts meet (MMD $0.0036$, sIPM-LFR $0.0044$, supIPM-FRL $0.0050$).  On ACSIncome supIPM-FRL and FREM are within $0.0004$ of each other at the level $0.760$ ($0.0024$ against $0.0020$) and separate at $0.780$ ($0.0023$ against $0.0088$); the supIPM-FRL runs on this dataset used the weak discriminator schedule $J_v=2$, $\alpha_v=10^{-3}$ examined in Appendix~\ref{app:ablation-studies}, rather than $J_v=20$, $\alpha_v=10^{-2}$ as on Adult and Crime.  On Pokec-z and Pokec-n, reported in Appendix~\ref{app:real-experiments} for reasons of space, the two methods are within $0.001$ of each other at every matched level.  The lead of supIPM-FRL on Adult persists through $c=32$ ($0.0629$ against $0.0748$), whereas on ACSIncome and the graphs the two methods are within $0.0004$ at $c=1$ and FREM is lower at $c=16$ and $c=32$.  Under kernel GDP, which supIPM-FRL does not optimize, its front is close to that of FREM on every dataset (Appendix~\ref{app:real-experiments}).
+\paragraph{Results.}  Figure~\ref{fig:adult} shows both disparities on Adult, and Figure~\ref{fig:crime-acs} the worst-case disparity on Crime and ACSIncome; their prediction-level curves are given in Appendix~\ref{app:real-experiments}.  At the prediction level supIPM-FRL is comparable to FREM and to the best of the other methods, so the supremum penalty costs no utility relative to the average penalty.  The binary-$S$ methods do not improve on it, except at the lowest utility on Crime, where every curve meets, since binarizing $S$ does not control the disparity at every sensitive value \citep{kong2025fair}.  The worst-case disparity separates the methods.  On Adult the curve of supIPM-FRL lies far to the left of every other curve and is nearly vertical: the worst-case disparity is driven close to zero at a small loss in accuracy, whereas every baseline requires a large loss to reach the same level.  On Crime the curve of supIPM-FRL lies to the left of every other curve at every utility above the lowest, where the curves meet.  On ACSIncome the accuracy of supIPM-FRL and FREM is nearly constant along their curves, and supIPM-FRL has the smallest disparity at every accuracy it reaches.
+
+The two rows of Figure~\ref{fig:adult} rank the methods differently: a method that appears as fair as supIPM-FRL for the fitted head is not so for another head.  A penalty on the fitted head leaves directions of $\mathbf{Z}$ that this head does not use, and a penalty averaged over $S$ leaves the dependence at sensitive values of small probability; in either case a downstream head of the same class can exploit what remains.  supIPM-FRL constrains the discrepancy in every direction of $\mathbf{Z}$ at every $s$, so its fairness transfers to every head in $\mathcal{F}_1$, as Corollary~\ref{cor:certificate} guarantees for heads of bounded H\"older norm, and its empirical supIPM on the test split, the quantity of Theorem~\ref{thm:uniform}, is far below that of every other method on Adult and Crime (Appendix~\ref{app:real-experiments}).  The ordering persists for $c$ up to $16$, of the order of the weight norm of the heads trained with the encoder (Appendix~\ref{app:real-experiments}).
 
 \section{Conclusion}
 
@@ -1152,9 +1168,9 @@ Algorithm~\ref{alg:supipm-frl} assembles the three updates of Appendix~\ref{app:
 \section{Experiments for synthetic dataset}
 \label{app:synth-experiments}
 
-This appendix gives the generative process behind Section~\ref{sec:exp-simulation}, the training and evaluation protocol specific to the simulation, and the additional simulation figures.  The discriminator-strength and kernel-bandwidth studies, which use the same generators, are given in Appendix~\ref{app:ablation-studies}.
+This appendix gives the generating equations and the settings of the simulation study in Section~\ref{sec:exp-simulation}.
 
-\subsection{Generative process}
+\subsection{Data-generating process}
 \label{app:synth-generative}
 
 Two generators are used, which differ only in the dependence on $S$ that they inject.  Both draw
@@ -1163,63 +1179,540 @@ Two generators are used, which differ only in the dependence on $S$ that they in
   S&\sim\mathrm{Uniform}(-\sqrt{3},\sqrt{3}),\qquad
   \mathbf{X}_{\mathrm{task}}\sim N(\mathbf{0},\mathbf{I}_4),\qquad
   \mathbf{X}_{\mathrm{noise}}\sim N(\mathbf{0},\mathbf{I}_3),\\
-  \omega(S)&:=\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\},\qquad s_0=1.2,\quad \tau=0.30,\\
-  X_{\mathrm{leak}}&:=3\,\omega(S)+0.5\,\varepsilon_1,
+  \omega(S)&:=\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\},\qquad s_0=1.2,\quad \tau=0.30,\qquad
+  X_{\mathrm{loc}}:=3\,\omega(S)+0.5\,\varepsilon_1,
 \end{aligned}
 \label{eq:synth-common}
 \end{equation}
-where $\varepsilon_1,\varepsilon_2,\varepsilon_3\sim N(0,1)$ and all random quantities are drawn independently, so that $S$ has mean $0$ and standard deviation $1$ and $\omega$ is a Gaussian bump of width $\tau$ centred at $s_0$.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$.  The \emph{bump-only} generator sets
+where $\varepsilon_1,\varepsilon_2,\varepsilon_3\sim N(0,1)$ and all random quantities are independent, so that $S$ has mean $0$ and standard deviation $1$, and $\omega$ is a Gaussian function of width $\tau$ centered at $s_0$.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function.  The first generator injects the localized dependence alone,
 \begin{equation}
   Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+\omega(S)+0.3\,\varepsilon_2\right),
   \qquad
-  \mathbf{X}:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{leak}},\mathbf{X}_{\mathrm{noise}})\in\mathbb{R}^{8},
-  \label{eq:synth-bump}
+  \mathbf{X}:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{loc}},\mathbf{X}_{\mathrm{noise}})\in\mathbb{R}^{8},
+  \label{eq:synth-localized}
 \end{equation}
-where $\sigma$ is the logistic function, so that the outcome and one input column depend on $S$ through the bump alone.  The generator of Section~\ref{sec:exp-simulation} adds a broad linear dependence to both:
+and the second generator, used in Section~\ref{sec:exp-simulation}, adds a linear dependence to both the outcome and the input,
 \begin{equation}
-\begin{aligned}
-  Y&:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+0.5\,S+\omega(S)+0.3\,\varepsilon_2\right),\\
-  \mathbf{X}&:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{leak}},\mathbf{X}_{\mathrm{noise}},X_{\mathrm{lin}})\in\mathbb{R}^{9},
+  Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+0.5\,S+\omega(S)+0.3\,\varepsilon_2\right),
+  \qquad
+  \mathbf{X}:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{loc}},\mathbf{X}_{\mathrm{noise}},X_{\mathrm{lin}})\in\mathbb{R}^{9},
   \qquad
   X_{\mathrm{lin}}:=S+0.5\,\varepsilon_3 .
-\end{aligned}
-  \label{eq:synth-bump-linear}
+  \label{eq:synth-linear}
 \end{equation}
-Since $Y\in(0,1)$, the task is regression: the prediction head is followed by the logistic function and trained with the squared-error loss, and utility is the test $1-\mathrm{MAE}$.  For each seed in $\{2023,2024,2025\}$, training, validation and test samples of sizes $n_{\mathrm{train}}=n_{\mathrm{test}}=5{,}000$ and $n_{\mathrm{val}}=1{,}000$ are drawn independently.  As on the real datasets, $S$ is min--max scaled to $[0,1]$ on the training split, and in this coordinate the bump is centred at $s_0=(1.2+\sqrt{3})/(2\sqrt{3})=0.846$ with width $\tau/(2\sqrt{3})=0.087$; Figure~\ref{fig:simulation} marks this $s_0$.
+Since $Y\in(0,1)$, the task is regression with the squared-error loss, and utility is the test $1-\mathrm{MAE}$.  As on the real datasets, $S$ is min--max scaled to $[0,1]$ on the training split.  In this coordinate the localized term is centered at $s_0=0.846$ with width $0.087$, and an interval of one width around $s_0$ carries $\mathbb{P}_S$-probability $0.087$.  The linear term is present at every $s$, so it dominates an average over $S$ such as EIPM, whereas the supremum over $s$ is determined by the localized term.  The first generator is used in the ablation study of Appendix~\ref{app:ablation-studies}, where a single localized dependence isolates whether the discriminators find the supremum.
 
-The second generator realizes Figure~\ref{fig:motivation}.  Under the uniform $S$, an interval of length $\tau$ centred at $s_0$ carries $\mathbb{P}_S$-probability $0.087$, so the conditional distribution of $\mathbf{Z}$ differs from the marginal distribution on a set of small probability whenever the encoder retains $X_{\mathrm{leak}}$.  An average over $S$ weights this set by its probability, whereas the linear dependence is present at every $s$.  For a function of $S$ that is linear, $|\mathbb{E}[\,\cdot\mid S=s]-\mathbb{E}[\,\cdot\,]|$ is V-shaped in $s$, with its minimum at the mean of $S$ and its maximum at the two ends of the domain, so an average such as EIPM or GDP is dominated by the linear term.  In Figure~\ref{fig:simulation} the profile of the worst head peaks near $s_0$ for both methods, so the supremum in Equation~(\ref{eq:supipm}) is driven by the bump.  Both dependences enter $Y$, so removing either one costs utility.  The two penalties differ in which dependence they remove first.  The bump-only generator is used in the discriminator-strength study of Appendix~\ref{app:ablation-studies}, where a single localized violation isolates whether the discriminators find the supremum.
+\subsection{Settings}
+\label{app:synth-settings}
 
-\subsection{Training and evaluation protocol}
-\label{app:synth-protocol}
+Table~\ref{tab:synth-settings} lists the settings.  The encoder, the prediction head and the optimizer are those of the real datasets (Appendix~\ref{app:real-experiments}), except that the weight decay is zero so that $X_{\mathrm{loc}}$ and $X_{\mathrm{lin}}$ are not removed by regularization alone.  The worst-case downstream disparity is computed as described in Appendix~\ref{app:real-experiments}, with one difference: the conditional expectations in $\operatorname{GDP}_{\infty}$ are estimated at the training bandwidth of supIPM-FRL rather than at Silverman's bandwidth, because the latter exceeds the width of the localized term by a factor of $2.2$ at $n=5{,}000$ and places the maximum of $\Delta(s)$ at the end of the domain, where the linear term is largest, rather than near $s_0$.  Appendix~\ref{app:ablation-studies} shows that this choice changes every value by a common factor and no ranking.
 
-Every method uses the architecture and optimizer of Appendix~\ref{app:real-experiments}: the encoder MLP($d\to50\to50$) with SELU activations and the normalization of Appendix~\ref{app:ascent}, a linear prediction head, and Adam with learning rate $10^{-3}$, moment parameters $(0.5,0.999)$, minibatches of size $200$ and $200$ epochs.  The weight decay is $0$ rather than the $10^{-2}$ of the real datasets, so that the columns $X_{\mathrm{leak}}$ and $X_{\mathrm{lin}}$ are not removed by regularization alone.
+The circled points in Figure~\ref{fig:simulation} are fixed by a rule chosen before the results were inspected.  Let $u_0$ be the utility of the model trained with $\lambda=0$ and $u_{\mathrm{lo}}$ the larger of the two minimum utilities of the two curves.  The target utility is $u_0-\tfrac14(u_0-u_{\mathrm{lo}})$, and the circled pair consists of one point per method, chosen to minimize the larger of the two distances to the target.  The right panel of Figure~\ref{fig:simulation} shows $\Delta(s)$ of the least fair head in $\mathcal{F}_1$ of each circled configuration, averaged over the three seeds.
 
-supIPM-FRL uses the bandwidth $\gamma=0.25\,\mathrm{sd}(S)$, $M=100$ discriminators, and the interior region between the $5\%$ and $95\%$ sample quantiles of the training $S$ for the supremum over $s$.  Each descent step of Algorithm~\ref{alg:supipm-frl} is preceded by $J_v=20$ discriminator updates.  An update consists of an Adam step of size $\alpha_v=10^{-2}$, with the gradient norm clipped at $5$, and the projection of Appendix~\ref{app:ascent}.  On the generator of Section~\ref{sec:exp-simulation} the candidate ascent is switched off ($J_s=0$), and $s^{\star}$ is the maximizer over a grid of $33$ equally spaced points of the interior region.  For the bump-only generator, the grid maximizer seeds one of $T=8$ candidates, the remaining seven are drawn uniformly from the interior region, and each candidate takes $J_s=20$ ascent steps with $\alpha_s=0.1$.  The penalty parameter runs over $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$.  FREM runs over $\lambda\in\{0.01,0.05,0.1,0.2,0.5,1,2,3\}$ for each of the three width parameters $0.03$, $0.05$ and $0.07$ of its Gaussian kernel on $S$ in Equation~(\ref{eq:frem-conditional}), in the $[0,1]$ coordinate of $S$, with the width parameter of the Gaussian kernel of its RKHS discriminator class set to $1.0$; its Pareto front is taken over all $24$ configurations.  With three seeds, each generator has $93$ runs, $21$ of supIPM-FRL and $72$ of FREM.  Of these, $84$ on the generator of Section~\ref{sec:exp-simulation} and $78$ on the bump-only generator pass the collapse rule of Appendix~\ref{app:real-experiments}, and every run that passes carries a worst-head measurement, so the fronts under $R_c$ and under the own-head measure are computed from the same runs.
+\begin{table}[t]
+  \centering
+  \small
+  \caption{Settings of the simulation study.}
+  \label{tab:synth-settings}
+  \begin{tabular}{@{}lp{0.6\textwidth}@{}}
+    \toprule
+    Item & Value \\
+    \midrule
+    Sample sizes (train / validation / test) & $5{,}000$ / $1{,}000$ / $5{,}000$, drawn independently per seed \\
+    Seeds & $2023$, $2024$, $2025$ \\
+    Encoder and prediction head & as in Appendix~\ref{app:real-settings} \\
+    Optimizer & Adam, learning rate $10^{-3}$, moments $(0.5,0.999)$, minibatch $200$, $200$ epochs, no weight decay \\
+    Bandwidth $\gamma$ of supIPM-FRL & $0.25$ standard deviations of $S$ ($0.072$ in the $[0,1]$ coordinate) \\
+    Discriminators & $M=100$; $J_v=20$ updates per iteration, $\alpha_v=10^{-2}$, gradient norm clipped at $5$ \\
+    Search over $s$ (second generator) & grid of $33$ points on the interior region ($J_s=0$) \\
+    Search over $s$ (first generator) & $T=8$ candidates, $J_s=20$ steps, $\alpha_s=0.1$ \\
+    Penalty parameters of supIPM-FRL & $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$ \\
+    Penalty parameters of FREM & $\lambda\in\{0.01,0.05,0.1,0.2,0.5,1,2,3\}$ for each kernel width in $\{0.03,0.05,0.07\}$ \\
+    Runs per generator & $93$ ($21$ supIPM-FRL, $72$ FREM); $84$ and $78$ pass the collapse rule of Appendix~\ref{app:real-experiments} \\
+    Evaluation bandwidth & training bandwidth of supIPM-FRL (Silverman's rule gives $0.193$) \\
+    \bottomrule
+  \end{tabular}
+\end{table}
 
-The profile and the frontier of Figure~\ref{fig:simulation} estimate the conditional expectation with the training width $0.25\,\mathrm{sd}(S)$, that is, $0.25/(2\sqrt{3})\approx0.072$ in the $[0,1]$ coordinate, in place of the Silverman width used on the real datasets.  At $n=5{,}000$ the Silverman width $(3n/4)^{-1/5}=0.193$ is $2.2$ times the bump width, and an estimate at that width places the maximum of the profile at the end of the domain, where the linear term is largest, rather than at $s_0$.  Appendix~\ref{app:ablation-studies} quantifies the effect of this choice on the frontier.
+\section{Experiments for real dataset}
+\label{app:real-experiments}
 
-The matched operating point circled in Figure~\ref{fig:simulation} is fixed by a rule chosen before the results were inspected.  Let $u_0$ be the utility of the model trained with $\lambda=0$ and $u_{\mathrm{lo}}$ the larger of the minimum utilities of the two fronts, so that $[u_{\mathrm{lo}},u_0]$ is the utility range that both fronts span.  The target utility is $u_0-\tfrac14(u_0-u_{\mathrm{lo}})$, and the circled pair consists of one front point per method, chosen to minimize the larger of the two distances from the target.  The profile in the right panel is that of the worst head at $c=1$ of each circled configuration, averaged over the three seeds.
+This appendix lists the datasets and the settings of Section~\ref{sec:exp-real}, describes the computation of the worst-case downstream disparity, and gives the results omitted from the main text: the prediction-level disparities on Crime and ACSIncome, the worst-case disparity at other values of $c$, the results under other fairness measures, the results on the graph datasets, and the numerical tables.
 
-\subsection{The frontier under alternative utility axes}
-\label{app:synth-axes}
+\subsection{Datasets}
+\label{app:real-datasets}
+
+Table~\ref{tab:datasets} summarizes the five datasets.  On Adult and ACSIncome a large $L_{\infty}$-GDP means that the predicted income depends on age at some age, and on Crime that the predicted crime rate depends on the racial composition of a community.  $S$ is min--max scaled to $[0,1]$ on the training split, and the methods for a binary $S$ receive $S$ split at the median or at the mean of the training split.
+
+The graph datasets Pokec-z and Pokec-n are the social-network graphs of \citet{kong2025fair}, constructed with the loader of FairGNN, and the encoder is a graph convolutional network (GCN) or a simplified graph convolution (SGC) followed by a linear head, as in \citet{kong2025fair}.  Age is missing for about $31\%$ of the nodes, coded as zero; these nodes enter the supervised loss but not the fairness penalty and not the fairness measures, and $S$ is scaled over the nodes with a known age.  Relative to the released script of \citet{kong2025fair}, three corrections are applied identically to every method: the intended training split is used in place of a fixed index range, the evaluation outputs are recomputed in evaluation mode, and the random seed of the network initialization is set for every run.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Datasets; the sizes of Pokec-z and Pokec-n are those of \citet{kong2025fair}.}
+\label{tab:datasets}
+\begin{tabular}{llrlll}
+\toprule
+Dataset & Task & input dim. & $n$ train / test & $Y$ & $S$ \\
+\midrule
+Adult      & binary classification & 102 & 32{,}561 / 12{,}661 & income $>$ \$50k & age \\
+Crime      & regression            & 122 & 1{,}794--1{,}795 / 199--200 & violent crime rate & Black population share \\
+ACSIncome  & binary classification & 9   & 12{,}800 / 4{,}000 & income & age \\
+Pokec-z    & node classification   & 276 & 33{,}898 / 16{,}949 & spoken-language indicator & age \\
+Pokec-n    & node classification   & 265 & 33{,}284 / 16{,}643 & spoken-language indicator & age \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Settings}
+\label{app:real-settings}
+
+Table~\ref{tab:hyperparameters} gives the training settings and Table~\ref{tab:penalty-grids} the penalty values swept for each method.  For every method the encoder is a two-layer network with $50$ SELU units per layer followed by the normalization of Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear; the methods differ only in their fairness term, which Table~\ref{tab:baselines} summarizes.  On ACSIncome, supIPM-FRL is trained with $J_v=2$ discriminator updates per iteration, a setting examined in Appendix~\ref{app:ablation-discriminator}.
+
+Every curve in the figures is the Pareto front of a method over its configurations, that is, its penalty values, the binarization of $S$ for the binary-$S$ methods, and the kernel width for FREM.  A configuration is shown when at least two of its seeds remain, as the mean over seeds with $\pm1$ standard deviation, and a run is removed for every method alike when its encoder collapsed to a constant predictor, that is, when its test $\mathrm{MAE}$ exceeds $0.98$ times that of predicting the training mean or, in classification, when its balanced accuracy does not exceed $0.5001$.  Table~\ref{tab:coverage} gives the number of runs that remain.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Training settings; $\gamma$ is given in standard deviations of $S$.}
+\label{tab:hyperparameters}
+\resizebox{\textwidth}{!}{\begin{tabular}{lrrllrrllc}
+\toprule
+Dataset & batch & epochs & learning rate & weight decay & $\gamma$ & $M$ & $J_v$ & $\alpha_v$ & $J_s$ / $T$ \\
+\midrule
+Adult                & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 20 & $10^{-2}$ & 20 / 8 \\
+Crime                & 200  & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 20 & $10^{-2}$ & 20 / 8 \\
+ACSIncome            & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 2  & $10^{-3}$ & 20 / 8 \\
+Simulation          & 200  & 200 & $10^{-3}$ & 0         & 0.25 & 100 & 20 & $10^{-2}$ & 0 / 1 (grid) \\
+Pokec-z / Pokec-n    & 1024 & 100 & $10^{-3}$ & 0         & 0.25 & 100 & 10 & $10^{-2}$ & 20 / 8 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Penalty values $\lambda$ swept for each method on each dataset.}
+\label{tab:penalty-grids}
+\begin{tabular}{llp{0.45\textwidth}r}
+\toprule
+Dataset & Method & $\lambda$ values & count \\
+\midrule
+Adult & supIPM-FRL & 0.01, 0.1, 0.2, 0.3, 0.5, 1, 1.5, 2, 2.05, 2.1, 2.15, 2.2, 2.25, 2.5, 3 & 15 \\
+Adult & FREM & 0, 0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 3 & 9 \\
+Adult & Reg-GDP, Reg-HGR & 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100 & 12 \\
+Adult & ADV & 5, 10, 100, 500, 1000, 2000, 5000, 10000, 20000, 50000 & 10 \\
+Adult & LAFTR, MMD, sIPM-LFR & 0.1, 0.2, 0.3, 0.5, 0.8, 1, 2, 3, 5, 10 & 10 \\
+\midrule
+Crime & supIPM-FRL & 0.003, 0.01, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.1, 0.12, 0.13, 0.16, 0.2, 0.25, 0.3, 1 & 16 \\
+Crime & FREM & 0, 0.01, 0.03, 0.1, 0.3, 0.5, 1 & 7 \\
+Crime & Reg-GDP & 0, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100 & 13 \\
+Crime & Reg-HGR & 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100 & 12 \\
+Crime & ADV & 0, 5, 10, 100, 500, 1000, 2000, 5000, 10000, 20000, 50000 & 11 \\
+Crime & LAFTR, MMD, sIPM-LFR & 0.1, 0.2, 0.3, 0.5, 0.8, 1, 2, 3, 5, 10 & 10 \\
+\midrule
+ACSIncome & supIPM-FRL & 0, 0.01, 0.03, 0.1, 0.3, 0.5, 1, 1.5, 2, 3 & 10 \\
+ACSIncome & FREM & 0, 0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 3 & 9 \\
+ACSIncome & Reg-GDP, Reg-HGR & 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100 & 12 \\
+ACSIncome & ADV & 5, 10, 100, 500, 1000, 2000, 5000, 10000, 20000, 50000 & 10 \\
+ACSIncome & LAFTR, MMD, sIPM-LFR & 0.1, 0.2, 0.3, 0.5, 0.8, 1, 2, 3, 5, 10 & 10 \\
+\midrule
+\multicolumn{4}{l}{FREM (every dataset): width of the kernel on $S$ in $\{0.03,\, 0.05,\, 0.07\}$, width of the RKHS kernel $1.0$;} \\
+\multicolumn{4}{l}{every $\lambda$ above is run at all three, except $\lambda = 0$, which is run once, at width $0.05$.} \\
+\multicolumn{4}{l}{LAFTR, MMD and sIPM-LFR are run at both the median and the mean split of $S$.} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+  \centering
+  \footnotesize
+  \caption{Fairness terms of the compared methods.}
+  \label{tab:baselines}
+  \begin{tabular}{@{}llp{0.5\textwidth}@{}}
+    \toprule
+    Method & $S$ & Fairness term \\
+    \midrule
+    supIPM-FRL & continuous & empirical supIPM of Equation~(\ref{eq:empirical-supipm}) on the representation \\
+    FREM \citep{kong2025fair} & continuous & empirical EIPM of Equation~(\ref{eq:eipm-estimator}) on the representation, with the RKHS unit ball of a Gaussian kernel \\
+    Reg-GDP \citep{jiang2022gdp} & continuous & kernel estimate of GDP of the prediction \\
+    Reg-HGR \citep{mary2019continuous} & continuous & estimate of the HGR maximal correlation between the prediction and $S$ \\
+    ADV \citep{kong2025fair} & continuous & adversary trained to predict $S$ from the representation \\
+    LAFTR \citep{madras2018adversarially} & binary & adversary trained to predict the group from the representation \\
+    MMD \citep{deka2023mmdbfair} & binary & MMD between the representations of the two groups \\
+    sIPM-LFR \citep{kim2022parametric} & binary & IPM with sigmoid discriminators between the representations of the two groups \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{Computation of the worst-case downstream disparity}
+\label{app:worst-case}
+
+For a frozen representation and a norm bound $c$, the supremum in Equation~(\ref{eq:worst-case-gdp}) is computed by gradient ascent of the estimated $\operatorname{GDP}_{\infty}(f\circ h)$ on the training representation over the parameters $(\mathbf{w},b)$ of $f\in\mathcal{F}_c$, with $\mathbf{w}$ projected onto the ball of radius $c$ after each step, and the disparity of the resulting head is reported on the test representation.  The conditional expectations are estimated by kernel smoothing in $S$ at Silverman's bandwidth, and the supremum over $s$ is taken over a grid on the interior region.  The ascent starts from eight heads, four in the leading directions of the matrix of kernel-smoothed conditional mean shifts of the representation and four at random, and proceeds through a sequence of objectives in which the disparity is weighted more and more heavily against the supervised loss; the supervised loss serves only as a continuation device, at the last stage it no longer affects the optimum, and the reported value is the largest disparity reached, which does not depend on the labels.  Table~\ref{tab:worst-case-settings} lists the settings.  As a check, on the simulation with $c=1$ this procedure reaches a larger disparity than $512$ random restarts of the ascent on the disparity alone, for both methods.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Settings of the computation of the worst-case downstream $L_{\infty}$-GDP.}
+\label{tab:worst-case-settings}
+\begin{tabular}{lp{0.66\textwidth}}
+\toprule
+Item & Value \\
+\midrule
+Head class & $\sigma(\mathbf{w}^\top \mathbf{z} + b)$ with $\|\mathbf{w}\|_2 \le c$, fitted on the frozen training representation and evaluated on the test representation \\
+Fitting objective & supervised loss $-\ \lambda_h\times$ estimated $\operatorname{GDP}_{\infty}(f\circ h)$ \\
+Norm bound $c$ & $\{1,\, 2,\, 4,\, 8,\, 16,\, 32\}$ \\
+Optimizer & Adam, 2000 full-batch steps, step size $10^{-2}$, cosine decay to zero; the reported head is the last iterate \\
+Starts & 8: the 4 leading directions of the kernel-smoothed conditional mean shifts $\widehat{\mathbb{E}}[\mathbf{Z}\mid S=s]-\widehat{\mathbb{E}}[\mathbf{Z}]$ over $s$, and 4 random heads of scale $0.01$ \\
+$\lambda_h$ ladder & $\{0,\, 1,\, 10,\, 100,\, 1000\}$ for $c=1$; $\{0,\, 10,\, 1000\}$ for $c>1$ \\
+Continuation rule & 3 rounds: each round re-seeds every $\lambda_h$ column with whichever converged head scores best under that column's own objective, adopts it when better, and refines at a tenth of the step size \\
+Reported value & the largest disparity over the ladder, attained at $\lambda_h=1000$ in every run \\
+Evaluation grid & step $10^{-3}$ on the interior between the 5\% and 95\% quantiles of $S$ (min-max scaled to $[0,1]$ on the train split) \\
+Bandwidth & Silverman's rule $(3n/4)^{-1/5}$; the simulation uses the training bandwidth of supIPM-FRL instead \\
+Convergence check & relative drift of the objective over the last tenth of the run, recorded per head ($2.8 \cdot 10^{-2}$ under a constant step, $2 \cdot 10^{-4}$ under the cosine schedule) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Additional results}
+\label{app:real-additional}
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\textwidth]{appendix/figA3_axis_variants.pdf}
-  \caption{Simulation, $c=1$.  The frontier of the generator of Section~\ref{sec:exp-simulation} under three horizontal axes: the test $1-\mathrm{MAE}$ of the head trained with the encoder (left), of the head fitted on the frozen representation under $\lVert\mathbf{w}\rVert_2\le1$ by the supervised loss alone (centre, labelled $\lambda_h=0$), and of the worst head attaining $R_1$ (right).  The vertical axis is $R_1$ at the Silverman bandwidth in every panel; configurations off a method's front are drawn faded.}
-  \label{fig:app-axis-variants}
+  \includegraphics[width=0.8\textwidth]{appendix/fig2_own_head_crime.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/fig2_own_head_acs.pdf}
+  \caption{Crime (top) and ACSIncome (bottom): prediction-level $L_{\infty}$-GDP against test utility.}
+  \label{fig:app-prediction-level}
 \end{figure}
 
-The horizontal axis of Figure~\ref{fig:simulation} is the test $1-\mathrm{MAE}$ of the head trained with the encoder.  Two other utilities become available once the worst head has been fitted, and Figure~\ref{fig:app-axis-variants} shows the $c=1$ frontier under each of them.  The centre panel uses the utility of the head fitted on the frozen representation under the gain budget $\lVert\mathbf{w}\rVert_2\le1$ by the supervised loss alone, the unpenalized end of the ladder that yields $R_c$ in Appendix~\ref{app:real-experiments}, and the right panel uses the utility of the worst head itself.  The vertical axis is $R_1$ throughout, here at the Silverman bandwidth of the reported estimator, as on the real datasets.
+\paragraph{Prediction-level disparity on Crime and ACSIncome.}  Figure~\ref{fig:app-prediction-level} complements Figure~\ref{fig:crime-acs}.  At the prediction level, supIPM-FRL, FREM and the two regularization methods have nearly the same curve on both datasets, and the binary-$S$ methods coincide with them where they reach.  The differences among the methods therefore appear only under the worst-case disparity, as on Adult.
 
-A head of gain at most $1$ recovers only part of the utility that the representation carries.  Measured as the utility of this head above the trivial predictor relative to that of the head trained with the encoder above the trivial predictor, the recovery at $c=1$ is $7.7\%$ for supIPM-FRL and $13.7\%$ for FREM.  Under the centre and right axes the horizontal position of a configuration therefore reflects how much utility a gain-limited head can extract from the representation rather than how fair the representation is, and the displacement differs between the two methods.  Corollary~\ref{cor:certificate} bounds the disparity of every head in a class and places no constraint on the utility of those heads, and the utility available to a practitioner is that of the head fitted for prediction on the encoder, so the main figures use the left axis.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_adult_c4.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_crime_c4.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_acs_c4.pdf}
+  \caption{Worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_4$ against test utility on Adult, Crime and ACSIncome.}
+  \label{fig:app-c4}
+\end{figure}
 
-The frontier of the bump-only generator is given in Appendix~\ref{app:ablation-studies}, where it is used for the discriminator-strength study.
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_adult_c16.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_crime_c16.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_acs_c16.pdf}
+  \caption{Worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_{16}$ against test utility on Adult, Crime and ACSIncome.}
+  \label{fig:app-c16}
+\end{figure}
 
-\section{Experiments for real dataset}
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\textwidth]{appendix/figA1_gain_budget_curve.pdf}
+  \caption{Worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_c$ against the norm bound $c$, for each method at its best configuration above a utility level.}
+  \label{fig:app-norm-bound}
+\end{figure}
 
+\paragraph{Other norm bounds.}  Figures~\ref{fig:app-c4} and~\ref{fig:app-c16} repeat the worst-case comparison with $c=4$ and $c=16$, and Figure~\ref{fig:app-norm-bound} follows the worst-case disparity of each method over $c\in\{1,2,4,8,16,32\}$, with each method read at its best configuration above a utility level ($0.840$ on Adult, $0.855$ on Crime, $0.775$ on ACSIncome and $0.900$ on the simulation).  The ordering of Section~\ref{sec:exp-real} is unchanged up to $c=16$, of the order of the weight norm of the heads trained with the encoder, which lies between $13$ and $27$ in our runs.  The disparity of supIPM-FRL grows in proportion to $c$ over most of the range, as it does for a linear head, whereas the disparity of the regularization methods and of the binary-$S$ methods is close to its maximum by $c=8$.  At $c=32$ the logistic heads approach threshold functions, whose disparity is not controlled by a penalty on a bounded discriminator class, and the curves of supIPM-FRL and FREM meet or cross.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_adult_gdp_w_kernel.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_crime_gdp_w_kernel.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_acs_gdp_w_kernel.pdf}
+  \caption{Kernel estimate of GDP of the fitted prediction model against test utility on Adult, Crime and ACSIncome.}
+  \label{fig:app-gdp}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_adult_hgr.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_crime_hgr.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_acs_hgr.pdf}
+  \caption{HGR maximal correlation between the fitted prediction and $S$ against test utility on Adult, Crime and ACSIncome.}
+  \label{fig:app-hgr}
+\end{figure}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_adult_sup_ipm.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_crime_sup_ipm.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA6_other_measures_acs_sup_ipm.pdf}
+  \caption{Empirical supIPM of the representation on the test split against test utility on Adult, Crime and ACSIncome.}
+  \label{fig:app-supipm}
+\end{figure}
+
+\paragraph{Other fairness measures.}  Figures~\ref{fig:app-gdp}--\ref{fig:app-supipm} replace the disparity axis by the kernel estimate of GDP \citep{jiang2022gdp}, the HGR maximal correlation \citep{mary2019continuous}, and the empirical supIPM of Equation~(\ref{eq:empirical-supipm}) evaluated on the test split.  Under GDP, the average over $S$ that FREM penalizes, the curves of supIPM-FRL and FREM coincide on all three datasets, so the supremum penalty loses nothing under the average criterion.  Under HGR, Reg-HGR, which penalizes an estimate of this quantity, is lowest on Adult and Crime, and supIPM-FRL is comparable to FREM on every dataset.  Under the empirical supIPM, supIPM-FRL is lowest by a wide margin on Adult and Crime, so the value that its penalty minimizes on the training split carries over to the test split, consistent with Theorem~\ref{thm:uniform}.  On ACSIncome, where supIPM-FRL is trained with $J_v=2$, FREM attains a smaller empirical supIPM; this agrees with Appendix~\ref{app:ablation-discriminator}, where $J_v=2$ leaves the discriminators short of the supremum, so the penalty acts on an underestimate.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.72\textwidth]{appendix/figA7_graph_own_head.pdf}\\[1pt]
+  \includegraphics[width=0.72\textwidth]{appendix/figA7_graph_worst_head.pdf}
+  \caption{Pokec-z and Pokec-n: prediction-level $L_{\infty}$-GDP (top) and worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$ (bottom) against test accuracy.}
+  \label{fig:app-graph}
+\end{figure}
+
+\paragraph{Graph datasets.}  Figure~\ref{fig:app-graph} shows both disparities on Pokec-z and Pokec-n, where the binary-$S$ methods LAFTR and sIPM-LFR are not run.  At the prediction level the methods for a continuous $S$ have similar curves.  Under the worst-case disparity, supIPM-FRL and FREM coincide, MMD is close to them, and Reg-GDP and Reg-HGR lie to the right, so on these graphs the supremum and the average penalty control the downstream heads equally well, while a penalty on the fitted head does not.
+
+\paragraph{Numerical tables.}  Table~\ref{tab:ranking} lists, for every dataset, each method at its configuration with the lowest disparity among those within $0.004$ of three utility levels, under both measures, with the rank of each method at each level; a dash marks a method with no configuration at that level.  The change of rank between the two measures on Adult is the numerical form of the contrast in Figure~\ref{fig:adult}.  On Adult, Crime and ACSIncome, supIPM-FRL has the lowest worst-case disparity at the highest level; at the lowest level of Crime and ACSIncome, where every curve in Figure~\ref{fig:crime-acs} meets, and on the graph datasets, FREM and the binary-$S$ methods are within $0.002$ of supIPM-FRL.  Table~\ref{tab:coverage} gives the number of runs, and Table~\ref{tab:penalty-diagnostics} reports, for every method and dataset, the number of penalty values and runs that remain, the Spearman correlation $\rho$ between the position on the penalty grid and the prediction-level disparity, the median coefficient of variation across seeds, and the range of the disparity; a penalty that operates as intended gives $\rho$ close to $-1$ and a small coefficient of variation.  The table documents that LAFTR does not converge reliably under the shared settings and that the penalty of ADV has little effect on ACSIncome, which explains the position of these two methods in the figures.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Both disparities at three utility levels per dataset, with the rank of each method under each.}
+\label{tab:ranking}
+\begin{tabular}{llrrrrrrr}
+\toprule
+Dataset & Method & level & \multicolumn{3}{c}{prediction-level $L_{\infty}$-GDP} & \multicolumn{3}{c}{worst-case ($c=1$)} \\
+\cmidrule(lr){4-6} \cmidrule(lr){7-9}
+ & & & utility & value & rank & utility & value & rank \\
+\midrule
+Adult & ADV & 0.835 & 0.8355 & 0.0842 & 8 & 0.8368 & 0.0446 & 8 \\
+Adult & LAFTR & 0.835 & 0.8346 & 0.0722 & 7 & 0.8322 & 0.0309 & 7 \\
+Adult & Reg-GDP & 0.835 & 0.8323 & 0.0454 & 5 & 0.8338 & 0.0239 & 6 \\
+Adult & Reg-HGR & 0.835 & 0.8370 & 0.0492 & 6 & 0.8384 & 0.0192 & 5 \\
+Adult & sIPM-LFR & 0.835 & 0.8312 & 0.0299 & 2 & 0.8324 & 0.0110 & 3 \\
+Adult & MMD & 0.835 & 0.8316 & 0.0343 & 4 & 0.8337 & 0.0142 & 4 \\
+Adult & FREM & 0.835 & 0.8369 & 0.0320 & 3 & 0.8378 & 0.0077 & 2 \\
+Adult & supIPM-FRL & 0.835 & 0.8311 & 0.0201 & 1 & 0.8335 & 0.0006 & 1 \\
+\addlinespace
+Adult & ADV & 0.838 & 0.8355 & 0.0842 & 8 & 0.8416 & 0.0388 & 7 \\
+Adult & LAFTR & 0.838 & 0.8346 & 0.0722 & 7 & 0.8397 & 0.0403 & 8 \\
+Adult & Reg-GDP & 0.838 & 0.8391 & 0.0639 & 6 & 0.8408 & 0.0339 & 6 \\
+Adult & Reg-HGR & 0.838 & 0.8370 & 0.0492 & 5 & 0.8384 & 0.0192 & 5 \\
+Adult & sIPM-LFR & 0.838 & 0.8365 & 0.0467 & 4 & 0.8376 & 0.0182 & 3 \\
+Adult & MMD & 0.838 & 0.8356 & 0.0438 & 3 & 0.8368 & 0.0185 & 4 \\
+Adult & FREM & 0.838 & 0.8369 & 0.0320 & 2 & 0.8378 & 0.0077 & 2 \\
+Adult & supIPM-FRL & 0.838 & 0.8351 & 0.0231 & 1 & 0.8375 & 0.0008 & 1 \\
+\addlinespace
+Adult & ADV & 0.842 & 0.8393 & 0.0855 & 8 & 0.8416 & 0.0388 & 7 \\
+Adult & LAFTR & 0.842 & 0.8386 & 0.0822 & 7 & 0.8397 & 0.0403 & 8 \\
+Adult & Reg-GDP & 0.842 & 0.8391 & 0.0639 & 5 & 0.8408 & 0.0339 & 6 \\
+Adult & Reg-HGR & 0.842 & 0.8404 & 0.0706 & 6 & 0.8384 & 0.0192 & 4 \\
+Adult & sIPM-LFR & 0.842 & 0.8395 & 0.0601 & 4 & 0.8381 & 0.0197 & 5 \\
+Adult & MMD & 0.842 & 0.8387 & 0.0541 & 3 & 0.8381 & 0.0186 & 3 \\
+Adult & FREM & 0.842 & 0.8411 & 0.0529 & 2 & 0.8383 & 0.0086 & 2 \\
+Adult & supIPM-FRL & 0.842 & 0.8385 & 0.0350 & 1 & 0.8392 & 0.0014 & 1 \\
+\midrule
+Crime & ADV & 0.834 & 0.8315 & 0.0434 & 6 & 0.8310 & 0.0546 & 6 \\
+Crime & LAFTR & 0.834 & 0.8362 & 0.0353 & 5 & 0.8346 & 0.0697 & 7 \\
+Crime & Reg-GDP & 0.834 & -- & -- & -- & 0.8377 & 0.0122 & 5 \\
+Crime & Reg-HGR & 0.834 & 0.8379 & 0.0169 & 3 & 0.8305 & 0.0087 & 4 \\
+Crime & sIPM-LFR & 0.834 & 0.8300 & 0.0062 & 1 & 0.8349 & 0.0044 & 2 \\
+Crime & MMD & 0.834 & 0.8340 & 0.0081 & 2 & 0.8341 & 0.0036 & 1 \\
+Crime & supIPM-FRL & 0.834 & 0.8341 & 0.0181 & 4 & 0.8341 & 0.0050 & 3 \\
+\addlinespace
+Crime & ADV & 0.850 & 0.8461 & 0.0779 & 5 & -- & -- & -- \\
+Crime & LAFTR & 0.850 & 0.8492 & 0.0673 & 4 & 0.8470 & 0.1162 & 4 \\
+Crime & Reg-HGR & 0.850 & 0.8481 & 0.0298 & 1 & 0.8472 & 0.0189 & 1 \\
+Crime & sIPM-LFR & 0.850 & 0.8532 & 0.0465 & 3 & 0.8511 & 0.0314 & 2 \\
+Crime & MMD & 0.850 & -- & -- & -- & 0.8532 & 0.0380 & 3 \\
+Crime & supIPM-FRL & 0.850 & 0.8462 & 0.0311 & 2 & -- & -- & -- \\
+\addlinespace
+Crime & ADV & 0.866 & -- & -- & -- & 0.8670 & 0.0850 & 4 \\
+Crime & Reg-GDP & 0.866 & -- & -- & -- & 0.8676 & 0.0763 & 3 \\
+Crime & Reg-HGR & 0.866 & 0.8653 & 0.0653 & 1 & 0.8644 & 0.0494 & 2 \\
+Crime & supIPM-FRL & 0.866 & 0.8642 & 0.0673 & 2 & 0.8642 & 0.0131 & 1 \\
+\midrule
+ACSIncome & ADV & 0.760 & 0.7611 & 0.0638 & 6 & 0.7611 & 0.0366 & 6 \\
+ACSIncome & LAFTR & 0.760 & 0.7639 & 0.0416 & 5 & 0.7639 & 0.0158 & 5 \\
+ACSIncome & Reg-GDP & 0.760 & 0.7623 & 0.0130 & 3 & 0.7623 & 0.0049 & 3 \\
+ACSIncome & MMD & 0.760 & 0.7601 & 0.0188 & 4 & 0.7601 & 0.0074 & 4 \\
+ACSIncome & FREM & 0.760 & 0.7572 & 0.0108 & 2 & 0.7572 & 0.0020 & 1 \\
+ACSIncome & supIPM-FRL & 0.760 & 0.7614 & 0.0107 & 1 & 0.7614 & 0.0024 & 2 \\
+\addlinespace
+ACSIncome & ADV & 0.770 & 0.7685 & 0.0641 & 5 & 0.7685 & 0.0340 & 5 \\
+ACSIncome & Reg-HGR & 0.770 & 0.7679 & 0.0291 & 4 & 0.7679 & 0.0110 & 4 \\
+ACSIncome & sIPM-LFR & 0.770 & 0.7684 & 0.0175 & 1 & 0.7684 & 0.0052 & 2 \\
+ACSIncome & MMD & 0.770 & 0.7659 & 0.0219 & 3 & 0.7659 & 0.0086 & 3 \\
+ACSIncome & FREM & 0.770 & 0.7671 & 0.0175 & 2 & 0.7695 & 0.0038 & 1 \\
+\addlinespace
+ACSIncome & ADV & 0.780 & 0.7837 & 0.0617 & 7 & 0.7823 & 0.0248 & 7 \\
+ACSIncome & Reg-GDP & 0.780 & 0.7782 & 0.0350 & 4 & 0.7782 & 0.0146 & 5 \\
+ACSIncome & Reg-HGR & 0.780 & 0.7802 & 0.0423 & 6 & 0.7802 & 0.0165 & 6 \\
+ACSIncome & sIPM-LFR & 0.780 & 0.7763 & 0.0281 & 2 & 0.7763 & 0.0099 & 3 \\
+ACSIncome & MMD & 0.780 & 0.7785 & 0.0368 & 5 & 0.7785 & 0.0145 & 4 \\
+ACSIncome & FREM & 0.780 & 0.7764 & 0.0302 & 3 & 0.7796 & 0.0088 & 2 \\
+ACSIncome & supIPM-FRL & 0.780 & 0.7763 & 0.0279 & 1 & 0.7763 & 0.0023 & 1 \\
+\midrule
+Pokec-z & Reg-GDP & 0.731 & 0.7297 & 0.0033 & 1 & 0.7297 & 0.0053 & 3 \\
+Pokec-z & FREM & 0.731 & 0.7286 & 0.0042 & 3 & 0.7286 & 0.0003 & 1 \\
+Pokec-z & supIPM-FRL & 0.731 & 0.7291 & 0.0034 & 2 & 0.7291 & 0.0005 & 2 \\
+\addlinespace
+Pokec-z & Reg-GDP & 0.738 & 0.7361 & 0.0063 & 1 & 0.7361 & 0.0076 & 5 \\
+Pokec-z & Reg-HGR & 0.738 & 0.7367 & 0.0136 & 3 & 0.7413 & 0.0066 & 4 \\
+Pokec-z & MMD & 0.738 & 0.7359 & 0.0151 & 5 & 0.7359 & 0.0015 & 3 \\
+Pokec-z & FREM & 0.738 & 0.7394 & 0.0141 & 4 & 0.7394 & 0.0012 & 2 \\
+Pokec-z & supIPM-FRL & 0.738 & 0.7410 & 0.0127 & 2 & 0.7410 & 0.0011 & 1 \\
+\addlinespace
+Pokec-z & ADV & 0.745 & 0.7458 & 0.0328 & 6 & 0.7466 & 0.0044 & 4 \\
+Pokec-z & Reg-GDP & 0.745 & 0.7473 & 0.0269 & 5 & 0.7475 & 0.0082 & 6 \\
+Pokec-z & Reg-HGR & 0.745 & 0.7413 & 0.0182 & 2 & 0.7413 & 0.0066 & 5 \\
+Pokec-z & MMD & 0.745 & 0.7440 & 0.0211 & 4 & 0.7440 & 0.0022 & 3 \\
+Pokec-z & FREM & 0.745 & 0.7459 & 0.0202 & 3 & 0.7459 & 0.0018 & 2 \\
+Pokec-z & supIPM-FRL & 0.745 & 0.7410 & 0.0127 & 1 & 0.7410 & 0.0011 & 1 \\
+\midrule
+Pokec-n & Reg-GDP & 0.723 & 0.7225 & 0.0007 & 1 & 0.7225 & 0.0019 & 3 \\
+Pokec-n & FREM & 0.723 & 0.7198 & 0.0029 & 3 & 0.7198 & 0.0003 & 1 \\
+Pokec-n & supIPM-FRL & 0.723 & 0.7233 & 0.0028 & 2 & 0.7236 & 0.0004 & 2 \\
+\addlinespace
+Pokec-n & Reg-GDP & 0.732 & 0.7319 & 0.0090 & 2 & 0.7319 & 0.0078 & 4 \\
+Pokec-n & Reg-HGR & 0.732 & 0.7341 & 0.0114 & 4 & 0.7341 & 0.0059 & 3 \\
+Pokec-n & FREM & 0.732 & 0.7303 & 0.0074 & 1 & 0.7303 & 0.0006 & 1 \\
+Pokec-n & supIPM-FRL & 0.732 & 0.7322 & 0.0094 & 3 & 0.7322 & 0.0010 & 2 \\
+\addlinespace
+Pokec-n & ADV & 0.740 & 0.7376 & 0.0276 & 6 & 0.7399 & 0.0039 & 4 \\
+Pokec-n & Reg-GDP & 0.740 & 0.7412 & 0.0222 & 5 & 0.7411 & 0.0065 & 6 \\
+Pokec-n & Reg-HGR & 0.740 & 0.7391 & 0.0157 & 1 & 0.7391 & 0.0059 & 5 \\
+Pokec-n & MMD & 0.740 & 0.7375 & 0.0159 & 2 & 0.7375 & 0.0017 & 2 \\
+Pokec-n & FREM & 0.740 & 0.7393 & 0.0167 & 3 & 0.7393 & 0.0015 & 1 \\
+Pokec-n & supIPM-FRL & 0.740 & 0.7435 & 0.0219 & 4 & 0.7435 & 0.0022 & 3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Runs remaining after the collapse rule, runs with a worst-case downstream measurement, seeds and methods.}
+\label{tab:coverage}
+\begin{tabular}{lrrrlr}
+\toprule
+Dataset & runs kept & measured & seeds & seed range & methods \\
+\midrule
+Adult & 545 & 316 & 5 & 2023--2027 & 8 \\
+Crime & 377 & 244 & 5 & 2023--2027 & 8 \\
+ACSIncome & 551 & 551 & 5 & 2023--2027 & 8 \\
+Pokec-z & 253 & 253 & 5 & 2023--2027 & 6 \\
+Pokec-n & 284 & 284 & 5 & 2023--2027 & 6 \\
+Simulation, second generator & 84 & 84 & 3 & 2023--2025 & 2 \\
+Simulation, first generator & 78 & 78 & 3 & 2023--2025 & 2 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\caption{Behavior of each penalty along its $\lambda$ grid.}
+\label{tab:penalty-diagnostics}
+\begin{tabular}{llcrrrrrr}
+\toprule
+Dataset & Method & $S$ split & $\lambda$ kept & runs kept & $\rho$ & seed CV & min & max \\
+\midrule
+Adult & ADV & -- & 10 & 50/50 & $-0.99$ & 0.03 & 0.0764 & 0.0891 \\
+Adult & FREM & -- & 8 & 120/125 & $-1.00$ & 0.03 & 0.0051 & 0.0888 \\
+Adult & LAFTR & mean & 5 & 14/50 & $+0.00$ & 0.07 & 0.0331 & 0.0858 \\
+Adult & LAFTR & median & 6 & 13/50 & $-0.14$ & 0.13 & 0.0345 & 0.0945 \\
+Adult & MMD & mean & 10 & 49/50 & $-1.00$ & 0.07 & 0.0282 & 0.0704 \\
+Adult & MMD & median & 10 & 47/50 & $-1.00$ & 0.08 & 0.0245 & 0.0694 \\
+Adult & Reg-GDP & -- & 10 & 50/60 & $-1.00$ & 0.03 & 0.0030 & 0.0891 \\
+Adult & Reg-HGR & -- & 10 & 39/60 & $-1.00$ & 0.05 & 0.0002 & 0.0870 \\
+Adult & sIPM-LFR & mean & 10 & 50/50 & $-1.00$ & 0.06 & 0.0256 & 0.0735 \\
+Adult & sIPM-LFR & median & 10 & 50/50 & $-0.98$ & 0.06 & 0.0239 & 0.0734 \\
+Adult & supIPM-FRL & -- & 14 & 58/75 & $-0.84$ & 0.15 & 0.0201 & 0.0878 \\
+\midrule
+Crime & ADV & -- & 10 & 43/51 & $-0.99$ & 0.05 & 0.0434 & 0.1114 \\
+Crime & FREM & -- & 4 & 48/95 & $-1.00$ & 0.15 & 0.0027 & 0.1104 \\
+Crime & LAFTR & mean & 9 & 27/50 & $-0.17$ & 0.35 & 0.0353 & 0.0754 \\
+Crime & LAFTR & median & 10 & 32/50 & $-0.33$ & 0.37 & 0.0350 & 0.0633 \\
+Crime & MMD & mean & 4 & 20/50 & $-1.00$ & 0.72 & 0.0059 & 0.0241 \\
+Crime & MMD & median & 4 & 20/50 & $-1.00$ & 0.32 & 0.0158 & 0.0529 \\
+Crime & Reg-GDP & -- & 7 & 35/61 & $-1.00$ & 0.09 & 0.0046 & 0.1126 \\
+Crime & Reg-HGR & -- & 7 & 34/60 & $-1.00$ & 0.36 & 0.0089 & 0.0886 \\
+Crime & sIPM-LFR & mean & 7 & 30/50 & $-0.96$ & 0.69 & 0.0018 & 0.0180 \\
+Crime & sIPM-LFR & median & 7 & 30/50 & $-0.96$ & 0.74 & 0.0031 & 0.0465 \\
+Crime & supIPM-FRL & -- & 11 & 51/72 & $-1.00$ & 0.18 & 0.0081 & 0.1062 \\
+\midrule
+ACSIncome & ADV & -- & 10 & 50/50 & $+0.65$ & 0.06 & 0.0614 & 0.0641 \\
+ACSIncome & FREM & -- & 8 & 115/125 & $-1.00$ & 0.06 & 0.0111 & 0.0620 \\
+ACSIncome & LAFTR & mean & 7 & 22/50 & $-0.82$ & 0.73 & 0.0046 & 0.0362 \\
+ACSIncome & LAFTR & median & 8 & 26/50 & $-0.88$ & 0.64 & 0.0061 & 0.0495 \\
+ACSIncome & MMD & mean & 10 & 50/50 & $-1.00$ & 0.06 & 0.0173 & 0.0576 \\
+ACSIncome & MMD & median & 10 & 50/50 & $-1.00$ & 0.06 & 0.0169 & 0.0573 \\
+ACSIncome & Reg-GDP & -- & 11 & 52/60 & $-1.00$ & 0.06 & 0.0006 & 0.0621 \\
+ACSIncome & Reg-HGR & -- & 8 & 35/60 & $-1.00$ & 0.06 & 0.0036 & 0.0614 \\
+ACSIncome & sIPM-LFR & mean & 10 & 50/50 & $-0.99$ & 0.06 & 0.0175 & 0.0562 \\
+ACSIncome & sIPM-LFR & median & 10 & 50/50 & $-1.00$ & 0.05 & 0.0175 & 0.0560 \\
+ACSIncome & supIPM-FRL & -- & 9 & 41/50 & $-0.98$ & 0.16 & 0.0025 & 0.0600 \\
+\midrule
+Pokec-z & ADV & -- & 9 & 45/45 & $-0.10$ & 0.03 & 0.0328 & 0.0339 \\
+Pokec-z & FREM & -- & 9 & 45/45 & $-1.00$ & 0.05 & 0.0042 & 0.0328 \\
+Pokec-z & MMD & -- & 9 & 32/45 & $-1.00$ & 0.09 & 0.0002 & 0.0313 \\
+Pokec-z & Reg-GDP & -- & 9 & 45/45 & $-1.00$ & 0.20 & 0.0002 & 0.0300 \\
+Pokec-z & Reg-HGR & -- & 9 & 18/45 & $-0.97$ & 0.52 & 0.0001 & 0.0182 \\
+Pokec-z & supIPM-FRL & -- & 6 & 30/40 & $-1.00$ & 0.05 & 0.0016 & 0.0330 \\
+\midrule
+Pokec-n & ADV & -- & 9 & 45/45 & $-0.18$ & 0.04 & 0.0276 & 0.0284 \\
+Pokec-n & FREM & -- & 9 & 45/45 & $-1.00$ & 0.06 & 0.0029 & 0.0276 \\
+Pokec-n & MMD & -- & 9 & 41/45 & $-1.00$ & 0.18 & 0.0001 & 0.0273 \\
+Pokec-n & Reg-GDP & -- & 9 & 45/45 & $-1.00$ & 0.33 & 0.0007 & 0.0254 \\
+Pokec-n & Reg-HGR & -- & 9 & 37/45 & $-0.92$ & 0.77 & 0.0000 & 0.0157 \\
+Pokec-n & supIPM-FRL & -- & 7 & 32/40 & $-1.00$ & 0.07 & 0.0001 & 0.0275 \\
+\midrule
+Simulation, second generator & FREM & -- & 8 & 63/72 & $-1.00$ & 0.07 & 0.0030 & 0.1505 \\
+Simulation, second generator & supIPM-FRL & -- & 6 & 18/21 & $-1.00$ & 0.12 & 0.0064 & 0.1414 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Ablation studies}
+\label{app:ablation-studies}
+
+This appendix examines two choices in the implementation of supIPM-FRL: the number of discriminator updates per iteration in Algorithm~\ref{alg:supipm-frl}, and the bandwidth at which the disparity is evaluated.  Both studies use the generators of Appendix~\ref{app:synth-experiments}.
+
+\subsection{Number of discriminator updates}
+\label{app:ablation-discriminator}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{appendix/figA4_critic_ablation.pdf}
+  \caption{First generator.  Left: worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$ against utility for supIPM-FRL with $J_v=2$ and with $J_v=20$, and for FREM.  Right: empirical supIPM of the learned representation on the test split against $\lambda$.}
+  \label{fig:app-discriminator}
+\end{figure}
+
+The penalty of supIPM-FRL is the supremum that the discriminators find, so the encoder is constrained only as well as the inner maximization is solved.  Figure~\ref{fig:app-discriminator} and Table~\ref{tab:discriminator-ablation} compare, on the first generator, supIPM-FRL trained with $J_v=2$ discriminator updates of step size $\alpha_v=10^{-3}$ per iteration and with $J_v=20$ updates of step size $10^{-2}$.  With $J_v=2$ the empirical supIPM of the learned representation is not monotone in $\lambda$ and is two to four times that obtained with $J_v=20$ at the same $\lambda$ for $0.01\le\lambda\le1$, and the worst-case disparity is larger than that of FREM over the range of utility that FREM spans.  With $J_v=20$ the empirical supIPM decreases monotonically in $\lambda$ and the worst-case disparity lies below that of FREM, as in Section~\ref{sec:exp-simulation}.  The guarantee of Corollary~\ref{cor:certificate} refers to the empirical supIPM that is actually attained, and this study shows that attaining it requires the discriminators to be updated sufficiently often.  The results of supIPM-FRL on ACSIncome in Section~\ref{sec:exp-real}, which use $J_v=2$, are therefore conservative.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Number of discriminator updates on the first generator, means over three seeds.}
+\label{tab:discriminator-ablation}
+\begin{tabular}{rrrr}
+\toprule
+$\lambda$ & $1-\mathrm{MAE}$ & empirical supIPM & prediction-level $L_\infty$-GDP \\
+\midrule
+\multicolumn{4}{l}{\emph{$J_v = 2$, $\alpha_v = 10^{-3}$, as first run}} \\
+0.0  & 0.9493 & 0.3300 & 0.0627 \\
+0.01 & 0.9481 & 0.1492 & 0.0499 \\
+0.03 & 0.9464 & 0.1920 & 0.0426 \\
+0.1  & 0.9413 & 0.1122 & 0.0282 \\
+0.3  & 0.9352 & 0.0369 & 0.0195 \\
+1.0  & 0.9174 & 0.0243 & 0.0073 \\
+3.0  & 0.7938 & 0.0005 & 0.0000 \\
+\midrule
+\multicolumn{4}{l}{\emph{$J_v = 20$, $\alpha_v = 10^{-2}$}} \\
+0.0  & 0.9493 & 0.3318 & 0.0627 \\
+0.01 & 0.9489 & 0.0717 & 0.0536 \\
+0.03 & 0.9481 & 0.0498 & 0.0485 \\
+0.1  & 0.9450 & 0.0318 & 0.0372 \\
+0.3  & 0.9388 & 0.0170 & 0.0242 \\
+1.0  & 0.9222 & 0.0063 & 0.0096 \\
+3.0  & 0.8224 & 0.0010 & 0.0007 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Bandwidth of the evaluation}
+\label{app:ablation-bandwidth}
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=0.85\textwidth]{appendix/figA5_bandwidth.pdf}
+  \caption{Worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$ against utility on the second (left) and the first (right) generator, estimated at Silverman's bandwidth and at the training bandwidth of supIPM-FRL.}
+  \label{fig:app-bandwidth}
+\end{figure}
+
+The conditional expectations in $\operatorname{GDP}_{\infty}$ are estimated by kernel smoothing in $S$, and the value depends on the bandwidth.  Figure~\ref{fig:app-bandwidth} shows the worst-case trade-off curves on both generators estimated at Silverman's bandwidth, used on the real datasets, and at the training bandwidth of supIPM-FRL, used in Section~\ref{sec:exp-simulation}.  The narrower bandwidth resolves the localized dependence and raises every value by about a factor of $1.3$, for both methods and on both generators, and no ranking changes.
 
 \end{document}
 
