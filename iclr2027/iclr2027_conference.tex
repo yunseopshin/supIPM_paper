@@ -414,7 +414,7 @@ The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the se
 
 This section evaluates supIPM-FRL on simulated data, in which the location of a unfairness $s_0$ is known, and on three tabular datasets against existing baselines.
 
-\paragraph{Measures.}  Prediction performance is measured by the test accuracy for classification and by the test $1-\mathrm{MAE}$ for regression, and fairness by two disparities of the learned representation, both evaluated on the test data over the interior region $\mathcal{S}_n$ of Section~\ref{sec:theory}: the prediction-level disparity $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ of the head trained with the encoder, and the largest disparity that a downstream head can attain on the representation, the quantity that Corollary~\ref{cor:certificate} controls.  For $c>0$ let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$, where $\sigma$ is the logistic function, and define the worst-case downstream disparity
+\paragraph{Measures.}  Prediction performance is measured by the test accuracy for classification and by the test 1 minus Mean Absolute Error ($1-\mathrm{MAE}$) for regression, and fairness by two disparities of the learned representation, both evaluated on the test data over the interior region $\mathcal{S}_n$ of Section~\ref{sec:theory}: the prediction-level disparity $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ of the head trained with the encoder, and the largest disparity that a downstream head can attain on the representation, the quantity that Corollary~\ref{cor:certificate} controls.  For $c>0$ let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$, where $\sigma$ is the logistic function, and define the worst-case downstream disparity
 \begin{equation}
   \operatorname{GDP}_{\infty}(h;\mathcal{F}_c):=\sup_{f\in\mathcal{F}_c}\operatorname{GDP}_{\infty}(f\circ h),
   \label{eq:worst-case-gdp}
@@ -515,7 +515,7 @@ and let $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ be the smallest number of
 \end{equation}
 \end{assumption}
 
-Assumption~\ref{as:encoder} holds on a bounded $\mathcal{X}$ for ReLU networks with bounded parameters followed by the normalization of Appendix~\ref{app:ascent}, which is $1$-Lipschitz because its Jacobian is symmetric with eigenvalues in $(0,1]$, and therefore does not increase covering numbers.  For such networks $\mathfrak{v}_n$ is of the order of the number of parameters and $\log A_n$ of the order of the depth times the logarithm of the width \citep{schmidt2020nonparametric}.
+Assumption~\ref{as:encoder} holds on a bounded $\mathcal{X}$ for ReLU networks with bounded parameters followed by the normalization of Appendix~\ref{app:ascent}, which is $1$-Lipschitz because its Jacobian is symmetric with eigenvalues in $(0,1]$, and therefore does not increase covering numbers.  For such networks, $\mathfrak{v}_n$ is bounded by a multiple of the number of parameters and $\log A_n$ by a multiple of the depth times the logarithm of the width \citep{schmidt2020nonparametric}.
 
 \subsection{Notation}
 \label{app:notation}
@@ -1176,7 +1176,7 @@ This appendix gives the generating equations and the settings of the simulation 
 \subsection{Data-generating process}
 \label{app:synth-generative}
 
-Two generators are used, which differ only in the dependence on $S$ that they introduce.  Both draw
+This appendix describes the data-generating mechanisms and simulation settings for Section~\ref{sec:exp-simulation}.  Both draw
 \begin{equation}
 \begin{aligned}
   S&\sim\mathrm{Uniform}(-\sqrt{3},\sqrt{3}),\qquad
