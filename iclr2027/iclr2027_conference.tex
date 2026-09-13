@@ -1171,40 +1171,35 @@ Algorithm~\ref{alg:supipm-frl} assembles the three updates of Appendix~\ref{app:
 \section{Experiments for synthetic dataset}
 \label{app:synth-experiments}
 
-This appendix gives the generating equations and the settings of the simulation study in Section~\ref{sec:exp-simulation}.
-
 \subsection{Data-generating process}
 \label{app:synth-generative}
 
-This appendix describes the data-generating mechanisms and simulation settings for Section~\ref{sec:exp-simulation}.  Both draw
+This appendix describes the data-generating mechanisms and simulation settings for Section~\ref{sec:exp-simulation}.  Two generators are used, and both draw
 \begin{equation}
 \begin{aligned}
-  S&\sim\mathrm{Uniform}(-\sqrt{3},\sqrt{3}),\qquad
-  \mathbf{X}_{\mathrm{task}}\sim N(\mathbf{0},\mathbf{I}_4),\qquad
-  \mathbf{X}_{\mathrm{noise}}\sim N(\mathbf{0},\mathbf{I}_3),\\
-  \omega(S)&:=\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\},\qquad s_0=1.2,\quad \tau=0.30,\qquad
-  X_{\mathrm{loc}}:=3\,\omega(S)+0.5\,\varepsilon_1,
+  S &\sim \mathrm{Uniform}(0,1), &\qquad \tilde{S} &:= 2\sqrt{3}\,\bigl(S-\tfrac{1}{2}\bigr), \\
+  \mathbf{X}_{\mathrm{task}} &\sim N(\mathbf{0},\mathbf{I}_4), &\qquad \mathbf{X}_{\mathrm{noise}} &\sim N(\mathbf{0},\mathbf{I}_3), \\
+  \omega(S) &:= \exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}, &\qquad s_0 &= 0.846, \quad \tau = 0.087, \\
+  X_{\mathrm{loc}} &:= 3\,\omega(S) + 0.5\,\varepsilon_1, &\qquad X_{\mathrm{lin}} &:= \tilde{S} + 0.5\,\varepsilon_2,
 \end{aligned}
 \label{eq:synth-common}
 \end{equation}
-where $\varepsilon_1,\varepsilon_2,\varepsilon_3\sim N(0,1)$ and all random quantities are independent, so that $S$ has mean $0$ and standard deviation $1$, and $\omega$ is a Gaussian function of width $\tau$ centered at $s_0$.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function.  The first generator introduces the localized dependence alone,
+where $\varepsilon_1,\varepsilon_2,\varepsilon_3\sim N(0,1)$ and all random quantities are independent.  Here $S$ is on the $[0,1]$ scale of the real datasets and $\tilde{S}$ is its standardized value, with mean $0$ and standard deviation $1$; the Gaussian function $\omega$ is centered at $s_0$ with width $\tau$, that is, at $1.2$ with width $0.30$ on the scale of $\tilde{S}$, so that an interval of one width around $s_0$ has $\mathbb{P}_S$-probability $0.087$.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function.  The first generator introduces the localized dependence alone,
 \begin{equation}
-  Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+\omega(S)+0.3\,\varepsilon_2\right),
+  Y := \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}} + \omega(S) + 0.3\,\varepsilon_3\right),
   \qquad
-  \mathbf{X}:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{loc}},\mathbf{X}_{\mathrm{noise}})\in\mathbb{R}^{8},
+  \mathbf{X} := (\mathbf{X}_{\mathrm{task}},\, X_{\mathrm{loc}},\, \mathbf{X}_{\mathrm{noise}}) \in \mathbb{R}^{8},
   \label{eq:synth-localized}
 \end{equation}
 and the second generator, used in Section~\ref{sec:exp-simulation}, adds a linear dependence to both the outcome and the input,
 \begin{equation}
 \begin{aligned}
-  Y&:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+0.5\,S+\omega(S)+0.3\,\varepsilon_2\right),\\
-  \mathbf{X}&:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{loc}},\mathbf{X}_{\mathrm{noise}},X_{\mathrm{lin}})\in\mathbb{R}^{9},
-  \qquad
-  X_{\mathrm{lin}}:=S+0.5\,\varepsilon_3 .
+  Y &:= \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}} + 0.5\,\tilde{S} + \omega(S) + 0.3\,\varepsilon_3\right), \\
+  \mathbf{X} &:= (\mathbf{X}_{\mathrm{task}},\, X_{\mathrm{loc}},\, \mathbf{X}_{\mathrm{noise}},\, X_{\mathrm{lin}}) \in \mathbb{R}^{9}.
 \end{aligned}
-  \label{eq:synth-linear}
+\label{eq:synth-linear}
 \end{equation}
-Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.  As on the real datasets, $S$ is min--max scaled to $[0,1]$ on the training split.  In this coordinate the localized term is centered at $s_0=0.846$ with width $0.087$, and an interval of one width around $s_0$ has $\mathbb{P}_S$-probability $0.087$.  The first generator is used in the ablation studies of Appendix~\ref{app:ablation-studies}, where a single localized dependence isolates the ability of the discriminators to attain the supremum.
+Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.  The first generator is used in the ablation studies of Appendix~\ref{app:ablation-studies}, where a single localized dependence isolates the ability of the discriminators to attain the supremum.
 
 \subsection{Settings}
 \label{app:synth-settings}
