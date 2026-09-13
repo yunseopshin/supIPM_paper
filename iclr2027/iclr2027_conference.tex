@@ -412,7 +412,7 @@ The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the se
 \section{Experiments}
 \label{sec:experiments}
 
-This section evaluates supIPM-FRL on simulated data, in which the location of a localized dependence on $S$ is known, and on three tabular datasets against seven existing methods.
+This section evaluates supIPM-FRL on simulated data, in which the location of a unfairness $s_0$ is known, and on three tabular datasets against existing baselines.
 
 \paragraph{Measures.}  Prediction performance is measured by the test accuracy for classification and by the test $1-\mathrm{MAE}$ for regression, and fairness by two disparities of the learned representation, both evaluated on the test data over the interior region $\mathcal{S}_n$ of Section~\ref{sec:theory}: the prediction-level disparity $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ of the head trained with the encoder, and the largest disparity that a downstream head can attain on the representation, the quantity that Corollary~\ref{cor:certificate} controls.  For $c>0$ let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$, where $\sigma$ is the logistic function, and define the worst-case downstream disparity
 \begin{equation}
@@ -501,7 +501,7 @@ The tail condition of Assumption~\ref{as:kernel} bounds the kernel mass beyond $
 
 \begin{assumption}[Encoder class]
 \label{as:encoder}
-$\mathcal{E}_n$ is a pointwise measurable class \citep[Section~2.3.3]{vaart1997weak} of measurable encoders $h:\mathcal{X}\to\mathbb{B}^d$.  For encoders $h$ and $h'$ let
+$\mathcal{E}_n$ is a pointwise measurable class \citep[Example~2.3.4]{vaart1997weak} of measurable encoders $h:\mathcal{X}\to\mathbb{B}^d$.  For encoders $h$ and $h'$ let
 \begin{equation}
   \lVert h-h'\rVert_\infty:=\sup_{\mathbf{x}\in\mathcal{X}}\lVert h(\mathbf{x})-h'(\mathbf{x})\rVert_2 ,
   \label{eq:encoder-sup-norm}
@@ -1234,7 +1234,7 @@ Table~\ref{tab:datasets} summarizes the five datasets.  The tabular datasets are
 Dataset & Task & input dim. & $n$ train / test & $Y$ & $S$ \\
 \midrule
 Adult      & classification & 102 & 32{,}561 / 12{,}661 & income $>$ \$50k & age \\
-Crime      & regression            & 122 & 1{,}794--1{,}795 / 199--200 & violent crime rate & Black population share \\
+Crime      & regression            & 122 & 1{,}795 / 200 & violent crime rate & Black population share \\
 ACSIncome  & classification & 9   & 12{,}800 / 4{,}000 & income & age \\
 Pokec-z    & node classification   & 276 & 33{,}898 / 16{,}949 & spoken language & age \\
 Pokec-n    & node classification   & 265 & 33{,}284 / 16{,}643 & spoken language & age \\
