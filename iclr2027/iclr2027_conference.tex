@@ -454,7 +454,7 @@ which is computed by gradient ascent over $(\mathbf{w},b)$ on the frozen trainin
   \label{fig:crime-acs}
 \end{figure}
 
-\paragraph{Datasets.}  The tabular datasets are Adult, where $Y$ indicates an income above \$50k and $S$ is age; Crime, where $Y$ is the violent crime rate of a community and $S$ the share of its Black population; and ACSIncome, where $Y$ indicates the income of a respondent to the 2018 American Community Survey and $S$ is age.  Table~\ref{tab:datasets} in Appendix~\ref{app:real-experiments} lists their sizes, and the results on the graph datasets Pokec-z and Pokec-n are given there.
+\paragraph{Datasets.}  The tabular datasets are Adult ($Y$: income above \$50k, $S$: age), Crime ($Y$: violent crime rate of a community, $S$: share of its Black population) and ACSIncome ($Y$: income in the 2018 American Community Survey, $S$: age).  Table~\ref{tab:datasets} in Appendix~\ref{app:real-experiments} lists their sizes, and the results on the graph datasets Pokec-z and Pokec-n are given there.
 
 \paragraph{Baselines.}  For a continuous $S$ we compare with FREM \citep{kong2025fair}, the regularization methods Reg-GDP \citep{jiang2022generalized} and Reg-HGR \citep{mary2019fairness}, and the adversarial method ADV of \citet{kong2025fair}; for a binary $S$, with LAFTR \citep{madras2018learning}, MMD \citep{deka2023mmd} and sIPM-LFR \citep{kim2022learning}, given $S$ binarized at its median or at its mean.  All methods share the encoder and the prediction head of Appendix~\ref{app:ascent}, use five random seeds, and are swept over their penalty parameters; each curve in the figures is the Pareto front of a method over its configurations.
 
