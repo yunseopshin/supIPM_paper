@@ -1229,14 +1229,15 @@ Since $Y\in(0,1)$, the task is regression with the squared-error loss, and predi
 \subsection{Settings}
 \label{app:synth-settings}
 
-The encoder, the prediction head and the optimizer are those of the real datasets (the simulation row of Table~\ref{tab:hyperparameters}), except that the weight decay is zero so that $X_{\mathrm{loc}}$ and $X_{\mathrm{lin}}$ are not removed by regularization alone.  For each of three seeds, training, validation and test samples of sizes $5{,}000$, $1{,}000$ and $5{,}000$ are drawn; supIPM-FRL is trained with $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$ and FREM with $\lambda\in\{0.01,0.05,0.1,0.2,0.5,1,2,3\}$ at each of three kernel widths.  The worst-case downstream disparity is computed as in Appendix~\ref{app:worst-case}, with the conditional expectations in $\operatorname{GDP}_{\infty}$ estimated at the training bandwidth of supIPM-FRL rather than at Silverman's bandwidth, which is too wide to resolve the localized dependence at $n=5{,}000$; Appendix~\ref{app:ablation-bandwidth} shows that this choice leaves every ranking unchanged.
+The encoder, the prediction head and the optimizer are those of the real datasets (the simulation row of Table~\ref{tab:hyperparameters}), except that the weight decay is zero so that $X_{\mathrm{loc}}$ and $X_{\mathrm{lin}}$ are not removed by regularization alone.  For each of three seeds, training, validation and test samples of sizes $5{,}000$ are drawn; supIPM-FRL is trained with $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$ and FREM with $\lambda\in\{0.01,0.05,0.1,0.2,0.5,1,2,3\}$ at each of three kernel widths.  The worst-case downstream disparity is computed as in Appendix~\ref{app:worst-case}, with the conditional expectations in $\operatorname{GDP}_{\infty}$ estimated at the training bandwidth of supIPM-FRL.
+% rather than at Silverman's bandwidth, which is too wide to resolve the localized dependence at $n=5{,}000$; Appendix~\ref{app:ablation-bandwidth} shows that this choice leaves every ranking unchanged.
 
-The circled points in Figure~\ref{fig:simulation} are the pair of configurations, one per method, that is jointly closest to a common level of prediction performance, one quarter of the distance from the model trained without penalty to the lowest level attained by both curves.  The right panel shows $\Delta(s)$ of the head attaining the supremum in $\mathcal{F}_1$ at these two configurations, averaged over the three seeds.
+The circled points are the configurations of the two methods with nearly the same prediction performance.  The right panel shows $\Delta(s)$ of the head attaining the supremum in $\mathcal{F}_1$ at these two configurations, averaged over the three seeds.
 
 \section{Experiments for real dataset}
 \label{app:real-experiments}
 
-This appendix lists the datasets and the settings of Section~\ref{sec:exp-real}, describes the computation of the worst-case downstream disparity, and gives the results omitted from the main text: the prediction-level disparities on Crime and ACSIncome, the worst-case disparity at other values of $c$, the results under other fairness measures, the results on the graph datasets, and a numerical comparison at a matched level of prediction performance.
+This appendix lists the datasets and the settings of Section~\ref{sec:exp-real}, describes the computation of the worst-case downstream disparity, and gives the results omitted from the main text: the prediction-level disparities on Crime and ACSIncome, the results under other fairness measures, the results on the graph datasets, and a numerical comparison at a matched level of prediction performance.
 
 \subsection{Datasets}
 \label{app:real-datasets}
@@ -1256,18 +1257,18 @@ Dataset & Task & input dim. & $n$ train / test & $Y$ & $S$ \\
 Adult      & classification & 102 & 32{,}561 / 12{,}661 & income $>$ \$50k & age \\
 Crime      & regression            & 122 & 1{,}794 / 200 & violent crime rate & Black population share \\
 ACSIncome  & classification & 9   & 12{,}800 / 4{,}000 & income & age \\
-Pokec-z    & node classification   & 276 & 33{,}898 / 16{,}949 & spoken language & age \\
-Pokec-n    & node classification   & 265 & 33{,}284 / 16{,}643 & spoken language & age \\
+Pokec-z    & classification   & 276 & 33{,}898 / 16{,}949 & spoken language & age \\
+Pokec-n    & classification   & 265 & 33{,}284 / 16{,}643 & spoken language & age \\
 \bottomrule
 \end{tabular}}
 \end{table}
 
-The graph datasets Pokec-z and Pokec-n are the social-network graphs of \citet{kong2025fair}, drawn from the Pokec network of \citet{takac2012data}, constructed with the loader of FairGNN \citep{dai2021say} and with the node counts reported by \citet{kong2025fair}; the encoder is a graph convolutional network (GCN) \citep{kipf2016semi} followed by a linear head, as in \citet{kong2025fair}.  Age is missing for about $31\%$ of the nodes, coded as zero; these nodes enter the supervised loss but not the fairness penalty and not the fairness measures, and $S$ is scaled over the nodes with a known age.  Every method is trained on the same node split and evaluated in the same manner, with the seed of the network initialization fixed in each run.
+The graph datasets Pokec-z and Pokec-n are the social-network graphs of \citet{kong2025fair}, drawn from the Pokec network of \citet{takac2012data}, constructed with the loader of FairGNN \citep{dai2021say} and with the node counts reported by \citet{kong2025fair}. The encoder is a graph convolutional network (GCN) \citep{kipf2016semi} followed by a linear head.  Age is missing for about $31\%$ of the nodes, coded as zero; these nodes enter the supervised loss but not the fairness penalty and not the fairness measures, and $S$ is scaled over the nodes with a known age.  Every method is trained on the same node split and evaluated in the same manner, with the seed of the network initialization fixed in each run.
 
 \subsection{Settings}
 \label{app:real-settings}
 
-Table~\ref{tab:hyperparameters} gives the training settings.  For every method the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer followed by the normalization of Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear.  The methods differ only in their fairness term.  FREM penalizes the empirical EIPM of Equation~(\ref{eq:eipm-estimator}) with the RKHS unit ball of a Gaussian kernel, and the regularization methods Reg-GDP and Reg-HGR penalize a kernel estimate of GDP and an estimate of the HGR maximal correlation of the prediction, respectively.  ADV trains an adversary to predict $S$ from the representation, and the binary-$S$ methods LAFTR, MMD and sIPM-LFR align the representations of the two groups of the binarized $S$ through an adversary, the MMD and an IPM with sigmoid discriminators, respectively.  Each method is swept over $6$ to $16$ penalty values, FREM at each of three kernel widths and the binary-$S$ methods at both binarizations.
+Table~\ref{tab:hyperparameters} gives the training settings.  For every method the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer followed by the normalization of Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear.  The methods differ only in their fairness term.  FREM penalizes the empirical EIPM of Equation~(\ref{eq:eipm-estimator}) with the RKHS unit ball of a Gaussian kernel, and the regularization methods Reg-GDP and Reg-HGR penalize a kernel estimate of GDP and an estimate of the HGR maximal correlation of the prediction, respectively.  ADV trains an adversary to predict $S$ from the representation, and the binary-$S$ methods LAFTR, MMD and sIPM-LFR align the representations of the two groups of the binarized $S$ through an adversary, the MMD and an IPM with sigmoid discriminators, respectively.  Each method is swept over $6$ to $16$ penalty values, FREM at each of three kernel widths and the binary-$S$ methods at both discretization.
 
 \begin{table}[!htb]
 \centering
@@ -1287,7 +1288,8 @@ Pokec-z / Pokec-n    & 1024 & 100 & $10^{-3}$ & 0         & 0.25 & 100 & 10 & $1
 \end{tabular}}
 \end{table}
 
-A configuration of a method consists of a penalty value together with the kernel width for FREM and the binarization of $S$ for the binary-$S$ methods, and each curve in the figures is the Pareto front over these configurations.  A configuration is shown when at least two of its seeds remain, as the mean over seeds with $\pm1$ standard deviation, and a run is removed, for every method alike, when its encoder collapsed to a constant predictor, that is, when its test error is within two percent of that of predicting the training mean or, in classification, when its balanced accuracy is at chance level.  With five seeds, between $377$ and $551$ runs remain on each tabular dataset and between $253$ and $284$ on each graph.
+Each curve is the trade-off between prediction performance and disparity of a method. At each level of prediction performance it shows the smallest disparity attained over the penalty values and settings of the method, as the mean over five seeds with $\pm1$ standard deviation.
+supIPM-FRL uses the settings of Table~\ref{tab:hyperparameters} with penalty values between $0.003$ and $3$.  FREM uses a Gaussian kernel of width $1.0$ on the representation and kernel widths $0.03$, $0.05$ and $0.07$ on $S$, with penalty values between $0.01$ and $3$.  Reg-GDP and Reg-HGR use the estimators of \citet{jiang2022generalized} and \citet{mary2019fairness} with penalty values between $0.02$ and $100$, and ADV uses penalty values between $5$ and $5\times10^{4}$.  LAFTR, MMD and sIPM-LFR are run with $S$ binarized at its median and at its mean, with penalty values between $0.1$ and $10$.
 
 \subsection{Computation of the worst-case downstream disparity}
 \label{app:worst-case}
