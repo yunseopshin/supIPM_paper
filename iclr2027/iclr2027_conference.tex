@@ -1216,7 +1216,7 @@ This appendix describes the data-generating mechanism and simulation settings fo
 \end{aligned}
 \label{eq:synth-common}
 \end{equation}
-where $\varepsilon_1,\varepsilon_2,\varepsilon_3\sim N(0,1)$ and all random quantities are independent.  Here $S$ is on the $[0,1]$ scale of the real datasets and $\tilde{S}$ is its standardized value, with mean $0$ and standard deviation $1$; the Gaussian function $\omega$ is centered at $s_0$ with width $\tau$, that is, at $1.2$ with width $0.30$ on the scale of $\tilde{S}$, so that an interval of length $\tau$ around $s_0$ has $\mathbb{P}_S$-probability $0.087$.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function.  The outcome and the input are
+where $\varepsilon_1,\varepsilon_2,\varepsilon_3\sim N(0,1)$ and all random quantities are independent.  Here $S$ is on the $[0,1]$ scale of the real datasets and $\tilde{S}$ is its standardized value, with mean $0$ and standard deviation $1$. The function $\omega$ is a Gaussian kernel centered at $s_0=0.846$ with standard deviation $\tau=0.087$.  Since $S$ is uniform on $[0,1]$, the interval $[s_0-\tau,\,s_0+\tau]$ has probability $2\tau\approx0.17$, so the dependence on $S$ introduced through $\omega$ is confined to a small part of the sensitive domain.Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function.  The outcome and the input are
 \begin{equation}
 \begin{aligned}
   Y &:= \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}} + 0.5\,\tilde{S} + \omega(S) + 0.3\,\varepsilon_3\right), \\
