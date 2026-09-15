@@ -41,5 +41,5 @@ Not used: `T2_ranking_inversion.csv`, `T3_gain_budget.csv` (read at a different 
 
 ## Caveats
 
-- ACSIncome supIPM-FRL runs are the J_v = 2 (weak discriminator) runs; the retrained J_v = 20 runs exist in `results/critic20/ACSIncome-age/supipm` but have no worst-case measurement, so the figures use the first runs. Stated in Appendix D.2 and E.1.
+- ACSIncome supIPM-FRL results now come from the retrained J_v = 20 runs (`results/critic20/ACSIncome-age/supipm`; `scripts/summary_data.py` was switched to that tree and the figures/tables regenerated before 2026-09-14). Table 2 records J_v = 20, α_v = 1e-2 for ACSIncome; the earlier "J_v = 2 / conservative" caveat was removed from Appendices D and E on 2026-09-14.
 - No TeX toolchain on ideaserver2: the document was not compiled here. Check page count on Overleaf; the main-text Experiments section was written to about 2.1 pages (Sections 1–4 end at ≈6.2 pages).

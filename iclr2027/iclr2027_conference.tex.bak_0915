@@ -1229,7 +1229,7 @@ Since $Y\in(0,1)$, the task is regression with the squared-error loss, and predi
 \subsection{Settings}
 \label{app:synth-settings}
 
-This subsection gives the training settings of the simulation study and the rule by which the circled configurations of Figure~\ref{fig:simulation} are selected.  The encoder, the prediction head and the optimizer are those of the real datasets, with the settings in the simulation row of Table~\ref{tab:hyperparameters}; the weight decay is zero, so that $X_{\mathrm{loc}}$ and $X_{\mathrm{lin}}$ are not removed by regularization alone.  For each of the seeds $2023$ to $2025$, training, validation and test samples of sizes $5{,}000$, $1{,}000$ and $5{,}000$ are drawn.  supIPM-FRL is trained with $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$ and FREM with $\lambda\in\{0.01,0.05,0.1,0.2,0.5,1,2,3\}$ at each of the kernel widths $0.03$, $0.05$ and $0.07$, and $84$ of the $93$ runs pass the collapse rule of Appendix~\ref{app:real-settings}.  The worst-case downstream disparity is computed as in Appendix~\ref{app:worst-case}, except that the conditional expectations in $\operatorname{GDP}_{\infty}$ are estimated at the training bandwidth of supIPM-FRL rather than at Silverman's bandwidth, which at $n=5{,}000$ exceeds the width of the localized term by a factor of $2.2$ and places the maximum of $\Delta(s)$ at the boundary of the domain rather than near $s_0$; estimating at the training bandwidth instead raises every value by about a factor of $1.3$ for both methods and leaves every ranking unchanged.
+This subsection gives the training settings of the simulation study and the rule by which the circled configurations of Figure~\ref{fig:simulation} are selected.  The encoder, the prediction head and the optimizer are those of the real datasets, with the settings in the simulation row of Table~\ref{tab:hyperparameters}; the weight decay is zero, so that $X_{\mathrm{loc}}$ and $X_{\mathrm{lin}}$ are not removed by regularization alone.  For each of the seeds $2023$ to $2025$, training, validation and test samples of sizes $5{,}000$, $1{,}000$ and $5{,}000$ are drawn.  supIPM-FRL is trained with $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$ and FREM with $\lambda\in\{0.01,0.05,0.1,0.2,0.5,1,2,3\}$ at each of the kernel widths $0.03$, $0.05$ and $0.07$, and $84$ of the $93$ runs pass the collapse rule of Appendix~\ref{app:real-settings}.  The worst-case downstream disparity is computed as in Appendix~\ref{app:worst-case}, except that the conditional expectations in $\operatorname{GDP}_{\infty}$ are estimated at the training bandwidth of supIPM-FRL rather than at Silverman's bandwidth, which at $n=5{,}000$ exceeds the width of the localized term by a factor of $2.2$ and places the maximum of $\Delta(s)$ at the boundary of the domain rather than near $s_0$; Appendix~\ref{app:ablation-bandwidth} shows that this choice rescales every value by a common factor and leaves every ranking unchanged.
 
 The circled points in Figure~\ref{fig:simulation} are chosen at a common level of prediction performance, one quarter of the distance from the model trained without penalty to the lowest level attained by both curves, and the pair of configurations, one per method, whose larger distance to this level is smallest is circled.  The right panel of Figure~\ref{fig:simulation} shows $\Delta(s)$ of the head attaining the supremum in $\mathcal{F}_1$ at these two configurations, averaged over the three seeds.
 
@@ -1309,7 +1309,7 @@ This subsection collects the results omitted from Section~\ref{sec:exp-real}.
   \label{fig:app-prediction-level}
 \end{figure}
 
-\paragraph{Other norm bounds.}  Figure~\ref{fig:app-c16} repeats the worst-case comparison with $c=16$, and Figure~\ref{fig:app-norm-bound} follows the worst-case disparity of each method over $c\in\{1,2,4,8,16,32\}$, where each method is evaluated at the configuration with the smallest disparity among those whose prediction performance exceeds a fixed level, namely $0.840$ on Adult, $0.855$ on Crime, $0.775$ on ACSIncome and $0.900$ on the simulation; on Crime only supIPM-FRL and FREM are shown, and the dotted vertical line marks the value of $c$ beyond which supIPM-FRL is no longer lowest.  On all three tabular datasets the ordering of Section~\ref{sec:exp-real} is unchanged up to $c=16$, a value that exceeds the weight norm of the heads trained with the encoder on every dataset, and is reversed only at $c=32$, where supIPM-FRL attains $0.129$ against $0.109$ for the lowest of the other methods on Adult, $0.202$ against $0.171$ on Crime and $0.065$ against $0.059$ on ACSIncome.  The disparity of supIPM-FRL grows in proportion to $c$ over most of the range, as it does for a linear head, whereas the disparity of the regularization methods and of the binary-$S$ methods is close to its maximum by $c=8$.  At $c=32$ the logistic heads approach threshold functions, whose disparity is not controlled by a penalty on a bounded discriminator class, and the curves of supIPM-FRL and FREM coincide or cross, as they do between $c=4$ and $c=8$ on the simulation, where supIPM-FRL attains $0.011$ against $0.018$ at $c=4$ and $0.043$ against $0.039$ at $c=8$.
+\paragraph{Other norm bounds.}  Figure~\ref{fig:app-c16} repeats the worst-case comparison with $c=16$, and Figure~\ref{fig:app-norm-bound} follows the worst-case disparity of each method over $c\in\{1,2,4,8,16,32\}$, where each method is evaluated at the configuration with the smallest disparity among those whose prediction performance exceeds a fixed level, namely $0.840$ on Adult, $0.855$ on Crime, $0.775$ on ACSIncome and $0.900$ on the simulation; on Crime only supIPM-FRL and FREM are shown, and the dotted vertical line marks the value of $c$ beyond which supIPM-FRL is no longer lowest.  On Adult and ACSIncome the ordering of Section~\ref{sec:exp-real} is unchanged up to $c=16$, a value that exceeds the weight norm of the heads trained with the encoder on every dataset, whereas on Crime the advantage of supIPM-FRL narrows as $c$ grows and is reversed over most of the range at $c=16$.  The disparity of supIPM-FRL grows in proportion to $c$ over most of the range, as it does for a linear head, whereas the disparity of the regularization methods and of the binary-$S$ methods is close to its maximum by $c=8$.  At $c=32$ the logistic heads approach threshold functions, whose disparity is not controlled by a penalty on a bounded discriminator class, and the curves of supIPM-FRL and FREM coincide or cross, as they do near $c=6$ on the simulation.
 
 \begin{figure}[!htb]
   \centering
@@ -1385,7 +1385,7 @@ This subsection collects the results omitted from Section~\ref{sec:exp-real}.
   \label{fig:app-graph}
 \end{figure}
 
-\paragraph{Numerical comparison.}  Table~\ref{tab:matched} compares the methods at a common level of prediction performance, a test accuracy of $0.842$ on Adult, a test $1-\mathrm{MAE}$ of $0.855$ on Crime and a test accuracy of $0.780$ on ACSIncome, each method being evaluated at the configuration with the smallest disparity within $0.004$ of that level; a dash marks a method without such a configuration.  Under the worst-case disparity supIPM-FRL is lowest on all three datasets, smaller than FREM by a factor of about six on Adult, three on Crime and five on ACSIncome, and smaller than every other method by a larger factor.  At the prediction level it is lowest on Adult, whereas on Crime the four lowest methods lie within $0.001$ of one another, so that on that dataset the methods are separated by the worst-case disparity alone.  Along the penalty grids the prediction-level disparity of every method decreases as $\lambda$ grows, with two exceptions, consistent with the position of these methods in the figures: LAFTR on Adult and Crime, whose disparity is insensitive to $\lambda$, and ADV on ACSIncome, whose disparity varies little across the grid.
+\paragraph{Numerical comparison.}  Table~\ref{tab:matched} compares the methods at a common level of prediction performance, a test accuracy of $0.842$ on Adult and of $0.780$ on ACSIncome, each method being evaluated at the configuration with the smallest disparity within $0.004$ of that level; a dash marks a method without such a configuration, and Crime is omitted because FREM has no configuration at a level shared with the other methods, so that the comparison on Crime is based on Figure~\ref{fig:crime-acs}.  supIPM-FRL is lowest under both measures on both datasets, and under the worst-case disparity it is smaller than FREM by a factor of about six on Adult and about four on ACSIncome, and smaller than every other method by a larger factor.  Along the penalty grids the prediction-level disparity of every method decreases as $\lambda$ grows, with two exceptions, consistent with the position of these methods in the figures: LAFTR on Adult and Crime, whose disparity is insensitive to $\lambda$, and ADV on ACSIncome, whose disparity varies little across the grid.
 
 \begin{table}[!htb]
 \centering
@@ -1401,13 +1401,9 @@ This subsection collects the results omitted from Section~\ref{sec:exp-real}.
 prediction-level & $\mathbf{0.0350}$ & 0.0529 & 0.0639 & 0.0706 & 0.0855 & 0.0822 & 0.0541 & 0.0601 \\
 worst-case ($c=1$) & $\mathbf{0.0014}$ & 0.0086 & 0.0339 & 0.0192 & 0.0388 & 0.0403 & 0.0186 & 0.0197 \\
 \midrule
-\multicolumn{9}{l}{\emph{Crime, $1-\mathrm{MAE}$ $0.855$}} \\
-prediction-level & 0.0469 & 0.0468 & 0.0550 & $\mathbf{0.0458}$ & -- & -- & 0.0529 & 0.0465 \\
-worst-case ($c=1$) & $\mathbf{0.0100}$ & 0.0338 & 0.0504 & 0.0315 & -- & -- & 0.0380 & 0.0314 \\
-\midrule
 \multicolumn{9}{l}{\emph{ACSIncome, accuracy $0.780$}} \\
 prediction-level & $\mathbf{0.0279}$ & 0.0302 & 0.0350 & 0.0423 & 0.0617 & -- & 0.0368 & 0.0281 \\
-worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- & 0.0145 & 0.0099 \\
+worst-case ($c=1$) & $\mathbf{0.0023}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- & 0.0145 & 0.0099 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1469,49 +1465,17 @@ $\lambda$ & $1-\mathrm{MAE}$ & empirical supIPM & prediction-level $L_\infty$-GD
 
 
 \FloatBarrier
-\subsection{Bandwidth of the penalty}
+\subsection{Bandwidth of the evaluation}
 \label{app:ablation-bandwidth}
 
-The penalty of supIPM-FRL smooths in $S$ with a kernel of bandwidth $\gamma$, and the value of the
-penalty, and therefore the representation it produces, depends on that choice.  Table~\ref{tab:bandwidth-ablation}
-reports supIPM-FRL trained on the three tabular datasets at $\gamma\in\{0.10,0.25,0.50\}$ standard
-deviations of $S$, with every other setting held fixed and averaged over the five seeds, at the
-penalty weight whose prediction performance is closest to the operating points of
-Section~\ref{sec:exp-real}.  The three bandwidths give prediction performance within $0.005$ of one
-another on every dataset, and the prediction-level $L_{\infty}$-GDP varies by at most a third; no
-single bandwidth is best on all three, and $\gamma=0.25$, the value used throughout, is never worst
-by more than $0.008$.  A wider kernel lowers the empirical supIPM at a fixed penalty weight, since
-the smoothed conditional expectations vary less in $S$, without a corresponding fall in the
-disparity, so the two cannot be compared across bandwidths at a fixed $\lambda$.  This ablation was
-run with $J_v=2$ discriminator updates, so its absolute values are those of the left half of
-Table~\ref{tab:discriminator-ablation} rather than of the main experiments.
+The conditional expectations in $\operatorname{GDP}_{\infty}$ are estimated by kernel smoothing in $S$, and the value depends on the bandwidth.  Figure~\ref{fig:app-bandwidth} shows the worst-case trade-off curves, with and without the linear dependence, estimated at Silverman's bandwidth, used on the real datasets, and at the training bandwidth of supIPM-FRL, used in Section~\ref{sec:exp-simulation}.  The narrower bandwidth resolves the localized dependence and raises every value, by about a factor of $1.3$ for both methods with the linear dependence and by about $1.6$ for FREM without it, and leaves every ranking unchanged.
 
-\begin{table}[!htb]
-\centering
-\small
-\caption{Bandwidth of the penalty, on the real datasets.}
-\label{tab:bandwidth-ablation}
-\begin{tabular}{llrrr}
-\toprule
-Dataset & $\gamma$ & prediction performance & empirical supIPM & prediction-level $L_\infty$-GDP \\
-\midrule
-\multicolumn{5}{l}{\emph{Adult, $\lambda=0.3$}} \\
- & 0.10 & 0.8374 & 0.143 & 0.0412 \\
- & 0.25 & 0.8377 & 0.107 & 0.0330 \\
- & 0.50 & 0.8383 & 0.112 & 0.0408 \\
-\midrule
-\multicolumn{5}{l}{\emph{Crime, $\lambda=0.03$}} \\
- & 0.10 & 0.8500 & 0.453 & 0.0500 \\
- & 0.25 & 0.8542 & 0.379 & 0.0469 \\
- & 0.50 & 0.8516 & 0.268 & 0.0387 \\
-\midrule
-\multicolumn{5}{l}{\emph{ACSIncome, $\lambda=0.3$}} \\
- & 0.10 & 0.7754 & 0.168 & 0.0249 \\
- & 0.25 & 0.7763 & 0.157 & 0.0279 \\
- & 0.50 & 0.7799 & 0.128 & 0.0345 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.85\textwidth]{appendix/figA5_bandwidth.pdf}
+  \caption{Worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$ against prediction performance with (left) and without (right) the linear dependence, estimated at Silverman's bandwidth and at the training bandwidth of supIPM-FRL.}
+  \label{fig:app-bandwidth}
+\end{figure}
 
 \end{document}
 
