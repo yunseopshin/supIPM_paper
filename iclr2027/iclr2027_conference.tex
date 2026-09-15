@@ -1473,18 +1473,20 @@ $\lambda$ & $1-\mathrm{MAE}$ & empirical supIPM & prediction-level $L_\infty$-GD
 \label{app:ablation-bandwidth}
 
 The penalty of supIPM-FRL smooths in $S$ with a kernel of bandwidth $\gamma$, and the value of the
-penalty, and therefore the representation it produces, depends on that choice.  Table~\ref{tab:bandwidth-ablation}
-reports supIPM-FRL trained on the three tabular datasets at $\gamma\in\{0.10,0.25,0.50\}$ standard
-deviations of $S$, with every other setting held fixed and averaged over the five seeds, at the
-penalty weight whose prediction performance is closest to the operating points of
-Section~\ref{sec:exp-real}.  The three bandwidths give prediction performance within $0.005$ of one
-another on every dataset, and the prediction-level $L_{\infty}$-GDP varies by at most a third; no
-single bandwidth is best on all three, and $\gamma=0.25$, the value used throughout, is never worst
-by more than $0.008$.  A wider kernel lowers the empirical supIPM at a fixed penalty weight, since
-the smoothed conditional expectations vary less in $S$, without a corresponding fall in the
-disparity, so the two cannot be compared across bandwidths at a fixed $\lambda$.  This ablation was
-run with $J_v=2$ discriminator updates, so its absolute values are those of the left half of
-Table~\ref{tab:discriminator-ablation} rather than of the main experiments.
+penalty, and therefore the representation it produces, depends on that choice.
+Figure~\ref{fig:app-bandwidth} shows the trade-off curve of supIPM-FRL trained on the three tabular
+datasets at $\gamma\in\{0.10,0.25,0.50\}$ standard deviations of $S$, with every other setting held
+fixed and averaged over the five seeds, and Table~\ref{tab:bandwidth-ablation} gives the values at
+the penalty weight whose prediction performance is closest to the operating points of
+Section~\ref{sec:exp-real}.  The three curves lie on top of one another over the range of prediction
+performance at which the method is used, and separate only at the end of the penalty grid, where the
+representation is close to collapse; no single bandwidth is best on all three datasets, and
+$\gamma=0.25$, the value used throughout, is never worst by more than $0.008$ at a matched level of
+prediction performance.  The empirical supIPM, by contrast, falls as $\gamma$ grows at a fixed
+penalty weight, since the smoothed conditional expectations vary less in $S$, so that quantity is
+not comparable across bandwidths.  This ablation was run with $J_v=2$ discriminator updates, so its
+absolute values are those of the left half of Table~\ref{tab:discriminator-ablation} rather than of
+the main experiments.
 
 \begin{table}[!htb]
 \centering
@@ -1512,6 +1514,15 @@ Dataset & $\gamma$ & prediction performance & empirical supIPM & prediction-leve
 \bottomrule
 \end{tabular}
 \end{table}
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\textwidth]{appendix/figA9_penalty_bandwidth.pdf}
+  \caption{Bandwidth of the penalty.  Prediction performance against the prediction-level
+  $L_{\infty}$-GDP for supIPM-FRL trained at $\gamma\in\{0.10,0.25,0.50\}$ standard deviations of
+  $S$ on Adult (left), Crime (middle) and ACSIncome (right).}
+  \label{fig:app-bandwidth}
+\end{figure}
 
 \end{document}
 
