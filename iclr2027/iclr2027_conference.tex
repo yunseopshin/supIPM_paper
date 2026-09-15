@@ -1294,27 +1294,50 @@ Pokec-z / Pokec-n    & 1024 & 100 & $10^{-3}$ & 0         & 0.25 & 100 & 10 & $1
 \end{tabular}}
 \end{table}
 
-Each curve in the figures is the trade-off between prediction performance and disparity of a method: at each level of prediction performance it shows the smallest disparity attained over the penalty values and settings of the method, as the mean over five seeds with $\pm1$ standard deviation.
+Each curve shows, at each level of prediction performance, the smallest disparity attained by a method over its penalty values and settings, as the mean over five seeds with $\pm1$ standard deviation.
 
 \subsection{Computation of the worst-case downstream disparity}
 \label{app:worst-case}
 
-This subsection describes how the supremum in Equation~(\ref{eq:worst-case-gdp}) is computed for a frozen representation and a norm bound $c$.  The estimated $\operatorname{GDP}_{\infty}(f\circ h)$ on the training representation is maximized by gradient ascent over the parameters $(\mathbf{w},b)$ of $f\in\mathcal{F}_c$, with $\mathbf{w}$ projected onto the ball of radius $c$ after each step, and the disparity of the resulting head is reported on the test representation.  The conditional expectations are estimated by Nadaraya--Watson kernel smoothing \citep{nadaraya1964estimating,watson1964smooth} in $S$ at Silverman's bandwidth \citep{silverman2018density}, and the supremum over $s$ is taken over a grid on the interior region.  The ascent starts from eight heads, four in the leading directions of the matrix of kernel-smoothed conditional mean shifts of the representation and four at random, and proceeds through a sequence of objectives in which the disparity is weighted by $\lambda_h\in\{0,1,10,100,1000\}$ relative to the supervised loss, with three rounds of continuation across them.  At the last stage the supervised loss no longer affects the optimum, and the reported value is the largest disparity reached, which does not depend on the labels.  The ascent uses Adam \citep{kingma2014adam} with $2{,}000$ steps and a step size of $10^{-2}$ decayed to zero.
+For a frozen representation and a norm bound $c$, the supremum in Equation~(\ref{eq:worst-case-gdp}) is computed by gradient ascent of the estimated $\operatorname{GDP}_{\infty}(f\circ h)$ on the training representation over the parameters $(\mathbf{w},b)$ of $f\in\mathcal{F}_c$, with $\mathbf{w}$ projected onto the ball of radius $c$ after each step, and the disparity of the resulting head is reported on the test representation.  The conditional expectations are estimated by Nadaraya--Watson kernel smoothing \citep{nadaraya1964estimating,watson1964smooth} at Silverman's bandwidth \citep{silverman2018density}.  The ascent uses Adam \citep{kingma2014adam} with $2{,}000$ steps and a step size of $10^{-2}$ decayed to zero, starts from eight heads, four along the leading directions of the kernel-smoothed conditional mean shifts and four at random, and reweights the disparity against the supervised loss by $\lambda_h\in\{0,1,10,100,1000\}$; the reported value is the largest disparity reached.
 
 \subsection{Additional results}
 \label{app:real-additional}
 
-This subsection collects the results omitted from Section~\ref{sec:exp-real}; the figures and the table follow the text.
+\paragraph{Prediction-level disparity.}  On Crime and ACSIncome (Figure~\ref{fig:app-prediction-level}), supIPM-FRL, FREM and Reg-GDP have nearly the same curve and the binary-$S$ methods are close to them, so the methods are separated mainly by the worst-case disparity, as on Adult.
 
-\paragraph{Prediction-level disparity.}  On Crime and ACSIncome (Figure~\ref{fig:app-prediction-level}), supIPM-FRL, FREM and Reg-GDP have nearly the same prediction-level curve, and the binary-$S$ methods are close to them.  As on Adult, the methods are separated mainly by the worst-case disparity.
+\paragraph{Other norm bounds.}  With $c=16$ (Figure~\ref{fig:app-c16}), which exceeds the weight norm of the trained head on every dataset, the ordering of Section~\ref{sec:exp-real} is unchanged: supIPM-FRL attains the lowest worst-case disparity at a matched level of prediction performance on all three tabular datasets, as it does at $c=4$; the dependence on $c$ is examined in Appendix~\ref{app:ablation-norm-bound}.
 
-\paragraph{Other norm bounds.}  Figure~\ref{fig:app-c16} repeats the worst-case comparison with $c=16$, a value that exceeds the weight norm of the head trained with the encoder on every dataset.  The ordering of Section~\ref{sec:exp-real} is unchanged: supIPM-FRL attains the lowest worst-case disparity at a matched level of prediction performance on all three tabular datasets, at $c=4$ as well as at $c=16$.  The dependence on $c$ itself is examined in Appendix~\ref{app:ablation-norm-bound}.
+\paragraph{Other fairness measures.}  Figures~\ref{fig:app-gdp}--\ref{fig:app-mi-y} replace the disparity axis by five other measures.  Under the kernel and the binned estimates of GDP \citep{jiang2022generalized}, both averages over $S$, supIPM-FRL and FREM coincide on Adult and Crime and are close on ACSIncome.  Under the HGR maximal correlation \citep{mary2019fairness} and the mutual information $I(\hat{Y};S)$ \citep{kraskov2004estimating,ross2014mutual}, Reg-HGR is lowest and supIPM-FRL is comparable to FREM, except under the HGR on Crime, where FREM is lower.  Under the empirical supIPM on the test split, supIPM-FRL is markedly lower than every other method on Adult and Crime, consistent with Theorem~\ref{thm:uniform}, whereas FREM is lower on ACSIncome.
 
-\paragraph{Other fairness measures.}  Figures~\ref{fig:app-gdp}--\ref{fig:app-mi-y} replace the disparity axis by five other measures.  Under the two averages over $S$, the kernel estimate of GDP \citep{jiang2022generalized} and the GDP of Equation~(\ref{eq:gdp}) over the observed values of $S$, supIPM-FRL and FREM coincide on Adult and Crime and are close on ACSIncome: the supremum penalty incurs no loss under the average criterion.  Under the HGR maximal correlation \citep{mary2019fairness} and the mutual information $I(\hat{Y};S)$ \citep{kraskov2004estimating,ross2014mutual}, Reg-HGR is lowest and supIPM-FRL is comparable to FREM, except under the HGR on Crime, where FREM is lower.  Under the empirical supIPM of Equation~(\ref{eq:empirical-supipm}) on the test split, supIPM-FRL is markedly lower than every other method on Adult and Crime, consistent with Theorem~\ref{thm:uniform}, whereas FREM is lower on ACSIncome.
+\paragraph{Graph datasets.}  On Pokec-z and Pokec-n (Figure~\ref{fig:app-graph}), the methods for a continuous $S$ other than Reg-HGR have similar prediction-level curves, and under the worst-case disparity supIPM-FRL and FREM coincide, with MMD close to them and Reg-GDP and Reg-HGR above, so a penalty on the fitted head is again insufficient.
 
-\paragraph{Graph datasets.}  On Pokec-z and Pokec-n (Figure~\ref{fig:app-graph}; LAFTR and sIPM-LFR are not run), the methods for a continuous $S$ other than Reg-HGR have similar prediction-level curves.  Under the worst-case disparity, supIPM-FRL and FREM coincide, MMD is close to them, and Reg-GDP and Reg-HGR attain larger disparities: on these graphs the supremum and the average penalty control the downstream heads equally well, whereas a penalty on the fitted head does not.
+\paragraph{Numerical comparison.}  Table~\ref{tab:matched} compares the methods at the levels of prediction performance given in the table.  Under the worst-case disparity supIPM-FRL is lowest on all three datasets, smaller than FREM by a factor of about six on Adult, three on Crime and five on ACSIncome; at the prediction level it is lowest on Adult, while on Crime the four lowest methods lie within $0.001$ of one another.
 
-\paragraph{Numerical comparison.}  Table~\ref{tab:matched} compares the methods at a common level of prediction performance, namely a test accuracy of $0.842$ on Adult and of $0.780$ on ACSIncome and a test $1-\mathrm{MAE}$ of $0.855$ on Crime, each method being evaluated at its configuration with the smallest disparity within $0.004$ of that level; a dash marks a method without such a configuration.  Under the worst-case disparity supIPM-FRL is lowest on all three datasets, smaller than FREM by a factor of about six on Adult, three on Crime and five on ACSIncome, and smaller than every other method by a larger factor.  At the prediction level it is lowest on Adult, whereas on Crime the four lowest methods lie within $0.001$ of one another, so that there the methods are separated by the worst-case disparity alone.  Along the penalty grids the prediction-level disparity of every method decreases with $\lambda$, except for LAFTR on Adult and Crime and ADV on ACSIncome, whose disparities vary little; this is consistent with their position in the figures.
+\begin{table}[!htb]
+\centering
+\caption{Both disparities at a matched level of prediction performance.}
+\label{tab:matched}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+ & supIPM-FRL & FREM & Reg-GDP & Reg-HGR & ADV & LAFTR & MMD & sIPM-LFR \\
+\midrule
+\multicolumn{9}{l}{\emph{Adult, accuracy $0.842$}} \\
+prediction-level & $\mathbf{0.0350}$ & 0.0529 & 0.0639 & 0.0706 & 0.0855 & 0.0822 & 0.0541 & 0.0601 \\
+worst-case ($c=1$) & $\mathbf{0.0014}$ & 0.0086 & 0.0339 & 0.0192 & 0.0388 & 0.0403 & 0.0186 & 0.0197 \\
+\midrule
+\multicolumn{9}{l}{\emph{Crime, $1-\mathrm{MAE}$ $0.855$}} \\
+prediction-level & 0.0469 & 0.0468 & 0.0550 & $\mathbf{0.0458}$ & -- & -- & 0.0529 & 0.0465 \\
+worst-case ($c=1$) & $\mathbf{0.0100}$ & 0.0338 & 0.0504 & 0.0315 & -- & -- & 0.0380 & 0.0314 \\
+\midrule
+\multicolumn{9}{l}{\emph{ACSIncome, accuracy $0.780$}} \\
+prediction-level & $\mathbf{0.0279}$ & 0.0302 & 0.0350 & 0.0423 & 0.0617 & -- & 0.0368 & 0.0281 \\
+worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- & 0.0145 & 0.0099 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{figure}[!htb]
   \centering
@@ -1385,31 +1408,6 @@ This subsection collects the results omitted from Section~\ref{sec:exp-real}; th
   \caption{Pokec-z and Pokec-n: test accuracy against the prediction-level $L_{\infty}$-GDP (top) and the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$ (bottom).}
   \label{fig:app-graph}
 \end{figure}
-
-\begin{table}[!htb]
-\centering
-\caption{Both disparities at a matched level of prediction performance.}
-\label{tab:matched}
-\footnotesize
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{lrrrrrrrr}
-\toprule
- & supIPM-FRL & FREM & Reg-GDP & Reg-HGR & ADV & LAFTR & MMD & sIPM-LFR \\
-\midrule
-\multicolumn{9}{l}{\emph{Adult, accuracy $0.842$}} \\
-prediction-level & $\mathbf{0.0350}$ & 0.0529 & 0.0639 & 0.0706 & 0.0855 & 0.0822 & 0.0541 & 0.0601 \\
-worst-case ($c=1$) & $\mathbf{0.0014}$ & 0.0086 & 0.0339 & 0.0192 & 0.0388 & 0.0403 & 0.0186 & 0.0197 \\
-\midrule
-\multicolumn{9}{l}{\emph{Crime, $1-\mathrm{MAE}$ $0.855$}} \\
-prediction-level & 0.0469 & 0.0468 & 0.0550 & $\mathbf{0.0458}$ & -- & -- & 0.0529 & 0.0465 \\
-worst-case ($c=1$) & $\mathbf{0.0100}$ & 0.0338 & 0.0504 & 0.0315 & -- & -- & 0.0380 & 0.0314 \\
-\midrule
-\multicolumn{9}{l}{\emph{ACSIncome, accuracy $0.780$}} \\
-prediction-level & $\mathbf{0.0279}$ & 0.0302 & 0.0350 & 0.0423 & 0.0617 & -- & 0.0368 & 0.0281 \\
-worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- & 0.0145 & 0.0099 \\
-\bottomrule
-\end{tabular}
-\end{table}
 \FloatBarrier
 \section{Ablation studies}
 \label{app:ablation-studies}
