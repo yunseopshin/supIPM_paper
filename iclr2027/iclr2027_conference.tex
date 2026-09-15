@@ -1475,10 +1475,8 @@ $\lambda$ & $1-\mathrm{MAE}$ & empirical supIPM & prediction-level $L_\infty$-GD
 The penalty of supIPM-FRL smooths in $S$ with a kernel of bandwidth $\gamma$, and the value of the
 penalty, and therefore the representation it produces, depends on that choice.
 Figure~\ref{fig:app-bandwidth} shows the trade-off curve of supIPM-FRL trained on the three tabular
-datasets at $\gamma\in\{0.10,0.25,0.50\}$ standard deviations of $S$, with every other setting held
-fixed and averaged over the five seeds, and Table~\ref{tab:bandwidth-ablation} gives the values at
-the penalty weight whose prediction performance is closest to the operating points of
-Section~\ref{sec:exp-real}.  The three curves lie on top of one another over the range of prediction
+datasets at $\gamma\in\{0.10,0.25,0.50\}$ standard deviations of $S$, averaged over the five seeds
+and with every other setting held fixed.  The three curves lie on top of one another over the range of prediction
 performance at which the method is used, and separate only at the end of the penalty grid, where the
 representation is close to collapse; no single bandwidth is best on all three datasets, and
 $\gamma=0.25$, the value used throughout, is never worst by more than $0.008$ at a matched level of
@@ -1487,33 +1485,6 @@ penalty weight, since the smoothed conditional expectations vary less in $S$, so
 not comparable across bandwidths.  This ablation was run with $J_v=2$ discriminator updates, so its
 absolute values are those of the left half of Table~\ref{tab:discriminator-ablation} rather than of
 the main experiments.
-
-\begin{table}[!htb]
-\centering
-\small
-\caption{Bandwidth of the penalty, on the real datasets.}
-\label{tab:bandwidth-ablation}
-\begin{tabular}{llrrr}
-\toprule
-Dataset & $\gamma$ & prediction performance & empirical supIPM & prediction-level $L_\infty$-GDP \\
-\midrule
-\multicolumn{5}{l}{\emph{Adult, $\lambda=0.3$}} \\
- & 0.10 & 0.8374 & 0.143 & 0.0412 \\
- & 0.25 & 0.8377 & 0.107 & 0.0330 \\
- & 0.50 & 0.8383 & 0.112 & 0.0408 \\
-\midrule
-\multicolumn{5}{l}{\emph{Crime, $\lambda=0.03$}} \\
- & 0.10 & 0.8500 & 0.453 & 0.0500 \\
- & 0.25 & 0.8542 & 0.379 & 0.0469 \\
- & 0.50 & 0.8516 & 0.268 & 0.0387 \\
-\midrule
-\multicolumn{5}{l}{\emph{ACSIncome, $\lambda=0.3$}} \\
- & 0.10 & 0.7754 & 0.168 & 0.0249 \\
- & 0.25 & 0.7763 & 0.157 & 0.0279 \\
- & 0.50 & 0.7799 & 0.128 & 0.0345 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
 \begin{figure}[!htb]
   \centering
