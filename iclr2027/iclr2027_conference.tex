@@ -1309,7 +1309,11 @@ This subsection collects the results omitted from Section~\ref{sec:exp-real}.
   \label{fig:app-prediction-level}
 \end{figure}
 
-\paragraph{Other norm bounds.}  Figure~\ref{fig:app-c16} repeats the worst-case comparison with $c=16$, and Figure~\ref{fig:app-norm-bound} follows the worst-case disparity of each method over $c\in\{1,2,4,8,16,32\}$, where each method is evaluated at the configuration with the smallest disparity among those whose prediction performance exceeds a fixed level, namely $0.840$ on Adult, $0.855$ on Crime, $0.775$ on ACSIncome and $0.900$ on the simulation; on Crime only supIPM-FRL and FREM are shown, and the dotted vertical line marks the value of $c$ beyond which supIPM-FRL is no longer lowest.  On all three tabular datasets the ordering of Section~\ref{sec:exp-real} is unchanged up to $c=16$, a value that exceeds the weight norm of the heads trained with the encoder on every dataset, and is reversed only at $c=32$, where supIPM-FRL attains $0.129$ against $0.109$ for the lowest of the other methods on Adult, $0.202$ against $0.171$ on Crime and $0.065$ against $0.059$ on ACSIncome.  The disparity of supIPM-FRL grows in proportion to $c$ over most of the range, as it does for a linear head, whereas the disparity of the regularization methods and of the binary-$S$ methods is close to its maximum by $c=8$.  At $c=32$ the logistic heads approach threshold functions, whose disparity is not controlled by a penalty on a bounded discriminator class, and the curves of supIPM-FRL and FREM coincide or cross, as they do between $c=4$ and $c=8$ on the simulation, where supIPM-FRL attains $0.011$ against $0.018$ at $c=4$ and $0.043$ against $0.039$ at $c=8$.
+\paragraph{Other norm bounds.}  Figure~\ref{fig:app-c16} repeats the worst-case comparison with
+$c=16$, a value that exceeds the weight norm of the head trained with the encoder on every dataset.
+The ordering of Section~\ref{sec:exp-real} is unchanged: supIPM-FRL attains the lowest worst-case
+disparity at a matched level of prediction performance on all three tabular datasets, at $c=4$ as
+well as at $c=16$.  Appendix~\ref{app:ablation-norm-bound} follows the dependence on $c$ itself.
 
 \begin{figure}[!htb]
   \centering
@@ -1318,13 +1322,6 @@ This subsection collects the results omitted from Section~\ref{sec:exp-real}.
   \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_acs_c16.pdf}
   \caption{Prediction performance against the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_{16}$ on Adult (top), Crime (middle) and ACSIncome (bottom).}
   \label{fig:app-c16}
-\end{figure}
-
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[width=\textwidth]{appendix/figA1_gain_budget_curve.pdf}
-  \caption{Worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_c$ against the norm bound $c$.}
-  \label{fig:app-norm-bound}
 \end{figure}
 
 \paragraph{Other fairness measures.}  Figures~\ref{fig:app-gdp}--\ref{fig:app-mi-y} replace the disparity axis by five other measures of the same runs.  Under the kernel estimate of GDP \citep{jiang2022generalized} and under the GDP of Equation~(\ref{eq:gdp}) evaluated over the observed values of $S$ without kernel smoothing, both averages over $S$, the curves of supIPM-FRL and FREM coincide on Adult and Crime and are close on ACSIncome, so the supremum penalty incurs no loss under the average criterion.  Under the HGR maximal correlation \citep{mary2019fairness} and under the mutual information $I(\hat{Y};S)$ between the prediction and $S$, estimated with the nearest-neighbor estimator \citep{kraskov2004estimating,ross2014mutual} used by \citet{kong2025fair}, Reg-HGR is lowest, and supIPM-FRL is comparable to FREM except under the HGR on Crime, where FREM is lower.  Under the empirical supIPM of Equation~(\ref{eq:empirical-supipm}) on the test split, supIPM-FRL attains a markedly smaller value than every other method on Adult and Crime, so the value that its penalty minimizes on the training split transfers to the test split, consistent with Theorem~\ref{thm:uniform}; on ACSIncome FREM attains a smaller value.
@@ -1416,14 +1413,14 @@ worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- 
 \section{Ablation studies}
 \label{app:ablation-studies}
 
-This appendix examines two choices in the implementation of supIPM-FRL: the number of discriminator updates per iteration in Algorithm~\ref{alg:supipm-frl}, and the bandwidth at which the disparity is evaluated.  Both studies use the simulated data of Appendix~\ref{app:synth-experiments} and, in addition, a variant of its generator without the linear dependence, in which
+This appendix examines three choices: the number of discriminator updates per iteration in Algorithm~\ref{alg:supipm-frl}, the norm bound $c$ that defines the worst-case disparity, and the bandwidth of the kernel in the penalty.  The first uses the simulated data of Appendix~\ref{app:synth-experiments} together with a variant of its generator without the linear dependence, in which
 \begin{equation}
   Y := \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}} + \omega(S) + 0.3\,\varepsilon_3\right),
   \qquad
   \mathbf{X} := (\mathbf{X}_{\mathrm{task}},\, X_{\mathrm{loc}},\, \mathbf{X}_{\mathrm{noise}}) \in \mathbb{R}^{8},
   \label{eq:synth-localized}
 \end{equation}
-so that a single localized dependence isolates the ability of the discriminators to attain the supremum; $78$ of its $93$ runs pass the collapse rule of Appendix~\ref{app:real-settings}.
+so that a single localized dependence isolates the ability of the discriminators to attain the supremum; $78$ of its $93$ runs pass the collapse rule of Appendix~\ref{app:real-settings}.  The other two use the real datasets.
 
 \subsection{Number of discriminator updates}
 \label{app:ablation-discriminator}
@@ -1467,6 +1464,34 @@ $\lambda$ & $1-\mathrm{MAE}$ & empirical supIPM & prediction-level $L_\infty$-GD
   \label{fig:app-discriminator}
 \end{figure}
 
+
+\FloatBarrier
+\subsection{Norm bound of the downstream head}
+\label{app:ablation-norm-bound}
+
+The worst-case disparity of Equation~(\ref{eq:worst-case-gdp}) is a supremum over the heads of norm
+at most $c$, so its value, and the comparison between methods, depends on $c$.
+Figure~\ref{fig:app-norm-bound} follows it over $c\in\{1,2,4,8,16\}$ for the two methods that take a
+continuous $S$, each evaluated at the configuration with the smallest disparity among those whose
+prediction performance exceeds a fixed level, namely $0.840$ on Adult, $0.855$ on Crime and $0.775$
+on ACSIncome.  The range stops at $16$ because that budget already exceeds the weight norm of the
+head trained with the encoder on every dataset, which is at most $10.3$.
+
+The curve of supIPM-FRL lies below that of FREM at every budget on all three datasets, and the two
+are close to parallel: the disparity of supIPM-FRL grows in proportion to $c$, as it does for a
+linear head, while that of FREM is close to its maximum by $c=8$.  A penalty on a bounded
+discriminator class controls the regime in which the logistic head is close to linear and says
+nothing about $c\to\infty$, where the head approaches a threshold function, and accordingly the two
+curves cross beyond the range shown, at $c=32$, where supIPM-FRL attains $0.129$ against $0.109$ on
+Adult, $0.202$ against $0.171$ on Crime and $0.065$ against $0.059$ on ACSIncome.
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\textwidth]{appendix/figA1_gain_budget_curve.pdf}
+  \caption{Worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_c$ against the norm bound $c$ on
+  Adult (left), Crime (middle) and ACSIncome (right).}
+  \label{fig:app-norm-bound}
+\end{figure}
 
 \FloatBarrier
 \subsection{Bandwidth of the penalty}
