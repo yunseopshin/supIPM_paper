@@ -1373,7 +1373,7 @@ For a frozen representation and a norm bound $c$, the supremum in Equation~(\ref
 \end{figure}
 \FloatBarrier
 
-\paragraph{Graph datasets.}  On Pokec-z and Pokec-n (Figure~\ref{fig:app-graph}), the methods for a continuous $S$ other than Reg-HGR have similar prediction-level curves.  Under the worst-case disparity, supIPM-FRL and FREM coincide, MMD is close to them, and Reg-GDP and Reg-HGR attain larger disparities: on these graphs the supremum and the average penalty control the downstream heads equally well, whereas a penalty on the fitted head does not.
+\paragraph{Graph datasets.}  The comparison on the graphs is with the baselines that apply to a graph encoder: the methods for a continuous $S$, and MMD among those for a binary $S$.  LAFTR and sIPM-LFR each fit an adversary on the representation, which the graph pipeline of \citet{kong2025fair} does not provide, so they are omitted there.  On Pokec-z and Pokec-n (Figure~\ref{fig:app-graph}), the methods for a continuous $S$ other than Reg-HGR have similar prediction-level curves.  Under the worst-case disparity, supIPM-FRL and FREM coincide, MMD is close to them, and Reg-GDP and Reg-HGR attain larger disparities: on these graphs the supremum and the average penalty control the downstream heads equally well, whereas a penalty on the fitted head does not.
 
 \begin{figure}[!htb]
   \centering
