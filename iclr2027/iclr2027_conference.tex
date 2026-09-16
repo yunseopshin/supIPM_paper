@@ -443,11 +443,11 @@ Since $\mathcal{F}_c$ is contained in a H\"older ball whose radius grows with $c
 % $S$ is uniform on an interval; the outcome $Y$ and one input variable depend on $S$ through a term concentrated near a value $s_0$, so that this dependence is confined to a set of small $\mathbb{P}_S$-probability, and $Y$ and a second input variable also depend on $S$ linearly; the generating equations are given in Appendix~\ref{app:synth-experiments}. 
 % With $S$ uniformly distributed on an interval, the outcome $Y$ and one input variable depend on $S$ through a term localized near $s_0$ in a region of small $\mathbb{P}_S$-probability.
 % The outcome $Y$ and a second input variable also depend linearly on $S$, with the full data-generating process specified in Appendix~\ref{app:synth-experiments}.
-We generate $S$ uniformly on an interval and induce unfairness near a specific value $s_0$: both $Y$ and $X$ depend on $S$ through a term concentrated near $s_0$, and on nothing else.
+We generate $S$ uniformly on an interval and induce unfairness near a specific value $s_0$: one input variable depends on $S$ through a term concentrated near $s_0$, and the outcome does not depend on $S$ at all, so the dependence can be removed at no cost in prediction performance.
 The full simulation setup is given in Appendix~\ref{app:synth-experiments}. 
 We compare supIPM-FRL with FREM over a grid of penalty parameters, with the worst-case downstream disparity over $\mathcal{F}_1$ as the fairness measure.
 
-\paragraph{Results.}  In the left panel of Figure~\ref{fig:simulation} the curve of supIPM-FRL lies above that of FREM, so at the same prediction performance it leaves a smaller worst-case disparity.  The right panel shows the source of this difference: at the circled points, which have comparable prediction performance, $\Delta(s)$ of the head attaining the supremum peaks near $s_0$ for both methods, and the peak of FREM is markedly higher.  This is the situation of Figure~\ref{fig:motivation}.  The neighborhood of $s_0$ enters the average in Equation~(\ref{eq:eipm}) only in proportion to its small probability, so the penalty of FREM constrains the dependence there only weakly, whereas the supremum in Equation~(\ref{eq:supipm}) is attained near $s_0$ and the penalty of supIPM-FRL constrains it directly.
+\paragraph{Results.}  In the left panel of Figure~\ref{fig:simulation} the curve of supIPM-FRL lies above that of FREM, so at the same prediction performance it leaves a smaller worst-case disparity.  Because $Y$ does not depend on $S$, the dependence near $s_0$ can be removed without giving up prediction performance, and the left panel shows that supIPM-FRL does remove it at no such cost: its curve runs horizontally before it turns downward.  The right panel shows what each penalty leaves behind at the circled points, which have the same prediction performance.  For FREM, $\Delta(s)$ of the head attaining the supremum still peaks at $s_0$; for supIPM-FRL it does not, and its largest value is attained away from $s_0$.  This is the situation of Figure~\ref{fig:motivation}.  The neighborhood of $s_0$ enters the average in Equation~(\ref{eq:eipm}) only in proportion to its small probability, so the penalty of FREM has little reason to remove a dependence that is confined to it, even when removing it is free; the supremum in Equation~(\ref{eq:supipm}) is attained near $s_0$, and the penalty of supIPM-FRL constrains it directly.
 
 \subsection{Real data analysis}
 \label{sec:exp-real}
@@ -1219,12 +1219,12 @@ This appendix describes the data-generating mechanism and simulation settings fo
 where $\varepsilon_1,\varepsilon_2\sim N(0,1)$ and all random quantities are independent.  Here $S$ is on the $[0,1]$ scale of the real datasets and $\tilde{S}$ is its standardized value, with mean $0$ and standard deviation $1$. The function $\omega$ is a Gaussian kernel centered at $s_0=0.5$ with standard deviation $\tau=0.043$.  Since $S$ is uniform on $[0,1]$, the interval $[s_0-\tau,\,s_0+\tau]$ has probability $2\tau\approx0.087$, so the dependence on $S$ introduced through $\omega$ is confined to a small part of the sensitive domain.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function.  The outcome and the input are
 \begin{equation}
 \begin{aligned}
-  Y &:= \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}} + \omega(S) + 0.3\,\varepsilon_2\right), \\
+  Y &:= \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}} + 0.3\,\varepsilon_2\right), \\
   \mathbf{X} &:= (\mathbf{X}_{\mathrm{task}},\, X_{\mathrm{loc}},\, \mathbf{X}_{\mathrm{noise}}) \in \mathbb{R}^{8}.
 \end{aligned}
 \label{eq:synth-linear}
 \end{equation}
-Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.
+The sensitive attribute enters the input through $X_{\mathrm{loc}}$ alone and the outcome not at all, so $Y$ is conditionally independent of $S$ given $\mathbf{X}_{\mathrm{task}}$ and a representation that discards the dependence near $s_0$ loses no prediction performance.  What the two criteria leave behind is then not confounded with what they pay for it.  Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.
 
 \subsection{Settings}
 \label{app:synth-settings}
@@ -1232,7 +1232,7 @@ Since $Y\in(0,1)$, the task is regression with the squared-error loss, and predi
 The encoder, the prediction head and the optimizer are those of the real datasets (the simulation row of Table~\ref{tab:hyperparameters}), except that the weight decay is zero so that $X_{\mathrm{loc}}$ is not removed by regularization alone.  For each of three seeds, training and test samples of size $5{,}000$ and a validation sample of size $1{,}000$ are drawn; supIPM-FRL is trained with $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$ and FREM with $\lambda\in\{0.05,0.1,0.2,0.5,1,2\}$ at each of two kernel widths.  The worst-case downstream disparity is computed as in Appendix~\ref{app:worst-case}, with the conditional expectations in $\operatorname{GDP}_{\infty}$ estimated with a kernel of width $0.03$: the local term is $0.043$ wide, which Silverman's bandwidth of $0.193$ at $n=5{,}000$ averages away.
 % rather than at Silverman's bandwidth, which is too wide to resolve the localized dependence at $n=5{,}000$; Appendix~\ref{app:ablation-bandwidth} shows that this choice leaves every ranking unchanged.
 
-The circled points are the configurations of the two methods with nearly the same prediction performance.  The right panel shows $\Delta(s)$ of the head attaining the supremum in $\mathcal{F}_1$ at these two configurations, averaged over the three seeds.
+Each curve joins the penalty values of one method in increasing order.  The circled points are the configurations at which each method attains its smallest worst-case disparity among those that keep a test $1-\mathrm{MAE}$ of at least $0.950$, the level both methods reach.  The right panel shows $\Delta(s)$ of the head attaining the supremum in $\mathcal{F}_1$ at these two configurations, averaged over the three seeds.
 
 \section{Experiments for real dataset}
 \label{app:real-experiments}
@@ -1414,7 +1414,7 @@ worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- 
 \section{Ablation studies}
 \label{app:ablation-studies}
 
-This appendix examines three choices: the number of discriminator updates per iteration in Algorithm~\ref{alg:supipm-frl}, the norm bound $c$ that defines the worst-case disparity, and the bandwidth of the kernel in the penalty.  The first uses the simulated data of Appendix~\ref{app:synth-experiments}, with the local term moved away from the center of the sensitive domain and widened, $s_0=0.846$ and $\tau=0.087$; a single localized dependence isolates the ability of the discriminators to attain the supremum, and $78$ of the $93$ runs pass the collapse rule of Appendix~\ref{app:real-settings}.  The other two use the real datasets.
+This appendix examines three choices: the number of discriminator updates per iteration in Algorithm~\ref{alg:supipm-frl}, the norm bound $c$ that defines the worst-case disparity, and the bandwidth of the kernel in the penalty.  The first uses the simulated data of Appendix~\ref{app:synth-experiments} with the local term also entering the outcome, as $Y:=\sigma(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+\omega(S)+0.3\,\varepsilon_2)$, and moved away from the center of the sensitive domain and widened, $s_0=0.846$ and $\tau=0.087$; a single localized dependence isolates the ability of the discriminators to attain the supremum, and $78$ of the $93$ runs pass the collapse rule of Appendix~\ref{app:real-settings}.  The other two use the real datasets.
 
 \subsection{Number of discriminator updates}
 \label{app:ablation-discriminator}
