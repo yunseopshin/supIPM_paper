@@ -26,7 +26,7 @@
 \renewcommand{\algorithmiccomment}[1]{\hfill$\triangleright$ #1}
 
 
-\title{Worst-Case Control Fair Representations Learning for Continuous Sensitive Attribute}
+\title{Worst-Case Control of Fairness for Continuous Sensitive Attributes}
 
 % Authors must not appear in the submitted version. They should be hidden
 % as long as the \iclrfinalcopy macro remains commented out below.
@@ -70,9 +70,10 @@ Address \\
 \maketitle
 
 \begin{abstract}
-Fair representation learning (FRL) seeks a representation that is informative for downstream prediction yet independent of a sensitive attribute. For a continuous sensitive attribute, existing methods measure the discrepancy between conditional and marginal distributions at each sensitive value and \emph{average} it over the distribution of the sensitive attribute. Such an average can be small even when a large discrepancy is confined to a low-probability range of sensitive values, where the criterion then provides no guarantee. We therefore propose $L_\infty$-generalized demographic parity, which replaces the average by a supremum, and its representation-level counterpart, the supremum integral probability metric (supIPM). We then propose supIPM-FRL, which learns a representation under a constraint on the empirical supIPM, estimating conditional distributions by kernel weighting and measuring their discrepancy from the marginal distribution by ReLU-IPM. 
+Fair representation learning (FRL) seeks a representation that is informative for downstream prediction yet independent of a sensitive attribute. For a continuous sensitive attribute, existing methods measure the discrepancy between conditional and marginal distributions at each sensitive value and \emph{average} it over the distribution of the sensitive attribute. Such an average can be small even when a large discrepancy is confined to a low-probability range of sensitive values, and thus provides no uniform guarantee over the sensitive domain. We therefore propose $L_\infty$-generalized demographic parity, which replaces the average by a supremum, and its representation-level counterpart, the supremum integral probability metric (supIPM). We then propose supIPM-FRL, which can control worst-case disparity across sensitive values and downstream heads.
 % Such a discriminator is determined by a direction and a bias alone, so each discrepancy is maximized over the discriminator class by gradient ascent. 
-We prove that the empirical supIPM is a uniformly consistent estimator, so the fairness level attained on the sample transfers to the population. 
+We prove that the empirical supIPM is a uniformly consistent estimator, and bounds downstream disparity for heads of bounded Hölder norm.
+%so the fairness level attained on the sample transfers to the population. 
 % The transfer is uniform over the sensitive domain and over prediction heads of bounded H\"older norm. 
 Experiments on tabular and graph benchmarks show that supIPM-FRL attains prediction performance comparable to existing methods while substantially reducing the worst discrepancy.
 \end{abstract}
@@ -83,7 +84,7 @@ A learned representation serves many downstream tasks, including tasks unspecifi
 %, so that every measurable function of the representation is again independent of $S$
 
 
-Most existing FRL methods have been developed for a categorical $S$, where each value of $S$ defines a group.  In this case, demographic parity (DP) requires the prediction to have the same distribution in every group, and these methods enforce DP by aligning the distribution of the representation across groups.  One line of work trains an adversary to predict the group from the representation \citep{edwards2015censoring,beutel2017data,zhang2018mitigating,madras2018learning}.  Another compares the distribution of the representation across groups through the maximum mean discrepancy (MMD) of a fixed kernel \citep{louizos2015variational}, an integral probability metric (IPM) over a prespecified parametric discriminator class \citep{kim2022learning}, or the power of an MMD two-sample test with a learned kernel \citep{deka2023mmd}.  This groupwise construction does not extend directly to a continuous $S$ such as age or income.  Distinct observations take distinct sensitive values with probability one, so at most one observation is available at any sensitive value $s$, which does not suffice to estimate the conditional distribution of the representation at $S=s$.  Discretizing $S$ makes the groupwise construction applicable, but the resulting criterion depends on how the bins are chosen \citep{kong2025fair}, and the discretization can split nearly identical values into different groups, and it ignores their ordering \citep{mary2019fairness}.
+Most existing FRL methods have been developed for a categorical $S$, where each value of $S$ defines a group.  In this case, demographic parity (DP) requires the prediction to have the same distribution in every group, and these methods enforce DP by aligning the distribution of the representation across groups.  One line of work trains an adversary to predict the group from the representation \citep{edwards2015censoring,beutel2017data,zhang2018mitigating,madras2018learning}.  Another compares the distribution of the representation across groups through the maximum mean discrepancy (MMD) of a fixed kernel \citep{louizos2015variational}, an integral probability metric (IPM) over a prespecified parametric discriminator class \citep{kim2022learning}, or the power of an MMD two-sample test with a learned kernel \citep{deka2023mmd}.  This groupwise construction does not extend directly to a continuous $S$ such as age or income.  Distinct observations take distinct sensitive values with probability one, so at most one observation is available at any sensitive value $s$, which does not suffice to estimate the conditional distribution of the representation at $S=s$.  Discretizing $S$ makes the groupwise construction applicable, but the resulting criterion depends on how the bins are chosen \citep{kong2025fair}. Moreover, discretization can assign nearly identical values to different groups and discards their ordering \citep{mary2019fairness}.
 % The discretization also introduces threshold effects and discards the ordering of the sensitive values \citep{mary2019fairness}.
 
 These difficulties have motivated methods that treat $S$ as continuous without discretization.  Most of them, however, constrain the fitted predictor rather than the representation \citep{mary2019fairness,grari2019fairness,grari2021learning,jiang2022generalized,sohn2024fair}, for instance through the maximal correlation between the prediction and $S$ or through generalized demographic parity (GDP).  In particular, GDP is the average over $S$ of the absolute difference between the conditional and marginal mean predictions.  \citet{kong2025fair} apply the same average at the representation level: the expectation of integral probability metrics (EIPM) is the average over $S$ of the IPM between the conditional distribution of the representation given $S=s$ and its marginal distribution.  Both criteria average the discrepancy over the distribution of $S$, so a large discrepancy confined to a low-probability range of sensitive values contributes little to the average.  The average thus departs from categorical DP, which imposes one fairness level on every group regardless of its probability. 
@@ -94,7 +95,7 @@ A new criterion for a continuous $S$ should therefore hold at every sensitive va
 \paragraph{Contributions.}
 \begin{itemize}
   \item We propose $L_{\infty}-$GDP, a fairness criterion for prediction models, and supIPM, its representation-level counterpart.  Both extend the groupwise condition of categorical DP to a continuous sensitive attribute by measuring the worst discrepancy over the sensitive domain.
-  \item We estimate supIPM from kernel weights and ReLU-IPM, and propose supIPM-FRL, an adversarial procedure that is compatible with minibatch training.
+  \item We estimate supIPM using kernel weights and ReLU-IPM, and propose supIPM-FRL, which can control worst-case disparity across sensitive values and downstream heads.
   \item We prove that the empirical supIPM is a uniformly consistent estimator, so that the fairness level attained on the sample transfers to the population.
   % uniformly over the sensitive domain and over prediction heads of bounded H\"older norm.
 \end{itemize}
@@ -168,7 +169,9 @@ Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$
   \right\},
   \label{eq:relu-class}
 \end{equation}
-where $(a)_+:=\max\{a,0\}$.  The ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, Equation~(\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  Although $\mathcal{V}_{\mathrm{R}}$ is indexed by the finite-dimensional parameter $(\theta,\mu)$ alone, ReLU-IPM separates probability distributions on $\mathbb{B}^d$, and this finite dimension makes the supremum computable.  \citet{park2026relu} evaluate ReLU-IPM between empirical distributions by gradient ascent over $(\theta,\mu)$, projecting $\theta$ back onto the unit sphere after each step.
+where $(a)_+:=\max\{a,0\}$.  The ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, Equation~(\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  
+Despite its finite-dimensional parameterization, ReLU-IPM separates probability distributions on $\mathbb{B}^d$, while keeping the supremum computationally tractable.
+\citet{park2026relu} evaluate ReLU-IPM between empirical distributions by gradient ascent over $(\theta,\mu)$, projecting $\theta$ back onto the unit sphere after each step.
 
 To specify the prediction heads that ReLU-IPM controls, fix a smoothness index $\beta>0$ and let $k$ be the largest integer strictly smaller than $\beta$.  Let $\partial^{\mathbf{a}}$ denote the partial derivative indexed by a multi-index $\mathbf{a}\in\mathbb{N}_0^d$ of order $|\mathbf{a}|=a_1+\cdots+a_d$.  Then the $\beta$-H\"older norm of a $k$ times continuously differentiable function $v:\mathbb{B}^d\to\mathbb{R}$ and the $\beta$-H\"older ball on $\mathbb{B}^d$ are
 \begin{equation}
@@ -243,7 +246,7 @@ We assume the following condition on the distribution of $S$.
 \label{as:positive-density}
 $S$ has a density $p_S$ with respect to the Lebesgue measure $\mathrm{Leb}$ on $\mathcal{S}$, and $0<c_S\le p_S(s)\le C_S<\infty$ for every $s\in\mathcal{S}$.
 \end{assumption}
-Following \citet{kong2025fair}, we assume Assumption~\ref{as:positive-density} throughout.  Let $\nu$ be a $\sigma$-finite measure on $\mathcal{X}$ and let $p(\mathbf{x},s)$ be a joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$. 
+Following \citet{kong2025fair}, we maintain Assumption~\ref{as:positive-density} throughout.  Let $\nu$ be a $\sigma$-finite measure on $\mathcal{X}$ and let $p(\mathbf{x},s)$ be a joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$. 
 % chosen so that $\int_{\mathcal{X}} p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})=p_S(s)$ for every $s\in\mathcal{S}$.  
 % Because a conditional expectation given $S=s$ is determined only up to a $\mathbb{P}_S$-null set of $s$, 
 From this, a conditional expectation given $S=s$ is as follows
@@ -311,8 +314,9 @@ where $K_{\gamma}$ is the kernel of Section~\ref{sec:frem}.  The weights sum to 
   \right|.
   \label{eq:empirical-supipm}
 \end{align}
-Unlike Equation~(\ref{eq:eipm-estimator}), Equation~(\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can maximize the discrepancy. 
-Section~\ref{sec:supipm-objective} learns a fair representation with this empirical supIPM.
+Unlike Equation~(\ref{eq:eipm-estimator}), Equation~(\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  
+% When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can maximize the discrepancy. 
+Section~\ref{sec:supipm-objective} introduces supIPM-FRL, which uses this empirical supIPM to learn representations with worst-case fairness control.
 
 \subsection{Fair Representation Learning with supIPM}
 \label{sec:supipm-objective}
@@ -329,7 +333,7 @@ The empirical supIPM of Section~\ref{sec:supipm-estimation} measures the fairnes
 \end{equation}
 where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  Equation~(\ref{eq:supipm-penalized-objective}) is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)\le\rho$, as in Section~\ref{sec:supipm-criterion}.
 
-The empirical supIPM in Equation~(\ref{eq:empirical-supipm}) is a supremum over the sensitive value $s$ and over the discriminator parameter $(\theta,\mu)$, so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem.  We solve it by alternating gradient descent in $(\phi,\psi)$ with projected gradient ascent in $s$ and in $(\theta,\mu)$, which extends the computation of ReLU-IPM in \citet{park2026relu} to the additional supremum over $s$.  Because gradient ascent can converge to a local maximum, the ascent runs in parallel from $T$ candidate sensitive values and $M$ discriminators.  We refer to this training method as supIPM-FRL, which can be trained efficiently by minibatch learning.  The details of the learning method are given in Appendix~\ref{app:ascent}, and the full algorithm in Algorithm~\ref{alg:supipm-frl} of Appendix~\ref{app:algorithm-steps}.
+The empirical supIPM in Equation~(\ref{eq:empirical-supipm}) is a supremum over the sensitive value $s$ and over the discriminator parameter $(\theta,\mu)$, so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem.  We solve it by alternating gradient descent in $(\phi,\psi)$ with compass search \citep{kolda2003optimization} in $s$ and projected gradient ascent in $(\theta,\mu)$, which extends the computation of ReLU-IPM in \citet{park2026relu} to the additional supremum over $s$.  Because gradient ascent can converge to a local maximum, the ascent runs in parallel from $T$ candidate sensitive values and $M$ discriminators.  We refer to this training method as supIPM-FRL, which can be implemented efficiently using minibatches.  Further details and the full algorithm are provided in  Appendix~\ref{app:ascent} and ~\ref{app:algorithm-steps}, respectively.
 
 The fairness of a representation learned by supIPM-FRL extends to every prediction head of bounded H\"older norm.  Section~\ref{sec:theory} proves that every such head then has a small $L_{\infty}$-GDP with high probability.
 
@@ -423,14 +427,16 @@ Fairness is assessed by the prediction-level disparity $\operatorname{GDP}_{\inf
 We also evaluate the largest disparity attainable by a downstream head on the learned representation, the quantity controlled by Corollary~\ref{cor:certificate}.
 % Both disparity measures are evaluated on the test data over the interior region $\mathcal{S}_n$ defined in Section~\ref{sec:theory}.
 % Prediction performance is measured by the test accuracy for classification and by the test 1 minus Mean Absolute Error ($1-\mathrm{MAE}$) for regression, and fairness by two disparities of the learned representation, both evaluated on the test data over the interior region $\mathcal{S}_n$ of Section~\ref{sec:theory}: the prediction-level disparity $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ of the head trained with the encoder, and the largest disparity that a downstream head can attain on the representation, the quantity that Corollary~\ref{cor:certificate} controls.  
+Following \citet{jovanovic2023fare,luo2026fair}, \citet{coston2021characterizing} and \citet{langlade2025fairness}, we evaluate fairness over a class of   downstream heads rather than only for the jointly trained head.
 For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$, where $\sigma$ is the logistic function, and define the worst-case downstream disparity
 \begin{equation}
   \operatorname{GDP}_{\infty}(h;\mathcal{F}_c):=\sup_{f\in\mathcal{F}_c}\operatorname{GDP}_{\infty}(f\circ h).
   \label{eq:worst-case-gdp}
 \end{equation}
-To assess unfairness of downstream task, we train heads in $\mathcal{F}_c$ on the frozen training representation by minimizing the supervised loss minus a weighted disparity term, and report the largest test disparity attained, as described in Appendix~\ref{app:worst-case}.
+To assess downstream unfairness, we train heads in $\mathcal{F}_c$ on the frozen training representation by minimizing the supervised loss minus a weighted disparity term, and report the largest test disparity attained, as described in Appendix~\ref{app:worst-case}.
 % which is computed by gradient ascent over $(\mathbf{w},b)$ on the frozen training representation, as described in Appendix~\ref{app:worst-case}. 
-Since $\mathcal{F}_c$ is contained in a H\"older ball, Equation~(\ref{eq:worst-case-gdp}) is the empirical counterpart of the left-hand side of Equation~(\ref{eq:certificate}). Evaluating fairness over a class of downstream models rather than for a single fitted model follows \citet{jovanovic2023fare,luo2026fair}, \citet{coston2021characterizing} and \citet{langlade2025fairness}.  For a head $f$ we write $\Delta(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$, so that $\operatorname{GDP}_{\infty}(f\circ h)=\sup_{s}\Delta(s)$.
+Since $\mathcal{F}_c$ is contained in a H\"older ball, Equation~(\ref{eq:worst-case-gdp}) is the empirical counterpart of the left-hand side of Equation~(\ref{eq:certificate}). 
+For a head $f$ we write $\Delta(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$, so that $\operatorname{GDP}_{\infty}(f\circ h)=\sup_{s}\Delta(s)$.
 
 \subsection{Simulation study}
 \label{sec:exp-simulation}
@@ -438,7 +444,7 @@ Since $\mathcal{F}_c$ is contained in a H\"older ball, Equation~(\ref{eq:worst-c
 \begin{figure}[!t]
   \centering
   \includegraphics[width=0.8\textwidth]{main/fig1_simulation.pdf}
-  \caption{Simulation study.  Left: prediction performance against the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$ (the upper left is favorable).  Right: $\Delta(s)$ of the head attaining the supremum in $\mathcal{F}_1$ at the circled points.}
+  \caption{ Left: prediction performance against the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$ (the upper left is favorable).  Right: $\Delta(s)$ of the head  at the circled points.}
   \label{fig:simulation}
 \end{figure}
 
@@ -446,11 +452,17 @@ Since $\mathcal{F}_c$ is contained in a H\"older ball, Equation~(\ref{eq:worst-c
 % $S$ is uniform on an interval; the outcome $Y$ and one input variable depend on $S$ through a term concentrated near a value $s_0$, so that this dependence is confined to a set of small $\mathbb{P}_S$-probability, and $Y$ and a second input variable also depend on $S$ linearly; the generating equations are given in Appendix~\ref{app:synth-experiments}. 
 % With $S$ uniformly distributed on an interval, the outcome $Y$ and one input variable depend on $S$ through a term localized near $s_0$ in a region of small $\mathbb{P}_S$-probability.
 % The outcome $Y$ and a second input variable also depend linearly on $S$, with the full data-generating process specified in Appendix~\ref{app:synth-experiments}.
-We generate $S$ uniformly on an interval and induce unfairness near a specific value $s_0$. One input variable depends on $S$ through a term concentrated near $s_0$, and $Y$ does not depend on $S$ at all, so the dependence can be removed at no cost in prediction performance.
+We generate $S$ uniformly on an interval and induce unfairness near a specific value $s_0$. Only one input variable depends on $S$ through a term concentrated near $s_0$.
 The full simulation setup is given in Appendix~\ref{app:synth-experiments}. 
 We compare supIPM-FRL with FREM over a grid of penalty parameters, with the worst-case downstream disparity over $\mathcal{F}_1$ as the fairness measure.
 
-\paragraph{Results.}  In the left panel of Figure~\ref{fig:simulation} the curve of supIPM-FRL lies above that of FREM, so at the same prediction performance it leaves a smaller worst-case disparity. Because $Y$ does not depend on $S$, the dependence near $s_0$ can be removed without giving up prediction performance, and the left panel shows that supIPM-FRL does remove it: its curve runs horizontally before it turns downward. The right panel shows what each penalty leaves behind. At the circled points, which have the same prediction performance, $\Delta(s)$ of the head attaining the supremum still peaks at $s_0$ for FREM; for supIPM-FRL it does not, and its largest value is attained away from $s_0$.  This is the situation of Figure~\ref{fig:motivation}.  The neighborhood of $s_0$ enters the average in Equation~(\ref{eq:eipm}) only in proportion to its small probability, so the penalty of FREM has little reason to remove a dependence confined to it, even when removing it is free; the supremum in Equation~(\ref{eq:supipm}) is attained near $s_0$, and the penalty of supIPM-FRL constrains it directly.
+\paragraph{Results.}  In the left panel of Figure~\ref{fig:simulation} the curve of supIPM-FRL lies above that of FREM, so at the same prediction performance it leaves a smaller worst-case disparity.
+% Because $Y$ does not depend on $S$, the dependence near $s_0$ can be removed without giving up prediction performance, and the left panel shows that supIPM-FRL does remove it: its curve runs horizontally before it turns downward. The right panel shows what each penalty leaves behind. 
+At the circled points with equal prediction performance, FREM still exhibits a peak in $\Delta(s)$ at $s_0$, whereas supIPM-FRL does not. 
+This is the situation of Figure~\ref{fig:motivation}.  The neighborhood of $s_0$ contributes to the average in Equation~(\ref{eq:eipm}) only in proportion to its small probability. 
+Consequently, FREM may retain dependence localized near $s_0$.
+In contrast,  the supremum in Equation~(\ref{eq:supipm}) is attained near $s_0$, so supIPM-FRL controls this dependence directly. 
+
 
 \subsection{Real data analysis}
 \label{sec:exp-real}
@@ -477,20 +489,19 @@ Results on the graph datasets Pokec-z and Pokec-n \citep{takac2012data} are also
 
 
 
-\paragraph{Baselines.}  For a continuous $S$ we compare with FREM \citep{kong2025fair}, the regularization methods Reg-GDP \citep{jiang2022generalized} and Reg-HGR \citep{mary2019fairness}, and the adversarial method ADV of \citet{kong2025fair} which is a modification of \citet{zhang2018mitigating}. For a binary $S$, with LAFTR \citep{madras2018learning}, MMD \citep{deka2023mmd} and sIPM-LFR \citep{kim2022learning}, given $S$ discretized at its median or at its mean.  All methods share the encoder and the prediction head of Appendix~\ref{app:ascent}, use five random seeds, and are swept over their penalty parameters. Each curve shows the trade-off between prediction performance and fairness.
+\paragraph{Baselines.}  For a continuous $S$ we compare with FREM \citep{kong2025fair}, the regularization methods Reg-GDP \citep{jiang2022generalized} and Reg-HGR \citep{mary2019fairness}, and the adversarial method ADV of \citet{kong2025fair} which is a modification of \citet{zhang2018mitigating}. For a binary $S$, we compare with LAFTR \citep{madras2018learning}, MMD \citep{deka2023mmd} and sIPM-LFR \citep{kim2022learning}, given $S$ discretized at its median or at its mean.  All methods share the encoder and the prediction head of Appendix~\ref{app:ascent}, use five random seeds, and are swept over their penalty parameters. Each curve shows the trade-off between prediction performance and fairness.
 
 \paragraph{Results.}  Figure~\ref{fig:adult} shows both disparities on Adult, and Figure~\ref{fig:crime-acs} the worst-case disparity on Crime and ACSIncome; their prediction-level curves are given in Appendix~\ref{app:real-experiments}. 
-At the prediction level, supIPM-FRL achieves trade-offs comparable to FREM and other methods, with no apparent loss in prediction performance.
+At the prediction level, supIPM-FRL achieves comparable result to FREM and other methods, with no apparent loss in prediction performance.
 Binary-$S$ methods offer no improvement, except at the lowest prediction performance on Crime, where the curves converge.
 % Discretizing $S$ does not ensure fairness at every sensitive value \citep{kong2025fair}.
 % The worst-case disparity separates the methods: on Adult and Crime, supIPM-FRL attains a markedly smaller worst-case disparity than every other method at the same prediction performance, and on ACSIncome it attains the smallest disparity at every accuracy it reaches, with FREM closest to it.
-Notably, supIPM-FRL achieves lower worst-case disparity than competing methods at comparable prediction performance.
+In contrast, when fairness is evaluated on downstream head, supIPM-FRL achieves substantially lower worst-case disparity at comparable prediction performance.
 % The two rows of Figure~\ref{fig:adult} rank the methods differently: a method that appears as fair as supIPM-FRL for the fitted head is not so for another head.  A penalty on the fitted head leaves directions of $\mathbf{Z}$ that this head does not use, and a penalty averaged over $S$ leaves the dependence at sensitive values of small probability; in either case a downstream head of the same class can exploit the remaining dependence.  supIPM-FRL constrains the discrepancy in every direction of $\mathbf{Z}$ at every $s$, so its fairness transfers to every head in $\mathcal{F}_1$, as Corollary~\ref{cor:certificate} guarantees for heads of bounded H\"older norm, and its empirical supIPM on the test split is markedly below that of every other method on Adult and Crime, as shown in Appendix~\ref{app:real-experiments}.
 
-This result can be explained by the fact that controlling prediction-level disparity alone does not ensure fairness across downstream heads.
+The difference between the prediction-level and worst-case results arises because controlling prediction-level disparity alone does not ensure fairness across downstream heads.
 Similarly, controlling average disparity does not ensure fairness across sensitive values.
-supIPM-FRL addresses both aspects, consistent with Corollary~\ref{cor:certificate}, which bounds disparity uniformly over the sensitive domain and downstream heads of bounded H\"older norm in terms of supIPM.
-Reducing supIPM therefore tightens a fairness bound that applies across downstream heads.
+supIPM-FRL addresses both aspects, consistent with Corollary~\ref{cor:certificate}, which bounds disparity uniformly over the sensitive domain and over downstream heads of bounded Hölder norm in terms of supIPM.
 This helps explain why methods with similar prediction-level disparity exhibit different downstream disparities in Figure~\ref{fig:adult}.
 The lower empirical supIPM of supIPM-FRL further supports this interpretation, as shown in Appendix~\ref{app:real-experiments}.
 
@@ -498,7 +509,8 @@ The lower empirical supIPM of supIPM-FRL further supports this interpretation, a
 \section{Conclusion}
 \label{sec:conclusion}
 
-Existing fairness criteria for a continuous sensitive attribute average the discrepancy between the conditional and the marginal distribution over the sensitive attribute, so that a discrepancy confined to sensitive values of small probability is not detected.  We proposed $L_{\infty}$-GDP and supIPM, which replace the average by a supremum over the sensitive domain and thereby impose one fairness level at every sensitive value.  supIPM-FRL estimates the supIPM from kernel weights and ReLU discriminators and searches the sensitive domain for the largest discrepancy.  We proved that the empirical supIPM converges uniformly to its population counterpart at the rate of nonparametric regression, so that the fairness level attained on the sample transfers to the population, and that this single quantity bounds the $L_{\infty}$-GDP of every prediction head of bounded H\"older norm.  On simulated and real data, supIPM-FRL matches existing methods in prediction performance at the prediction level and leaves a markedly smaller worst-case disparity over downstream heads, consistent with Corollary~\ref{cor:certificate}.
+Existing fairness criteria for a continuous sensitive attribute average the discrepancy between the conditional and the marginal distribution over the sensitive attribute, so that such criteria can obscure large discrepancies in low-probability regions of the sensitive domain..  
+We proposed $L_{\infty}$-GDP and supIPM, which replace the average by a supremum over the sensitive domain and thereby impose one fairness level at every sensitive value.  supIPM-FRL estimates the supIPM from kernel weights and ReLU discriminators and searches the sensitive domain for the largest discrepancy.  We proved that the empirical supIPM converges uniformly to its population counterpart at the rate of nonparametric regression, so that the fairness level attained on the sample transfers to the population, and that this single quantity bounds the $L_{\infty}$-GDP of every prediction head of bounded H\"older norm.  On simulated and real data, supIPM-FRL matches existing methods in prediction performance at the prediction level and leaves a markedly smaller worst-case disparity over downstream heads, consistent with Corollary~\ref{cor:certificate}.
 
 Two directions remain: extending supIPM to a multivariate or mixed sensitive attribute, for which the supremum ranges over a multidimensional domain, and finding a discriminator class that controls H\"older heads with an exponent closer to one than $\alpha_{d,\beta}$ in Equation~(\ref{eq:relu-holder}) while remaining computable.
 
@@ -507,7 +519,11 @@ Two directions remain: extending supIPM to a multivariate or mixed sensitive att
 \bibliographystyle{iclr2027_conference}
 \bibliography{bibliography}
 
+\newpage
 \appendix
+\begin{center}
+    {\LARGE \textsc{Appendix}}
+\end{center}
 \crefalias{section}{appendix}
 \crefalias{subsection}{appendix}
 \section{Proof for main theorems}
@@ -590,7 +606,7 @@ where $m_g$ is the version of the conditional expectation fixed in Equation~(\re
   \widehat{D}_n(h)=\sup_{g,s}\left|\widehat{m}_{g,\gamma}(s)-\mathbb{E}_ng\right| ,
   \label{eq:D-in-scores}
 \end{equation}
-where the suprema run over $g=v\circ h$ with $v\in\mathcal{V}_{\mathrm{R}}$ and over $s\in\mathcal{S}_n$.  Because $g$, $m_g$, $m_{g,\gamma}$ and $\widehat{m}_{g,\gamma}$ all take values in $[0,2]$, both quantities in Equation~(\ref{eq:D-in-scores}) lie in $[0,2]$.
+where the suprema taken over $g=v\circ h$ with $v\in\mathcal{V}_{\mathrm{R}}$ and over $s\in\mathcal{S}_n$.  Because $g$, $m_g$, $m_{g,\gamma}$ and $\widehat{m}_{g,\gamma}$ all take values in $[0,2]$, both quantities in Equation~(\ref{eq:D-in-scores}) lie in $[0,2]$.
 
 We use Bernstein's inequality in the following form \citep[Chapter~2]{boucheron2013concentration}.  If $W_1,\ldots,W_n$ are independent copies of a random variable $W$ with $0\le W\le U$ and $\operatorname{Var}(W)\le\sigma^2$, then
 \begin{equation}
@@ -602,17 +618,28 @@ We use Bernstein's inequality in the following form \citep[Chapter~2]{boucheron2
 We also use the inequality
 \begin{equation}
   \left|\ \sup_{t\in\mathcal{T}}|F_1(t)|-\sup_{t\in\mathcal{T}}|F_2(t)|\ \right|
-  \le\sup_{t\in\mathcal{T}}\left|F_1(t)-F_2(t)\right|,
+  \le\sup_{t\in\mathcal{T}}\left|F_1(t)-F_2(t)\right|.
   \label{eq:sup-diff}
 \end{equation}
-valid for any set $\mathcal{T}$ and any bounded $F_1,F_2:\mathcal{T}\to\mathbb{R}$: for every $t$, $|F_1(t)|\le|F_2(t)|+\sup_{\mathcal{T}}|F_1-F_2|$, so $\sup_{\mathcal{T}}|F_1|\le\sup_{\mathcal{T}}|F_2|+\sup_{\mathcal{T}}|F_1-F_2|$, and the roles of $F_1$ and $F_2$ may be exchanged.
+This inequality holds for any bounded functions
+$F_1,F_2:\mathcal{T}\to\mathbb{R}$. Indeed, the triangle inequality gives
+\begin{equation*}
+    \sup_{t\in\mathcal{T}} |F_1(t)|
+    \le
+    \sup_{t\in\mathcal{T}} |F_2(t)|
+    +
+    \sup_{t\in\mathcal{T}} |F_1(t)-F_2(t)|.
+\end{equation*}
+Interchanging $F_1$ and $F_2$ yields the same claim.
+
 
 \subsection{Auxiliary lemmas}
 \label{app:lemmas}
 
-\begin{lemma}[Lipschitz continuity of the discriminators and entropy of the score class]
+\begin{lemma}[Lipschitz and entropy bound]
 \label{lem:entropy}
-$ \\$
+The ReLU discriminators and the induced class $\mathcal{G}_n$
+satisfy the following properties. \\
 \emph{(i)} For $\mathbf{z},\mathbf{z}'\in\mathbb{B}^d$, $\theta,\theta'\in\mathbb{S}^{d-1}$ and $\mu,\mu'\in[-1,1]$,
 \[
   \left|v_{\theta,\mu}(\mathbf{z})-v_{\theta',\mu'}(\mathbf{z}')\right|
