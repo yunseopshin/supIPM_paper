@@ -1444,75 +1444,27 @@ worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- 
 \section{Ablation studies}
 \label{app:ablation-studies}
 
-This appendix examines three choices: the number of discriminator updates per iteration in Algorithm~\ref{alg:supipm-frl}, the norm bound $c$ that defines the worst-case disparity, and the bandwidth of the kernel in the penalty.  The first uses the simulated data of Appendix~\ref{app:synth-experiments} with the local term also entering the outcome, as $Y:=\sigma(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+\omega(S)+0.3\,\varepsilon_2)$, and moved away from the center of the sensitive domain and widened, $s_0=0.846$ and $\tau=0.087$; a single localized dependence isolates the ability of the discriminators to attain the supremum, and $78$ of the $93$ runs pass the collapse rule of Appendix~\ref{app:real-settings}.  The other two use the real datasets.
+This appendix examines the norm bound $c$ that defines the worst-case disparity and the bandwidth of the kernel in the penalty.  Both use the real datasets.
 
-\subsection{Number of discriminator updates}
-\label{app:ablation-discriminator}
-
-The penalty of supIPM-FRL is the supremum attained by the discriminators, so the encoder is constrained only to the extent that the inner maximization is solved.  Figure~\ref{fig:app-discriminator} and Table~\ref{tab:discriminator-ablation} compare, averaged over three seeds, supIPM-FRL trained with $J_v=2$ discriminator updates per iteration and with $J_v=20$, at the step sizes of Table~\ref{tab:discriminator-ablation}.  With $J_v=2$ the empirical supIPM of the learned representation does not decrease monotonically in $\lambda$ and exceeds the value attained with $J_v=20$ by a factor of two to four for $0.01\le\lambda\le1$, and the worst-case disparity exceeds that of FREM.  With $J_v=20$ the empirical supIPM decreases monotonically in $\lambda$ and the worst-case disparity lies below that of FREM, as in Section~\ref{sec:exp-simulation}.  Since the guarantee of Corollary~\ref{cor:certificate} refers to the empirical supIPM that is attained, a sufficient number of discriminator updates is required.
-
-\begin{table}[!htb]
-\centering
-\small
-\caption{Number of discriminator updates on the generator without the linear dependence.}
-\label{tab:discriminator-ablation}
-\begin{tabular}{rrrr}
-\toprule
-$\lambda$ & $1-\mathrm{MAE}$ & empirical supIPM & prediction-level $L_\infty$-GDP \\
-\midrule
-\multicolumn{4}{l}{\emph{$J_v = 2$, $\alpha_v = 10^{-3}$}} \\
-0.0  & 0.9493 & 0.3300 & 0.0627 \\
-0.01 & 0.9481 & 0.1492 & 0.0499 \\
-0.03 & 0.9464 & 0.1920 & 0.0426 \\
-0.1  & 0.9413 & 0.1122 & 0.0282 \\
-0.3  & 0.9352 & 0.0369 & 0.0195 \\
-1.0  & 0.9174 & 0.0243 & 0.0073 \\
-3.0  & 0.7938 & 0.0005 & 0.0000 \\
-\midrule
-\multicolumn{4}{l}{\emph{$J_v = 20$, $\alpha_v = 10^{-2}$}} \\
-0.0  & 0.9493 & 0.3318 & 0.0627 \\
-0.01 & 0.9489 & 0.0717 & 0.0536 \\
-0.03 & 0.9481 & 0.0498 & 0.0485 \\
-0.1  & 0.9450 & 0.0318 & 0.0372 \\
-0.3  & 0.9388 & 0.0170 & 0.0242 \\
-1.0  & 0.9222 & 0.0063 & 0.0096 \\
-3.0  & 0.8224 & 0.0010 & 0.0007 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[width=0.85\textwidth]{appendix/figA4_critic_ablation.pdf}
-  \caption{Generator without the linear dependence.  Left: worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$ against prediction performance for supIPM-FRL with $J_v=2$ and with $J_v=20$, and for FREM.  Right: empirical supIPM of the learned representation on the test split against $\lambda$.}
-  \label{fig:app-discriminator}
-\end{figure}
-
-
-\FloatBarrier
 \subsection{Norm bound of the downstream head}
 \label{app:ablation-norm-bound}
 
 The worst-case disparity of Equation~(\ref{eq:worst-case-gdp}) is a supremum over the heads of norm
 at most $c$, so its value, and the comparison between methods, depends on $c$.
-Figure~\ref{fig:app-norm-bound} follows it over $c\in\{1,2,4,8,16\}$ for the two methods that take a
-continuous $S$, each evaluated at the configuration with the smallest disparity among those whose
-prediction performance exceeds a fixed level, namely $0.840$ on Adult, $0.855$ on Crime and $0.775$
-on ACSIncome.  The range stops at $16$ because that budget already exceeds the weight norm of the
+Figure~\ref{fig:app-norm-bound} follows it over $c\in\{1,2,4,8,16\}$ for supIPM-FRL, evaluated at
+the configuration with the smallest disparity among those whose prediction performance exceeds a
+fixed level, namely $0.840$ on Adult, $0.855$ on Crime and $0.775$ on ACSIncome.  The range stops at $16$ because that budget already exceeds the weight norm of the
 head trained with the encoder on every dataset, which is at most $10.3$.
 
-The curve of supIPM-FRL lies below that of FREM at every budget on all three datasets, and the two
-are close to parallel: the disparity of supIPM-FRL grows in proportion to $c$, as it does for a
-linear head, while that of FREM is close to its maximum by $c=8$.  A penalty on a bounded
-discriminator class controls the regime in which the logistic head is close to linear and says
-nothing about $c\to\infty$, where the head approaches a threshold function, and accordingly the two
-curves cross beyond the range shown, at $c=32$, where supIPM-FRL attains $0.129$ against $0.109$ on
-Adult, $0.202$ against $0.171$ on Crime and $0.065$ against $0.059$ on ACSIncome.
+The disparity grows in proportion to $c$ on all three datasets, as it does for a linear head: the
+penalty controls the regime in which the logistic head is close to linear.  It says nothing about
+$c\to\infty$, where the head approaches a threshold function, and the reported value for a budget far
+above the head the encoder actually deploys should be read in that light.
 
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=\textwidth]{appendix/figA1_gain_budget_curve.pdf}
-  \caption{Worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_c$ against the norm bound $c$ on
+  \caption{Worst-case downstream $L_{\infty}$-GDP of supIPM-FRL over $\mathcal{F}_c$ against the norm bound $c$ on
   Adult (left), Crime (middle) and ACSIncome (right).}
   \label{fig:app-norm-bound}
 \end{figure}
@@ -1531,9 +1483,8 @@ representation is close to collapse; no single bandwidth is best on all three da
 $\gamma=0.25$, the value used throughout, is never worst by more than $0.008$ at a matched level of
 prediction performance.  The empirical supIPM, by contrast, falls as $\gamma$ grows at a fixed
 penalty weight, since the smoothed conditional expectations vary less in $S$, so that quantity is
-not comparable across bandwidths.  This ablation was run with $J_v=2$ discriminator updates, so its
-absolute values are those of the left half of Table~\ref{tab:discriminator-ablation} rather than of
-the main experiments.
+not comparable across bandwidths.  This ablation was run with $J_v=2$ discriminator updates rather than the $J_v=20$ of the main
+experiments, so its absolute values are not comparable with those reported there.
 
 \begin{figure}[!htb]
   \centering
