@@ -1336,7 +1336,7 @@ For a frozen representation and a norm bound $c$, the supremum in Equation~(\ref
 
 \paragraph{Prediction-level disparity.}  On Crime and ACSIncome (Figure~\ref{fig:app-prediction-level}), supIPM-FRL, FREM and Reg-GDP have nearly the same curve, and the binary-$S$ methods are close to them.  As on Adult, the methods are separated mainly by the worst-case disparity: a penalty on the fitted head, or an average over $S$, leaves a dependence on $S$ that a different head can exploit, whereas the supremum over $s$ and over the discriminators removes it.
 
-\paragraph{Other norm bounds.}  With $c=16$ (Figure~\ref{fig:app-c16}), which exceeds the weight norm of the trained head on every dataset, the ordering of Section~\ref{sec:exp-real} is unchanged: supIPM-FRL attains the lowest worst-case disparity at a matched level of prediction performance on all three tabular datasets, as it does at $c=4$.  The advantage therefore does not depend on the norm bound of the downstream head; the dependence on $c$ itself is examined in Appendix~\ref{app:ablation-norm-bound}.
+\paragraph{Other norm bounds.}  With $c=8$ (Figure~\ref{fig:app-c8}), which exceeds the weight norm of the trained head on every dataset, the ordering of Section~\ref{sec:exp-real} is unchanged: supIPM-FRL attains the lowest worst-case disparity at a matched level of prediction performance on all three tabular datasets, as it does at $c=4$.  The advantage therefore does not depend on the norm bound of the downstream head; the dependence on $c$ itself is examined in Appendix~\ref{app:ablation-norm-bound}.
 
 \paragraph{Other fairness measures.}  Figures~\ref{fig:app-gdp}--\ref{fig:app-mi-y} replace the disparity axis by five other measures.  Under the kernel and the binned estimates of GDP \citep{jiang2022generalized}, both averages over $S$, supIPM-FRL and FREM coincide on Adult and Crime and are close on ACSIncome: since the average never exceeds the supremum, controlling the supremum incurs no loss under the average criterion.  Under the HGR maximal correlation \citep{mary2019fairness} and the mutual information $I(\hat{Y};S)$ \citep{kraskov2004estimating,ross2014mutual}, Reg-HGR is lowest and supIPM-FRL is comparable to FREM, except under the HGR on Crime, where FREM is lower.  Under the empirical supIPM on the test split, supIPM-FRL is markedly lower than every other method on Adult and Crime, so the quantity that its penalty minimizes on the training split transfers to the test split, consistent with Theorem~\ref{thm:uniform}; on ACSIncome FREM is lower.
 
@@ -1350,11 +1350,11 @@ For a frozen representation and a norm bound $c$, the supremum in Equation~(\ref
 
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_adult_c16.pdf}\\[1pt]
-  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_crime_c16.pdf}\\[1pt]
-  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_acs_c16.pdf}
-  \caption{Prediction performance against the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_{16}$ on Adult (top), Crime (middle) and ACSIncome (bottom).}
-  \label{fig:app-c16}
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_adult_c8.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_crime_c8.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_acs_c8.pdf}
+  \caption{Prediction performance against the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_{8}$ on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \label{fig:app-c8}
 \end{figure}
 
 \begin{figure}[!htb]
