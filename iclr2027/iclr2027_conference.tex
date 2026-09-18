@@ -1398,7 +1398,7 @@ The baselines share the encoder, the prediction head and the optimization settin
   \widehat{\operatorname{GDP}}_{\infty}(f\circ h):=\max_{s\in\mathcal{Q}}\widehat{\Delta}(s),
   \label{eq:gdp-estimate}
 \end{equation}
-where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel of bandwidth $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ between the $5\%$ and the $95\%$ quantiles of $S$, the empirical counterpart of the interior region $\mathcal{S}_n$ of Section~\ref{sec:theory}.
+where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel of bandwidth $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ of $S$.
 
 \paragraph{Worst-case downstream disparity.}  The supremum over $\mathcal{F}_c$ in Equation~(\ref{eq:worst-case-gdp}) is approximated on the training representation and evaluated on the test representation:
 \begin{equation}
