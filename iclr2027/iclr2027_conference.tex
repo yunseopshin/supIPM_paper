@@ -335,11 +335,14 @@ The empirical supIPM of Section~\ref{sec:supipm-estimation} measures the fairnes
 \end{equation}
 where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  Equation~(\ref{eq:supipm-penalized-objective}) is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)\le\rho$, as in Section~\ref{sec:supipm-criterion}.
 
-The empirical supIPM in Equation~(\ref{eq:empirical-supipm}) is a supremum over the sensitive value $s$ and over the discriminator parameter $(\theta,\mu)$, so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem.  
+The empirical supIPM in Equation~(\ref{eq:empirical-supipm}) is a supremum over the sensitive value $s$ and over the discriminator parameter $(\theta,\mu)$.
+% , so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem.  
 % We solve it by alternating gradient descent in $(\phi,\psi)$ with compass search \citep{kolda2003optimization} in $s$ and projected gradient ascent in $(\theta,\mu)$, which extends the computation of ReLU-IPM in \citet{park2026relu} to the additional supremum over $s$. 
-We solve this min--max problem by alternating gradient descent over $(\phi,\psi)$, compass search over $s$ \citep{kolda2003optimization}, and projected gradient ascent over $(\theta,\mu)$.  This optimization scheme extends the computation of ReLU-IPM in
-\citet{park2026relu} by additionally maximizing over $s$.
-Because gradient ascent can converge to a local maximum, we use $T$ initial values of $s$ and $M$ discriminator initializations.  We refer to this training method as supIPM-FRL, which can be implemented efficiently using minibatches.  Further details and the full algorithm are provided in  Appendix~\ref{app:ascent} and ~\ref{app:algorithm-steps}, respectively.
+We alternate between gradient descent on $\mathcal{L}(\phi,\psi)$ and approximating the supremum in Equation~(14) with $(\phi,\psi)$ fixed. 
+To approximate this supremum, we use compass search over $s$ \citep{kolda2003optimization} and projected gradient ascent over $(\theta,\mu)$.
+This optimization scheme extends the computation of ReLU-IPM in \citet{park2026relu} by additionally maximizing over $s$.
+Because both procedures can converge to a local maximum, we use $T$ initial values of $s$ and $M$ discriminator initializations.  
+We refer to this training method as supIPM-FRL, which can be implemented efficiently using minibatches.  Further details and the full algorithm are provided in  Appendix~\ref{app:ascent} and ~\ref{app:algorithm-steps}, respectively.
 
 Section~\ref{sec:theory} shows that a small empirical supIPM yields a high-probability $L_{\infty}$-GDP bound for every downstream head of bounded Hölder norm.
 
@@ -490,7 +493,7 @@ Results on the graph datasets Pokec-z and Pokec-n \citep{takac2012data} are also
 
 
 
-\paragraph{Baselines.}  For a continuous $S$ we compare with FREM \citep{kong2025fair}, the regularization methods Reg-GDP \citep{jiang2022generalized} and Reg-HGR \citep{mary2019fairness}, and the adversarial method ADV of \citet{kong2025fair} which is a modification of \citet{zhang2018mitigating}. For a binary $S$, we compare with LAFTR \citep{madras2018learning}, MMD \citep{deka2023mmd} and sIPM-LFR \citep{kim2022learning}, given $S$ discretized at its median or at its mean.  All methods share the encoder and the prediction head of Appendix~\ref{app:real-settings}, use five random seeds, and are swept over their penalty parameters. Each curve shows the trade-off between prediction performance and fairnes
+\paragraph{Baselines.}  For a continuous $S$ we compare with FREM \citep{kong2025fair}, the regularization methods Reg-GDP \citep{jiang2022generalized} and Reg-HGR \citep{mary2019fairness}, and the adversarial method ADV of \citet{kong2025fair} which is a modification of \citet{zhang2018mitigating}. For a binary $S$, we compare with LAFTR \citep{madras2018learning}, MMD \citep{deka2023mmd} and sIPM-LFR \citep{kim2022learning}, given $S$ discretized at its median or at its mean.  All methods share the encoder and the prediction head of Appendix~\ref{app:real-settings}, use five random seeds, and are swept over their penalty parameters. Each curve shows the trade-off between prediction performance and fairness.
 
 \begin{figure}[!h]
   \centering
@@ -1202,7 +1205,7 @@ which is Equation~(\ref{eq:certificate}).  The event $\Omega_n$ depends on neith
 \section{Details of Learning supIPM-FRL}
 \label{app:algorithm}
 
-This appendix supplies the details of the learning procedure in Section~\ref{sec:supipm-objective}.  Appendix~\ref{app:ascent} describes the ascent steps over the sensitive values and the discriminators together with the descent step for the encoder and the prediction head, and Appendix~\ref{app:algorithm-steps} assembles these steps into Algorithm~\ref{alg:supipm-frl}.
+This appendix supplies the details of the learning procedure in Section~\ref{sec:supipm-objective}.  Appendix~\ref{app:ascent} describes the ascent steps over the sensitive values and the discriminators together with the descent step for the encoder and the prediction head, and Appendix~\ref{app:algorithm-steps} describes these steps into Algorithm~\ref{alg:supipm-frl}.
 
 \subsection{The Ascent and Descent Steps}
 \label{app:ascent}
