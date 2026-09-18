@@ -1395,7 +1395,7 @@ The baselines share the encoder, the prediction head and the optimization settin
 \subsection{Evaluation Measures}
 \label{app:worst-case}
 
-\paragraph{Prediction and fairness measures.}  All reported measures are computed on the test data, indexed here by $i=1,\ldots,n$; Equation~(\ref{eq:worst-case-estimate}) applies the same formulas to the training sample.  Prediction performance is the accuracy for classification and $1-\mathrm{MAE}$ for regression.  For both tasks the prediction $f_{\psi}(\mathbf{z})$ is the logistic function of the linear head of Appendix~\ref{app:real-settings}, so that $f_{\psi}\circ h_{\phi}$ and the heads of $\mathcal{F}_c$ take values in $(0,1)$.  Fairness is measured by the estimates $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ and $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_c)$ of the prediction-level and the worst-case downstream disparity of Section~\ref{sec:experiments}, with $c=1$ except in Appendix~\ref{app:real-tabular}.  Both use the estimates
+\paragraph{Prediction and fairness measures.}  All measures are computed on the test data, indexed here by $i=1,\ldots,n$.  Prediction performance is the accuracy for classification and $1-\mathrm{MAE}$ for regression.  Fairness is measured by the prediction-level disparity $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ and by the worst-case downstream disparity $\operatorname{GDP}_{\infty}(h_{\phi};\mathcal{F}_c)$ of Equation~(\ref{eq:worst-case-gdp}), with $c=1$ except in Appendix~\ref{app:real-tabular}.  Both use the estimates
 \begin{equation}
   \widehat{\Delta}(s):=\Bigl|\sum_{i=1}^{n}\widehat{w}_{\tilde{\gamma}}(i;s)\,f(\mathbf{Z}_i)-\frac{1}{n}\sum_{i=1}^{n}f(\mathbf{Z}_i)\Bigr|,
   \qquad
@@ -1418,7 +1418,7 @@ where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref
 \end{equation}
 where the supremum is over non-constant functions with finite second moments and $p_{\hat{Y}S}$, $p_{\hat{Y}}$ and $p_S$ are the joint and the marginal densities.  Both vanish if and only if $\hat{Y}$ and $S$ are independent.  The HGR is estimated as in \citet{mary2019fairness} from a kernel density estimate of the joint distribution of $(\hat{Y},S)$, and the mutual information with the nearest-neighbor estimator of \citet{kraskov2004estimating} and \citet{ross2014mutual}.
 
-Every curve in Section~\ref{sec:exp-real} and in this appendix retains, at each level of prediction performance, the smallest disparity over the evaluated penalty values and settings, and shows the mean over five seeds with $\pm1$ standard deviation.  Runs whose encoder degenerates to a constant predictor are excluded, and a configuration is retained when at least two seeds remain.
+Every curve in Section~\ref{sec:exp-real} and in this appendix retains, at each level of prediction performance, the smallest disparity over the evaluated penalty values and settings, and shows the mean over five seeds with $\pm1$ standard deviation.
 
 \subsection{Additional Results}
 \label{app:real-additional}
