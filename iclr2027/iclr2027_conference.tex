@@ -1391,14 +1391,14 @@ The baselines share the encoder, the prediction head and the optimization settin
 \subsection{Evaluation Measures}
 \label{app:worst-case}
 
-\paragraph{Prediction and fairness measures.}  All measures are computed on the test data, which this subsection indexes by $i=1,\ldots,n$.  Prediction performance is the accuracy for classification and $1-\mathrm{MAE}$ for regression.  Fairness is measured by the prediction-level $L_{\infty}$-GDP of the trained model $f_{\psi}\circ h_{\phi}$ and by the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_c$ of Equation~(\ref{eq:worst-case-gdp}), with $c=1$ except in Appendix~\ref{app:real-tabular}, where $c=4$ and $c=8$ are also reported.  Both are based on the estimates
+\paragraph{Prediction and fairness measures.}  All measures are computed on the test data, indexed here by $i=1,\ldots,n$.  Prediction performance is the accuracy for classification and $1-\mathrm{MAE}$ for regression.  Fairness is measured by the prediction-level $L_{\infty}$-GDP of the trained model $f_{\psi}\circ h_{\phi}$ and by the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_c$ of Equation~(\ref{eq:worst-case-gdp}), with $c=1$ except in Appendix~\ref{app:real-tabular}.  Both use the estimates
 \begin{equation}
   \widehat{\Delta}(s):=\Bigl|\sum_{i=1}^{n}\widehat{w}_{\tilde{\gamma}}(i;s)\,f(\mathbf{Z}_i)-\frac{1}{n}\sum_{i=1}^{n}f(\mathbf{Z}_i)\Bigr|,
   \qquad
-  \widehat{\operatorname{GDP}}_{\infty}(f\circ h):=\max_{s\in\mathcal{Q}}\widehat{\Delta}(s)
+  \widehat{\operatorname{GDP}}_{\infty}(f\circ h):=\max_{s\in\mathcal{Q}}\widehat{\Delta}(s),
   \label{eq:gdp-estimate}
 \end{equation}
-of $\Delta(s)$ and $\operatorname{GDP}_{\infty}(f\circ h)$ in Section~\ref{sec:experiments}.  Here $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$ \citep{nadaraya1964estimating,watson1964smooth}, the bandwidth is $\tilde{\gamma}=(3n/4)^{-1/5}$, the normal-reference bandwidth of \citet{silverman2018density} for a variable of unit scale, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ on the interval between the $5\%$ and the $95\%$ quantiles of $S$ on the training data, the empirical counterpart of the interior region $\mathcal{S}_n$ of Section~\ref{sec:theory}.
+where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel of bandwidth $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ between the $5\%$ and the $95\%$ quantiles of $S$, the empirical counterpart of the interior region $\mathcal{S}_n$ of Section~\ref{sec:theory}.
 
 \paragraph{Worst-case downstream disparity.}  The supremum over $\mathcal{F}_c$ in Equation~(\ref{eq:worst-case-gdp}) is approximated on the training representation and evaluated on the test representation:
 \begin{equation}
@@ -1407,19 +1407,9 @@ of $\Delta(s)$ and $\operatorname{GDP}_{\infty}(f\circ h)$ in Section~\ref{sec:e
   \hat{f}_c:=\argmax_{f\in\mathcal{F}_c}\Bigl\{\widehat{\operatorname{GDP}}^{\mathrm{tr}}_{\infty}(f\circ h)-10^{-3}\,\widehat{\mathcal{R}}^{\mathrm{tr}}(f\circ h)\Bigr\},
   \label{eq:worst-case-estimate}
 \end{equation}
-where the superscript $\mathrm{tr}$ indicates that Equation~(\ref{eq:gdp-estimate}) and the empirical supervised risk $\widehat{\mathcal{R}}$ are formed from the training sample in place of the test sample, with $\mathcal{Q}$ unchanged.  The maximization is carried out by projected gradient ascent over $(\mathbf{w},b)$, with $\mathbf{w}$ projected onto the ball of radius $c$ after every step, using Adam \citep{kingma2014adam} with $2{,}000$ steps and a step size of $10^{-2}$ decayed to zero.  The ascent is initialized at eight heads, four along the largest kernel-smoothed conditional mean shifts of $\mathbf{Z}$ over $s\in\mathcal{Q}$ and four drawn at random.  Two further rounds of the same length refine the result at a tenth of the step size, and the head attaining the largest value of the objective is retained.
+where the superscript $\mathrm{tr}$ indicates that Equation~(\ref{eq:gdp-estimate}) and the empirical supervised risk $\widehat{\mathcal{R}}$ are formed from the training sample.  The maximization is carried out by projected gradient ascent over $(\mathbf{w},b)$ from eight initial heads, with $\mathbf{w}$ projected onto the ball of radius $c$ after every step.
 
-\paragraph{Additional fairness measures.}  Appendix~\ref{app:real-measures} evaluates the methods under five further measures.  The first two replace the supremum over $s$ in Equation~(\ref{eq:gdp-estimate}) by an average over $S$:
-\begin{equation}
-\begin{aligned}
-  \widehat{\operatorname{GDP}}_{\mathrm{kernel}}(f\circ h)
-  &:=\frac{\sum_{s\in\mathcal{Q}_0}\widehat{p}_S(s)\,\widehat{\Delta}(s)}{\sum_{s\in\mathcal{Q}_0}\widehat{p}_S(s)},\\
-  \widehat{\operatorname{GDP}}_{\mathrm{binned}}(f\circ h)
-  &:=\sum_{s\in\{S_1,\ldots,S_n\}}\frac{n_s}{n}\,\Bigl|\frac{1}{n_s}\sum_{i:\,S_i=s}f(\mathbf{Z}_i)-\frac{1}{n}\sum_{i=1}^{n}f(\mathbf{Z}_i)\Bigr|,
-\end{aligned}
-\label{eq:gdp-averages}
-\end{equation}
-where $\widehat{p}_S$ is the Gaussian kernel density estimate of $S$ with bandwidth $\tilde{\gamma}$, $\mathcal{Q}_0$ is the grid of spacing $10^{-3}$ on $(0,1)$, the range of $S$ after the rescaling of Appendix~\ref{app:real-datasets}, and $n_s$ is the number of test observations with $S_i=s$.  The kernel GDP is the estimator of \citet{jiang2022generalized} as implemented by \citet{kong2025fair}, and the binned GDP is its counterpart over the distinct observed values of $S$.  The third measure is the empirical supIPM of Equation~(\ref{eq:empirical-supipm}), computed on the test representation with the bandwidth $\gamma$ of the training penalty, with the supremum over $s$ taken on a grid of $401$ points of the interval above and the supremum over $(\theta,\mu)$ computed at each grid point by $400$ steps of the projected gradient ascent of Appendix~\ref{app:ascent}, from four random initial values and from the discriminators of the trained model.  The last two measure the dependence between the prediction $\hat{Y}:=f_{\psi}(h_{\phi}(\mathbf{X}))$ and $S$: the HGR maximal correlation \citep{mary2019fairness} and the mutual information,
+\paragraph{Additional fairness measures.}  Appendix~\ref{app:real-measures} evaluates the methods under five further measures.  The kernel GDP and the binned GDP are two estimates of the GDP of Equation~(\ref{eq:gdp}): the former averages $\widehat{\Delta}(s)$ against a kernel density estimate of $S$, as in \citet{kong2025fair}, and the latter averages, over the distinct observed values of $S$, the absolute difference between the mean prediction at that value and the overall mean.  The empirical supIPM of Equation~(\ref{eq:empirical-supipm}) is computed on the test representation with the bandwidth $\gamma$ of the training penalty.  The last two measure the dependence between the prediction $\hat{Y}:=f_{\psi}(h_{\phi}(\mathbf{X}))$ and $S$: the HGR maximal correlation \citep{mary2019fairness} and the mutual information,
 \begin{equation}
 \begin{aligned}
   \operatorname{HGR}(\hat{Y},S)
@@ -1429,9 +1419,9 @@ where $\widehat{p}_S$ is the Gaussian kernel density estimate of $S$ with bandwi
 \end{aligned}
 \label{eq:hgr-mi}
 \end{equation}
-where the supremum is over non-constant functions $g_1$ and $g_2$ with $\mathbb{E}[g_1(\hat{Y})^2]<\infty$ and $\mathbb{E}[g_2(S)^2]<\infty$, and $p_{\hat{Y}S}$, $p_{\hat{Y}}$ and $p_S$ are the joint and the marginal densities.  Both vanish if and only if $\hat{Y}$ and $S$ are independent.  Following \citet{mary2019fairness}, the HGR is estimated by the second singular value of the matrix with entries $\widehat{p}_{\hat{Y}S}(\hat{y},s)/\{\widehat{p}_{\hat{Y}}(\hat{y})\,\widehat{p}_S(s)\}^{1/2}$ over a grid of $(\hat{y},s)$, where $\widehat{p}_{\hat{Y}S}$ is a Gaussian kernel density estimate normalized over the grid and $\widehat{p}_{\hat{Y}}$ and $\widehat{p}_S$ are its marginals, and the mutual information is estimated with the $k$-nearest-neighbor estimator of \citet{kraskov2004estimating} and \citet{ross2014mutual} with $k=3$.
+where the supremum is over non-constant functions with finite second moments and $p_{\hat{Y}S}$, $p_{\hat{Y}}$ and $p_S$ are the joint and the marginal densities.  Both vanish if and only if $\hat{Y}$ and $S$ are independent.  The HGR is estimated as in \citet{mary2019fairness} from a kernel density estimate of the joint distribution of $(\hat{Y},S)$, and the mutual information with the nearest-neighbor estimator of \citet{kraskov2004estimating} and \citet{ross2014mutual}.
 
-Every curve in Section~\ref{sec:exp-real} and in this appendix retains, at each level of prediction performance, the smallest disparity over the evaluated penalty values and settings, shows the mean over five seeds with $\pm1$ standard deviation, and is joined to the model trained without a fairness penalty, which is common to all methods.
+Every curve in Section~\ref{sec:exp-real} and in this appendix retains, at each level of prediction performance, the smallest disparity over the evaluated penalty values and settings, and shows the mean over five seeds with $\pm1$ standard deviation.
 
 \subsection{Additional Results}
 \label{app:real-additional}
