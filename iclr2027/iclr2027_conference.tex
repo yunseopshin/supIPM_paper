@@ -1281,6 +1281,8 @@ where $\varepsilon_1,\varepsilon_2\sim N(0,1)$ and all random quantities are ind
 \end{aligned}
 \label{eq:synth-linear}
 \end{equation}
+
+
 The sensitive attribute enters the input through $X_{\mathrm{loc}}$ alone and the outcome not at all, so $Y$ is conditionally independent of $S$ given $\mathbf{X}_{\mathrm{task}}$ and a representation that discards the dependence near $s_0$ incurs no loss of prediction performance.  The disparity that remains under each criterion therefore reflects the dependence that the criterion fails to remove, not a trade-off against prediction performance.  Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.
 
 \subsection{Settings}
