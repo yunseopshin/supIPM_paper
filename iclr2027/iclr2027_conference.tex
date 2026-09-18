@@ -1227,26 +1227,26 @@ Then $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathb
   H(\mathbf{v}):=\sum_{m=1}^{M}\Delta(s^{\star};\theta_m,\mu_m),
   \label{eq:stacked-objectives}
 \end{equation}
-and $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $g$ and in $H$, respectively.  We write $\Pi_{A}$ for the projection onto a set $A$.  One compass-search step with step size $\delta$ evaluates $g$ at the candidate $s^{(t)}$ and at the two points $\Pi_{\mathcal{S}}(s^{(t)}\pm\delta)$, moves the candidate to the point with the largest value, and halves $\delta$; the $T$ candidates are moved in parallel.  Since the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, one ascent step on $H$ moves all $M$ discriminators, and after each step $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ returns each $\theta_m$ to the unit sphere and each $\mu_m$ to $[-1,1]$.  The encoder and the prediction head are then updated by gradient descent on $\mathcal{L}(\phi,\psi)$ with the empirical supIPM replaced by $\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)$, that is, with the outer supremum taken over the $T$ candidates and the inner supremum over the $M$ discriminators.
+and $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $g$ and in $H$, respectively.  We write $\Pi_{A}$ for the projection onto a set $A$.  One compass-search step with step size $\delta$ evaluates $g$ at the candidate $s^{(t)}$ and at the two points $\Pi_{\mathcal{S}}(s^{(t)}\pm\delta)$, moves the candidate to the point with the largest value, and halves $\delta$; the $T$ candidates are moved in parallel.  The search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$, that is, once the step is smaller than one eighth of the bandwidth.  Since the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, one ascent step on $H$ moves all $M$ discriminators, and after each step $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ returns each $\theta_m$ to the unit sphere and each $\mu_m$ to $[-1,1]$.  The encoder and the prediction head are then updated by gradient descent on $\mathcal{L}(\phi,\psi)$ with the empirical supIPM replaced by $\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)$, that is, with the outer supremum taken over the $T$ candidates and the inner supremum over the $M$ discriminators.
 
 \subsection{Algorithm}
 \label{app:algorithm-steps}
 
-Algorithm~\ref{alg:supipm-frl} assembles the three updates of Appendix~\ref{app:ascent} into $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by $J_s$ compass-search steps from newly initialized candidates with the step size reset to $\delta_0$, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The discriminator updates and the descent step use the step sizes $\alpha_v$ and $\alpha$.  Every update depends on the data only through sums over the observations, so Algorithm~\ref{alg:supipm-frl} applies unchanged when these sums are computed on the current minibatch.
+Algorithm~\ref{alg:supipm-frl} assembles the three updates of Appendix~\ref{app:ascent} into $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by a compass search from newly initialized candidates, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The compass search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$, and the discriminator updates and the descent step use the step sizes $\alpha_v$ and $\alpha$.  Every update depends on the data only through sums over the observations, so Algorithm~\ref{alg:supipm-frl} applies unchanged when these sums are computed on the current minibatch.
 
 \begin{algorithm}[H]
 \caption{supIPM-FRL}
 \label{alg:supipm-frl}
 \begin{algorithmic}[1]
-\REQUIRE sample $\mathcal{D}$, supervised loss $\ell$, kernel $K_{\gamma}$ with bandwidth $\gamma$, penalty parameter $\lambda$, number of candidates $T$, number of discriminators $M$, number of iterations $R$, numbers of inner updates $J_v$ and $J_s$, initial step size $\delta_0$ of the compass search, step sizes $\alpha_v$ and $\alpha$
+\REQUIRE sample $\mathcal{D}$, supervised loss $\ell$, kernel $K_{\gamma}$ with bandwidth $\gamma$, penalty parameter $\lambda$, number of candidates $T$, number of discriminators $M$, number of iterations $R$, number of inner updates $J_v$, initial step size $\delta_0$ of the compass search, step sizes $\alpha_v$ and $\alpha$
 \ENSURE encoder $h_{\phi}$ and prediction head $f_{\psi}$
 \STATE Initialize $\phi$, $\psi$, and $\mathbf{v}$ with $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]$
 \FOR{$r=1,\ldots,R$}
   \FOR{$j=1,\ldots,J_v$}
     \STATE Initialize $\mathbf{s}$ at $T$ distinct points of $\mathcal{S}$ and set $\delta\leftarrow\delta_0$ \label{alg:s-init}
-    \FOR{$J_s$ steps}
+    \WHILE{$\delta\ge\gamma/8$}
       \STATE $s^{(t)}\leftarrow\argmax_{s\in\{s^{(t)},\;\Pi_{\mathcal{S}}(s^{(t)}-\delta),\;\Pi_{\mathcal{S}}(s^{(t)}+\delta)\}}\,g(s)$ for $t\in[T]$, and $\delta\leftarrow\delta/2$
-    \ENDFOR
+    \ENDWHILE
     \STATE $s^{\star}\leftarrow\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ \label{alg:s-star}
     \STATE $\mathbf{v}\leftarrow\Pi_{\mathbb{S}^{d-1}\times[-1,1]}\!\left(\mathbf{v}+\alpha_v\,\nabla_{\mathbf{v}}H(\mathbf{v})\right)$
   \ENDFOR
@@ -1286,7 +1286,7 @@ The sensitive attribute enters the input through $X_{\mathrm{loc}}$ alone and th
 \subsection{Settings}
 \label{app:synth-settings}
 
-Table~\ref{tab:synth-settings} gives the training settings of supIPM-FRL in the notation of Algorithm~\ref{alg:supipm-frl}, with the columns defined in Appendix~\ref{app:real-settings}; in the simulation the candidate sensitive value is chosen on a grid of $33$ points of $\mathcal{S}$ instead of by the compass search of Algorithm~\ref{alg:supipm-frl}, so that $J_s=0$ and $T=1$.  The encoder, the prediction head and the optimizer are those of the real datasets in Appendix~\ref{app:real-settings}, except that the weight decay is zero so that $X_{\mathrm{loc}}$ is not removed by regularization alone.  For each of five seeds, training and test samples of size $5{,}000$ and a validation sample of size $1{,}000$ are drawn; supIPM-FRL is trained with $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$ and FREM with $\lambda\in\{0.05,0.1,0.2,0.5,1,2\}$ at each of two kernel widths.  The worst-case downstream disparity is computed as in Appendix~\ref{app:worst-case}, with the conditional expectations in $\operatorname{GDP}_{\infty}$ estimated with a kernel of width $0.03$, since the local term has width $0.043$, which is smaller than Silverman's bandwidth of $0.193$ at $n=5{,}000$.
+Table~\ref{tab:synth-settings} gives the training settings of supIPM-FRL in the notation of Algorithm~\ref{alg:supipm-frl}, with the columns defined in Appendix~\ref{app:real-settings}.  The encoder, the prediction head and the optimizer are those of the real datasets in Appendix~\ref{app:real-settings}, except that the weight decay is zero so that $X_{\mathrm{loc}}$ is not removed by regularization alone.  For each of five seeds, training and test samples of size $5{,}000$ and a validation sample of size $1{,}000$ are drawn; supIPM-FRL is trained with $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$ and FREM with $\lambda\in\{0.05,0.1,0.2,0.5,1,2\}$ at each of two kernel widths.  The worst-case downstream disparity is computed as in Appendix~\ref{app:worst-case}, with the conditional expectations in $\operatorname{GDP}_{\infty}$ estimated with a kernel of width $0.03$, since the local term has width $0.043$, which is smaller than Silverman's bandwidth of $0.193$ at $n=5{,}000$.
 % rather than at Silverman's bandwidth, which is too wide to resolve the localized dependence at $n=5{,}000$; Appendix~\ref{app:ablation-bandwidth} shows that this choice leaves every ranking unchanged.
 
 \begin{table}[!htb]
@@ -1294,13 +1294,13 @@ Table~\ref{tab:synth-settings} gives the training settings of supIPM-FRL in the 
 \footnotesize
 \caption{Training settings for the simulation.}
 \label{tab:synth-settings}
-\resizebox{\textwidth}{!}{\begin{tabular}{rrllrrrlc}
+\begin{tabular}{rrllrrrlr}
 \toprule
-batch & epochs & learning rate & weight decay & $\gamma$ (in standard deviations of $S$) & $M$ & $J_v$ & $\alpha_v$ & $J_s$ / $T$ \\
+batch & epochs & learning rate & weight decay & $\gamma$ & $M$ & $J_v$ & $\alpha_v$ & $T$ \\
 \midrule
-200 & 200 & $10^{-3}$ & 0 & 0.25 & 100 & 20 & $10^{-2}$ & 0 / 1 (grid) \\
+200 & 200 & $10^{-3}$ & 0 & 0.108 & 100 & 20 & $10^{-2}$ & 17 \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 In the left panel of Figure~\ref{fig:simulation}, each curve joins the penalty values of one method in increasing order.  The circled points are the configurations at which each method attains its smallest worst-case disparity among those that retain the test $1-\mathrm{MAE}$ of the model trained without a fairness penalty, $0.952$.  Since the dependence near $s_0$ carries no information about $Y$, its removal entails no loss of prediction performance, and the disparity at these points is the dependence that each penalty fails to remove.  The right panel shows $\Delta(s)$ of the head attaining the supremum in $\mathcal{F}_1$ at these two configurations, averaged over the five seeds; the fluctuations away from $s_0$ are not reproduced across seeds, whereas the peak at $s_0$ is.
@@ -1339,23 +1339,23 @@ The graph datasets Pokec-z and Pokec-n are the social-network graphs of \citet{k
 \subsection{Training Settings}
 \label{app:real-settings}
 
-On the tabular datasets, for every method the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer followed by the normalization of Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear; on the graph datasets the encoder is the GCN of Appendix~\ref{app:real-datasets}.  Table~\ref{tab:hyperparameters} gives the batch size, the number of epochs, the learning rate and the weight decay, which are common to all methods, together with the settings of supIPM-FRL in the notation of Algorithm~\ref{alg:supipm-frl}: the bandwidth $\gamma$ of the kernel $K_{\gamma}$ in standard deviations of $S$, the number $M$ of discriminators, the number $J_v$ of discriminator updates with step size $\alpha_v$, and the number $J_s$ of compass-search steps over $s$ from each of the $T$ candidate sensitive values.  The penalty parameter $\lambda$ of supIPM-FRL takes values between $0.003$ and $3$.  The running times and the memory in Appendix~\ref{app:real-cost} are measured on a single NVIDIA GeForce RTX 3090 GPU with 24 GB of memory under PyTorch 2.0.1 and CUDA 11.7.
+On the tabular datasets, for every method the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer followed by the normalization of Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear; on the graph datasets the encoder is the GCN of Appendix~\ref{app:real-datasets}.  Table~\ref{tab:hyperparameters} gives the batch size, the number of epochs, the learning rate and the weight decay, which are common to all methods, together with the settings of supIPM-FRL in the notation of Algorithm~\ref{alg:supipm-frl}: the bandwidth $\gamma$ of the kernel $K_{\gamma}$, the number $M$ of discriminators, the number $J_v$ of discriminator updates with step size $\alpha_v$, and the number $T$ of candidate sensitive values from which the compass search over $s$ starts.  The search stops once its step size falls below $\gamma/8$.  The penalty parameter $\lambda$ of supIPM-FRL takes values between $0.003$ and $3$.  The running times and the memory in Appendix~\ref{app:real-cost} are measured on a single NVIDIA GeForce RTX 3090 GPU with 24 GB of memory under PyTorch 2.0.1 and CUDA 11.7.
 
 \begin{table}[!htb]
 \centering
 \footnotesize
 \caption{Training settings.}
 \label{tab:hyperparameters}
-\resizebox{\textwidth}{!}{\begin{tabular}{lrrllrrllc}
+\begin{tabular}{lrrllrrllr}
 \toprule
-Dataset & batch & epochs & learning rate & weight decay & $\gamma$ (in standard deviations of $S$) & $M$ & $J_v$ & $\alpha_v$ & $J_s$ / $T$ \\
+Dataset & batch & epochs & learning rate & weight decay & $\gamma$ & $M$ & $J_v$ & $\alpha_v$ & $T$ \\
 \midrule
-Adult                & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 20 & $10^{-2}$ & 20 / 8 \\
-Crime                & 200  & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 20 & $10^{-2}$ & 20 / 8 \\
-ACSIncome            & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 20 & $10^{-2}$ & 20 / 8 \\
-Pokec-z / Pokec-n    & 1024 & 100 & $10^{-3}$ & 0         & 0.25 & 100 & 10 & $10^{-2}$ & 20 / 8 \\
+Adult                & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.108 & 100 & 20 & $10^{-2}$ & 17 \\
+Crime                & 200  & 200 & $10^{-3}$ & $10^{-2}$ & 0.108 & 100 & 20 & $10^{-2}$ & 17 \\
+ACSIncome            & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.108 & 100 & 20 & $10^{-2}$ & 17 \\
+Pokec-z / Pokec-n    & 1024 & 100 & $10^{-3}$ & 0         & 0.108 & 100 & 10 & $10^{-2}$ & 17 \\
 \bottomrule
-\end{tabular}}
+\end{tabular}
 \end{table}
 
 \subsection{Baselines}
@@ -1545,7 +1545,8 @@ This appendix examines three choices in the penalty of supIPM-FRL on the tabular
 \subsection{Bandwidth}
 \label{app:ablation-bandwidth}
 
-The penalty of supIPM-FRL weights the observations by the kernel $K_{\gamma}$ in Equation~(\ref{eq:supipm-estimators}), and the bandwidth $\gamma$ determines the range of sensitive values over which the conditional distribution at $s$ is smoothed.  This ablation trains supIPM-FRL at $\gamma\in\{0.10,0.25,0.50\}$ standard deviations of $S$, where $0.25$ is the value of Table~\ref{tab:hyperparameters}, and varies only the bandwidth of the training penalty; the bandwidth of the evaluation smoother is held fixed.
+The penalty of supIPM-FRL weights the observations by the kernel $K_{\gamma}$ in Equation~(\ref{eq:supipm-estimators}), and the bandwidth $\gamma$ determines the range of sensitive values over which the conditional distribution at $s$ is smoothed.  This ablation trains supIPM-FRL at three bandwidths, smaller than, equal to and larger than the value of Table~\ref{tab:hyperparameters}, and varies only the bandwidth of the training penalty; the bandwidth of the evaluation smoother is held fixed.
+% TODO: fix the bandwidth grid (the design note specified 0.10, 0.25 and 0.50 standard deviations of S; Table 2 now records gamma = 0.108)
 % TODO: insert bandwidth results and figure
 % (one figure with panels for Adult, Crime and ACSIncome; prediction performance against the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$; one curve per bandwidth)
 % Previous bandwidth ablation (J_v = 2, prediction-level axis), superseded by the design above:
