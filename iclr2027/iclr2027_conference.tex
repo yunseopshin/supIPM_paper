@@ -1400,14 +1400,12 @@ The baselines share the encoder, the prediction head and the optimization settin
 \end{equation}
 where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel of bandwidth $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ of $S$.
 
-\paragraph{Worst-case downstream disparity.}  The supremum over $\mathcal{F}_c$ in Equation~(\ref{eq:worst-case-gdp}) is approximated on the training representation and evaluated on the test representation:
+\paragraph{Worst-case downstream disparity.}  The supremum over $\mathcal{F}_c$ in Equation~(\ref{eq:worst-case-gdp}) is approximated by the head
 \begin{equation}
-  \widehat{\operatorname{GDP}}_{\infty}(h;\mathcal{F}_c):=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h),
-  \qquad
-  \hat{f}_c:=\argmax_{f\in\mathcal{F}_c}\Bigl\{\widehat{\operatorname{GDP}}^{\mathrm{tr}}_{\infty}(f\circ h)-10^{-3}\,\widehat{\mathcal{R}}^{\mathrm{tr}}(f\circ h)\Bigr\},
+  \hat{f}_c:=\argmax_{f\in\mathcal{F}_c}\Bigl\{\widehat{\operatorname{GDP}}_{\infty}(f\circ h)-10^{-3}\,\widehat{\mathcal{R}}(f\circ h)\Bigr\},
   \label{eq:worst-case-estimate}
 \end{equation}
-where the superscript $\mathrm{tr}$ indicates that Equation~(\ref{eq:gdp-estimate}) and the empirical supervised risk $\widehat{\mathcal{R}}$ are formed from the training sample.  The maximization is carried out by projected gradient ascent over $(\mathbf{w},b)$ from eight initial heads, with $\mathbf{w}$ projected onto the ball of radius $c$ after every step.
+where $\widehat{\mathcal{R}}$ is the empirical supervised risk and both terms are computed on the training representation; the reported value is $\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$ on the test representation.  The maximization is carried out by projected gradient ascent over $(\mathbf{w},b)$ from eight initial heads, with $\mathbf{w}$ projected onto the ball of radius $c$ after every step.
 
 \paragraph{Additional fairness measures.}  Appendix~\ref{app:real-measures} evaluates the methods under five further measures.  The kernel GDP and the binned GDP are two estimates of the GDP of Equation~(\ref{eq:gdp}): the former averages $\widehat{\Delta}(s)$ against a kernel density estimate of $S$, as in \citet{kong2025fair}, and the latter averages, over the distinct observed values of $S$, the absolute difference between the mean prediction at that value and the overall mean.  The empirical supIPM of Equation~(\ref{eq:empirical-supipm}) is computed on the test representation with the bandwidth $\gamma$ of the training penalty.  The last two measure the dependence between the prediction $\hat{Y}:=f_{\psi}(h_{\phi}(\mathbf{X}))$ and $S$: the HGR maximal correlation \citep{mary2019fairness} and the mutual information,
 \begin{equation}
