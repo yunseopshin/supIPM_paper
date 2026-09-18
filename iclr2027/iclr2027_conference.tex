@@ -1294,11 +1294,11 @@ Table~\ref{tab:synth-settings} gives the training settings of supIPM-FRL in the 
 \footnotesize
 \caption{Training settings for the simulation.}
 \label{tab:synth-settings}
-\begin{tabular}{rrllrrrlr}
+\begin{tabular}{rrllrrrlrr}
 \toprule
-batch & epochs & learning rate & weight decay & $\gamma$ & $M$ & $J_v$ & $\alpha_v$ & $T$ \\
+batch & epochs & learning rate & weight decay & $\gamma$ & $M$ & $J_v$ & $\alpha_v$ & $T$ & $\delta_0$ \\
 \midrule
-200 & 200 & $10^{-3}$ & 0 & 0.108 & 100 & 20 & $10^{-2}$ & 17 \\
+200 & 200 & $10^{-3}$ & 0 & 0.25 & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1339,21 +1339,22 @@ The graph datasets Pokec-z and Pokec-n are the social-network graphs of \citet{k
 \subsection{Training Settings}
 \label{app:real-settings}
 
-On the tabular datasets, for every method the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer followed by the normalization of Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear; on the graph datasets the encoder is the GCN of Appendix~\ref{app:real-datasets}.  Table~\ref{tab:hyperparameters} gives the batch size, the number of epochs, the learning rate and the weight decay, which are common to all methods, together with the settings of supIPM-FRL in the notation of Algorithm~\ref{alg:supipm-frl}: the bandwidth $\gamma$ of the kernel $K_{\gamma}$, the number $M$ of discriminators, the number $J_v$ of discriminator updates with step size $\alpha_v$, and the number $T$ of candidate sensitive values from which the compass search over $s$ starts.  The search stops once its step size falls below $\gamma/8$.  The penalty parameter $\lambda$ of supIPM-FRL takes values between $0.003$ and $3$.  The running times and the memory in Appendix~\ref{app:real-cost} are measured on a single NVIDIA GeForce RTX 3090 GPU with 24 GB of memory under PyTorch 2.0.1 and CUDA 11.7.
+On the tabular datasets, for every method the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer followed by the normalization of Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear; on the graph datasets the encoder is the GCN of Appendix~\ref{app:real-datasets}.  Table~\ref{tab:hyperparameters} gives the batch size, the number of epochs, the learning rate and the weight decay, which are common to all methods, together with the settings of supIPM-FRL in the notation of Algorithm~\ref{alg:supipm-frl}: the bandwidth $\gamma$ of the kernel $K_{\gamma}$, the number $M$ of discriminators, the number $J_v$ of discriminator updates with step size $\alpha_v$, and the number $T$ of candidate sensitive values and the initial step size $\delta_0$ of the compass search over $s$, which stops once its step size falls below $\gamma/8$.  The penalty parameter $\lambda$ of supIPM-FRL takes values between $0.003$ and $3$.  The running times and the memory in Appendix~\ref{app:real-cost} are measured on a single NVIDIA GeForce RTX 3090 GPU with 24 GB of memory under PyTorch 2.0.1 and CUDA 11.7.
 
 \begin{table}[!htb]
 \centering
 \footnotesize
 \caption{Training settings.}
 \label{tab:hyperparameters}
-\begin{tabular}{lrrllrrllr}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrllrrllrr}
 \toprule
-Dataset & batch & epochs & learning rate & weight decay & $\gamma$ & $M$ & $J_v$ & $\alpha_v$ & $T$ \\
+Dataset & batch & epochs & learning rate & weight decay & $\gamma$ & $M$ & $J_v$ & $\alpha_v$ & $T$ & $\delta_0$ \\
 \midrule
-Adult                & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.108 & 100 & 20 & $10^{-2}$ & 17 \\
-Crime                & 200  & 200 & $10^{-3}$ & $10^{-2}$ & 0.108 & 100 & 20 & $10^{-2}$ & 17 \\
-ACSIncome            & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.108 & 100 & 20 & $10^{-2}$ & 17 \\
-Pokec-z / Pokec-n    & 1024 & 100 & $10^{-3}$ & 0         & 0.108 & 100 & 10 & $10^{-2}$ & 17 \\
+Adult                & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
+Crime                & 200  & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
+ACSIncome            & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
+Pokec-z / Pokec-n    & 1024 & 100 & $10^{-3}$ & 0         & 0.25 & 100 & 10 & $10^{-2}$ & 17 & 0.108 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1545,8 +1546,7 @@ This appendix examines three choices in the penalty of supIPM-FRL on the tabular
 \subsection{Bandwidth}
 \label{app:ablation-bandwidth}
 
-The penalty of supIPM-FRL weights the observations by the kernel $K_{\gamma}$ in Equation~(\ref{eq:supipm-estimators}), and the bandwidth $\gamma$ determines the range of sensitive values over which the conditional distribution at $s$ is smoothed.  This ablation trains supIPM-FRL at three bandwidths, smaller than, equal to and larger than the value of Table~\ref{tab:hyperparameters}, and varies only the bandwidth of the training penalty; the bandwidth of the evaluation smoother is held fixed.
-% TODO: fix the bandwidth grid (the design note specified 0.10, 0.25 and 0.50 standard deviations of S; Table 2 now records gamma = 0.108)
+The penalty of supIPM-FRL weights the observations by the kernel $K_{\gamma}$ in Equation~(\ref{eq:supipm-estimators}), and the bandwidth $\gamma$ determines the range of sensitive values over which the conditional distribution at $s$ is smoothed.  This ablation trains supIPM-FRL at $\gamma\in\{0.10,0.25,0.50\}$, where $0.25$ is the value of Table~\ref{tab:hyperparameters}, and varies only the bandwidth of the training penalty; the bandwidth of the evaluation smoother is held fixed.
 % TODO: insert bandwidth results and figure
 % (one figure with panels for Adult, Crime and ACSIncome; prediction performance against the worst-case downstream $L_{\infty}$-GDP over $\mathcal{F}_1$; one curve per bandwidth)
 % Previous bandwidth ablation (J_v = 2, prediction-level axis), superseded by the design above:
