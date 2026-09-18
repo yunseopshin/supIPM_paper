@@ -473,7 +473,7 @@ Experimental details and further results are given in Appendices~\ref{app:synth-
   \operatorname{GDP}_{\infty}(h;\mathcal{F}_c):=\sup_{f\in\mathcal{F}_c}\operatorname{GDP}_{\infty}(f\circ h).
   \label{eq:worst-case-gdp}
 \end{equation}
-Every head in $\mathcal{F}_c$ has a bounded H\"older norm, so Corollary~\ref{cor:certificate} bounds Equation~(\ref{eq:worst-case-gdp}) restricted to the interior region $\mathcal{S}_n$ in terms of the empirical supIPM.  For a head $f$ we write $\Delta(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$, so that $\operatorname{GDP}_{\infty}(f\circ h)=\sup_{s}\Delta(s)$.  Every disparity reported below is a kernel estimate over $\mathcal{S}_n$, written with a hat as $\widehat{\Delta}(s)$ and $\widehat{\operatorname{GDP}}_{\infty}$ and defined in Appendix~\ref{app:worst-case}.
+Every head in $\mathcal{F}_c$ has a bounded H\"older norm, so Corollary~\ref{cor:certificate} bounds Equation~(\ref{eq:worst-case-gdp}) in terms of the empirical supIPM.  For a head $f$ we write $\Delta(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$, so that $\operatorname{GDP}_{\infty}(f\circ h)=\sup_{s}\Delta(s)$.  Every disparity reported below is a kernel estimate on the test data, written with a hat as $\widehat{\Delta}(s)$ and $\widehat{\operatorname{GDP}}_{\infty}$ and defined in Appendix~\ref{app:worst-case}.
 
 \paragraph{Computation of the worst-case disparity.}  The supremum in Equation~(\ref{eq:worst-case-gdp}) is approximated by a head of $\mathcal{F}_c$ found with the encoder held fixed.  With $\widehat{\operatorname{GDP}}_{\infty}$ and the empirical supervised risk $\widehat{\mathcal{R}}$ computed on the training data, for $\lambda_h>0$ we find
 \begin{equation}
@@ -1402,7 +1402,7 @@ The baselines share the encoder, the prediction head and the optimization settin
   \widehat{\operatorname{GDP}}_{\infty}(f\circ h):=\max_{s\in\mathcal{Q}}\widehat{\Delta}(s),
   \label{eq:gdp-estimate}
 \end{equation}
-where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel of bandwidth $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ between the $5\%$ and the $95\%$ quantiles of $S$ on the training data, the empirical counterpart of the interior region $\mathcal{S}_n$ of Section~\ref{sec:theory}.
+where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel of bandwidth $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ of $S$.
 
 \paragraph{Worst-case downstream disparity.}  The head $\hat{f}_c$ of Equation~(\ref{eq:worst-case-estimate}) is computed with $\widehat{\operatorname{GDP}}_{\infty}$ of Equation~(\ref{eq:gdp-estimate}) and the empirical supervised risk $\widehat{\mathcal{R}}$ formed from the training sample, by projected gradient descent over $(\mathbf{w},b)$ from eight initial heads, with $\mathbf{w}$ projected onto the ball of radius $c$ after every step.  The reported value $\widehat{\operatorname{GDP}}_{\infty}(h;\mathcal{F}_c)=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$ of Section~\ref{sec:experiments} is computed on the test sample.
 
