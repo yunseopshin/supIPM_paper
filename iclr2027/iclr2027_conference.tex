@@ -81,23 +81,56 @@ Experiments on tabular and graph benchmarks show that supIPM-FRL attains predict
 
 \section{Introduction}
 
-A learned representation supports many downstream tasks, including tasks unspecified at training time \citep{bengio2013representation}.  This transferability makes the fairness requirement more difficult to satisfy because constraining one prediction head does not prevent another from exploiting sensitive information retained in the representation \citep{madras2018learning,shui2022fair}.  Fair representation learning (FRL) addresses this problem by seeking a representation that is informative for prediction and independent of the sensitive attribute $S$ \citep{zemel2013learning,moyer2018invariant,creager2019flexibly,song2019learning,balunovic2021fair,jovanovic2023fare}.
+Representations learned without specifying a task at the training phase
+could be fruitfully used to construct prediction models in multiple downstream tasks \citep{bengio2013representation}.  
+To ensure downstream prediction models to be fair, 
+%This transferability makes the fairness requirement more difficult to satisfy because constraining one prediction head does not prevent another from exploiting sensitive information retained in the representation \citep{madras2018learning,shui2022fair}.  
+Fair representation learning (FRL) seeks a representation that is independent to a given sensitive attribute
+but yet informative for downstream prediction tasks 
+\citep{zemel2013learning,moyer2018invariant,creager2019flexibly,song2019learning,balunovic2021fair,jovanovic2023fare}.
 %, so that every measurable function of the representation is again independent of $S$
 
-
-Most existing FRL methods have been developed for a categorical $S$, where each value of $S$ defines a group.  In this case, demographic parity (DP) requires the prediction to have the same distribution in every group, and these methods enforce DP by aligning the distribution of the representation across groups.  One line of work trains an adversary to predict the group from the representation \citep{edwards2015censoring,beutel2017data,zhang2018mitigating,madras2018learning}.  Another compares the distribution of the representation across groups through the maximum mean discrepancy (MMD) of a fixed kernel \citep{louizos2015variational}, an integral probability metric (IPM) over a prespecified parametric discriminator class \citep{kim2022learning}, or the power of an MMD two-sample test with a learned kernel \citep{deka2023mmd}.  This groupwise construction does not extend directly to a continuous $S$ such as age or income.  Distinct observations take distinct sensitive values with probability one, so at most one observation is available at any sensitive value $s$, which does not suffice to estimate the conditional distribution of the representation at $S=s$.  Discretizing $S$ makes the groupwise construction applicable, but the resulting criterion depends on how the bins are chosen \citep{kong2025fair}. Moreover, discretization can assign nearly identical values to different groups and ignores their ordering \citep{mary2019fairness}.
+Most existing FRL methods have mainly focused on demographic parity (DP) for categorical sensitive attributes,
+where these methods try to align the distribution of the representation across each sensitive group.
+Adversarial learning is popularly employed in FRL \citep{edwards2015censoring,beutel2017data,zhang2018mitigating,madras2018learning}. Alternatively, 
+various integral probability metrics (IPMs) have been used for measuring the degree of fairness of a given representation
+\citep{louizos2015variational,kim2022learning,deka2023mmd}. These methods, however,
+are not easily extended for continuous sensitive attributes such as age or income
+because the empirical distribution of a representation at each value of a continuous sensitive attribute
+is not easily estimated. We could discretize a continuous sensitive attribute, but 
+the results are sensitive to the choice of bins \citep{kong2025fair}, and 
+data around the boundaries of each bin
+would not be fully utilized \citep{mary2019fairness}.
 % The discretization also introduces threshold effects and discards the ordering of the sensitive values \citep{mary2019fairness}.
 
-These difficulties have motivated methods that treat $S$ as continuous without discretization.  Most of them, however, constrain the fitted predictor rather than the representation \citep{mary2019fairness,grari2019fairness,grari2021learning,jiang2022generalized,sohn2024fair}, for instance through the maximal correlation between the prediction and $S$ or through generalized demographic parity (GDP).  In particular, GDP is the average over $S$ of the absolute difference between the conditional and marginal mean predictions.  \citet{kong2025fair} apply the same average at the representation level: the expectation of integral probability metrics (EIPM) is the average over $S$ of the IPM between the conditional distribution of the representation given $S=s$ and its marginal distribution.  However, both criteria average the discrepancy over the distribution of $S$, so a large discrepancy confined to a low-probability range of sensitive values contributes little to the average.  The average thus departs from categorical DP, which imposes one fairness level on every group regardless of its probability. 
+Algorithms to learn fair prediction models for continuous sensitive attributes without discretizing 
+have been proposed by \citet{mary2019fairness,grari2019fairness,grari2021learning,jiang2022generalized,sohn2024fair}, and
+its extension to FRL has been proposed by \citet{kong2025fair}. The core idea of such methods
+is to control the average fairness level of a given model or representation with respect to 
+a continuous sensitive attribute $S.$ A critical limitation, however, in controlling the average fairness level
+is that under-represented sensitive groups could be highly discriminated.
 % Criteria that report a worst value over the sensitive domain have appeared for the fitted predictor, through a probable segmentation of $S$ \citep{kim202} and through the maximal local disparity of a classifier \citep{jin2024maximal}.
 
-A new criterion for a continuous $S$ should therefore hold at every sensitive value.  For a representation, the criterion should also hold for every prediction head that may later be fitted on it.  In this paper we propose criteria that take the supremum over $S$ instead of the average.  This replacement transforms GDP into $L_{\infty}$-generalized demographic parity ($L_{\infty}$-GDP) and EIPM into the supremum integral probability metric (supIPM).  Our estimator of supIPM estimates the conditional distribution at an arbitrary $s$ from kernel weights, without discretization, and searches the sensitive domain for the largest discrepancy.  The discrepancy is measured by the ReLU-IPM of \citet{park2026relu}, whose discriminators are single rectified linear units (ReLU). A bound on the ReLU-IPM then controls the disparity of every prediction head of bounded H\"older norm.  We add this supIPM estimate as a penalty to the supervised risk and train the encoder and the prediction head with minibatches.
+The aim of this paper is to develop an FRL algorithm for continuous sensitive attribute which
+can control the worst-case fairness violation and thus avoid discrimination against under-represented sensitive groups.
+For this purpose, we propose a measure for the worst-case fairness violation of a given representation and
+develop an algorithm to learn a representation while maintaining  
+the worst-case fairness violation. Our proposed measure is the supremum the IPM$_s$ with respect to $s,$
+which we call {\bf supIPM}, where IPM$_s$ is ReLU-IPM of \citet{park2026relu} between the distribution of a representation at $S=s$ and the marginal distribution. We use ReLU-IPM since 
+computation of supIPM can be done without much hamper and
+the worst-case fairness violation is well controlled by conttrolling supIPM. Moreover,
+an uniformly consistent estimator of supIPM can be obtained by combining ReLU-IPM and kernel density estimator,  and
+thus the worst-case fairness violation is also asymptotically controlled.
 
 \paragraph{Contributions.}
 \begin{itemize}
-  \item We propose $L_{\infty}-$GDP, a fairness criterion for prediction models, and supIPM, its representation-level counterpart.  Both extend the groupwise condition of categorical DP to a continuous sensitive attribute by measuring the worst-case disparity over the sensitive domain.
-  \item We estimate supIPM using kernel weights and ReLU-IPM, and propose supIPM-FRL, which can control worst-case disparity across sensitive values and downstream heads.
-  \item We prove that the empirical supIPM is a uniformly consistent estimator, so that the fairness level attained on the sample transfers to the population.
+  \item We propose supIPM as a measure of the worst-case fairness violation of a given representation
+  for continuous sensitive attributes.
+  \item We construct an estimator of supIPM by applying kernel density estimate techniques
+  to ReLU-IPM, and prove that this estimator is consistent. 
+  \item We develop an algorithm to learn fair representation while maintaining the worst-case fairness violation, called
+  supIPM-FRL, and prove that the worst-case fairness levels of a wide class of prediction models constructed on the fair representaion learned by supIPM-FRL are asymptotically controlled.
+  \item {\bf Empirical studies blablabla...}
   % uniformly over the sensitive domain and over prediction heads of bounded H\"older norm.
 \end{itemize}
 
@@ -1405,9 +1438,9 @@ where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref
   \hat{f}_c:=\argmax_{f\in\mathcal{F}_c}\Bigl\{\widehat{\operatorname{GDP}}_{\infty}(f\circ h)-10^{-3}\,\widehat{\mathcal{R}}(f\circ h)\Bigr\},
   \label{eq:worst-case-estimate}
 \end{equation}
-where $\widehat{\mathcal{R}}$ is the empirical supervised risk and both terms are computed on the training representation; the reported value is $\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$ on the test representation.  The maximization is carried out by projected gradient ascent over $(\mathbf{w},b)$ from eight initial heads, with $\mathbf{w}$ projected onto the ball of radius $c$ after every step.
+where $\widehat{\mathcal{R}}$ is the empirical supervised risk and both terms are computed on the training representation. The reported value is $\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$ on the test representation.  The maximization is carried out by projected gradient ascent over $(\mathbf{w},b)$ from eight initial heads, with $\mathbf{w}$ projected onto the ball of radius $c$ after every step.
 
-\paragraph{Additional fairness measures.}  Appendix~\ref{app:real-measures} evaluates the methods under five further measures.  The kernel GDP and the binned GDP are two estimates of the GDP of Equation~(\ref{eq:gdp}): the former averages $\widehat{\Delta}(s)$ against a kernel density estimate of $S$, as in \citet{kong2025fair}, and the latter averages, over the distinct observed values of $S$, the absolute difference between the mean prediction at that value and the overall mean.  The empirical supIPM of Equation~(\ref{eq:empirical-supipm}) is computed on the test representation with the bandwidth $\gamma$ of the training penalty.  The last two measure the dependence between the prediction $\hat{Y}:=f_{\psi}(h_{\phi}(\mathbf{X}))$ and $S$: the HGR maximal correlation \citep{mary2019fairness} and the mutual information,
+\paragraph{Additional fairness measures.}  Appendix~\ref{app:real-measures} evaluates the methods under five further measures.  The kernel GDP and the binned GDP are two estimates of the GDP of Equation~(\ref{eq:gdp}). The former averages $\widehat{\Delta}(s)$ against a kernel density estimate of $S$, as in \citet{kong2025fair}, and the latter averages, over the distinct observed values of $S$, the absolute difference between the mean prediction at that value and the overall mean.  The empirical supIPM of Equation~(\ref{eq:empirical-supipm}) is computed on the test representation with the bandwidth $\gamma$ of the training penalty.  The last two measure the dependence between the prediction $\hat{Y}:=f_{\psi}(h_{\phi}(\mathbf{X}))$ and $S$: the HGR maximal correlation \citep{mary2019fairness} and the mutual information,
 \begin{equation}
 \begin{aligned}
   \operatorname{HGR}(\hat{Y},S)
@@ -1424,7 +1457,10 @@ Every curve in Section~\ref{sec:exp-real} and in this appendix retains, at each 
 \subsection{Additional Results}
 \label{app:real-additional}
 
-This subsection collects the results omitted from Section~\ref{sec:exp-real}: the prediction-level curves on Crime and ACSIncome, the worst-case curves at larger norm bounds, the comparison under alternative fairness measures, the results on the graph datasets, and a comparison at a matched level of prediction performance.
+This subsection presents additional results omitted from Section~\ref{sec:exp-real}. 
+We report prediction-level curves on Crime and ACSIncome and worst-case curves at larger norm bounds.
+We also provide comparisons under alternative fairness measures, results on graph datasets, and comparisons at matched levels of prediction performance.
+
 
 \subsubsection{Tabular Results}
 \label{app:real-tabular}
@@ -1435,12 +1471,12 @@ Figure~\ref{fig:app-prediction-level} gives the prediction-level curves on Crime
   \centering
   \includegraphics[width=0.8\textwidth]{appendix/fig2_own_head_crime.pdf}\\[1pt]
   \includegraphics[width=0.8\textwidth]{appendix/fig2_own_head_acs.pdf}
-  \caption{Crime (top) and ACSIncome (bottom): prediction performance against the prediction-level $L_{\infty}$-GDP.}
+  \caption{Prediction performance against the prediction-level $L_{\infty}$-GDP on Crime (top) and ACSIncome (bottom).}
   \label{fig:app-prediction-level}
 \end{figure}
 \FloatBarrier
 
-\paragraph{Other norm bounds.}  Figures~\ref{fig:app-c4} and~\ref{fig:app-c8} repeat the worst-case comparison of Section~\ref{sec:exp-real} with $c=4$ and $c=8$.  The ordering is unchanged: supIPM-FRL attains the lowest worst-case disparity at a matched level of prediction performance on all three tabular datasets, with Reg-HGR closest to it on Crime at $c=8$, so its advantage does not depend on the norm bound of the downstream head.
+\paragraph{Other norm bounds.}  Figures~\ref{fig:app-c4} and~\ref{fig:app-c8} repeat the worst-case comparison of Section~\ref{sec:exp-real} with $c=4$ and $c=8$.  The ordering is unchanged: supIPM-FRL attains the lowest worst-case disparity at a matched level of prediction performance on all three tabular datasets, with Reg-HGR closest to it on Crime at $c=8$, so its advantage persists across the evaluated norm bounds.
 
 \begin{figure}[!htb]
   \centering
@@ -1464,7 +1500,9 @@ Figure~\ref{fig:app-prediction-level} gives the prediction-level curves on Crime
 \subsubsection{Alternative Fairness Measures}
 \label{app:real-measures}
 
-Figures~\ref{fig:app-gdp}--\ref{fig:app-mi-y} replace the disparity axis by the five measures of Appendix~\ref{app:worst-case}.  Under the kernel and the binned estimates of GDP, both averages over $S$, supIPM-FRL and FREM coincide on Adult and Crime and are close on ACSIncome: since the average never exceeds the supremum, a bound on the supremum also bounds the average.  Under the empirical supIPM on the test split, supIPM-FRL is markedly lower than every other method on Adult and Crime, consistent with Theorem~\ref{thm:uniform}, whereas FREM is lower on ACSIncome.  Under the HGR maximal correlation and the mutual information $I(\hat{Y};S)$, Reg-HGR is lowest and supIPM-FRL is comparable to FREM, except under the HGR on Crime, where FREM is lower.
+Figures~\ref{fig:app-gdp}--\ref{fig:app-mi-y} replace the disparity axis by the five measures of Appendix~\ref{app:worst-case}.  Under the kernel and the binned estimates of GDP, both averages over $S$, curves of supIPM-FRL and FREM nearly overlap on Adult and Crime and are close on ACSIncome.
+% since the average never exceeds the supremum, a bound on the supremum also bounds the average.  
+Under the empirical supIPM on the test split, supIPM-FRL is markedly lower than every other method on Adult and Crime, consistent with Theorem~\ref{thm:uniform}.  Under the HGR maximal correlation and the mutual information $I(\hat{Y};S)$, Reg-HGR is lowest and supIPM-FRL is comparable to FREM, except under the HGR on Crime, where FREM is lower.
 
 \begin{figure}[!htb]
   \centering
@@ -1560,7 +1598,7 @@ worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- 
 \subsection{Computational Cost}
 \label{app:real-cost}
 
-Table~\ref{tab:cost} compares the computational cost of supIPM-FRL, with the compass search over $s$ of Section~\ref{sec:supipm-objective}, and of FREM on Adult.  FREM is the closest average-case counterpart of supIPM-FRL: both penalize a kernel-weighted discrepancy between the conditional and the marginal distribution of the representation, and they differ in the aggregation over $S$, the average in Equation~(\ref{eq:eipm-estimator}) against the supremum in Equation~(\ref{eq:empirical-supipm}), and in the discriminator class.  Both methods use the same encoder, prediction head, batch size, hardware and timing procedure, with the settings of Appendix~\ref{app:real-settings}.  The table gives the mean and standard deviation of the training time per epoch, the time relative to FREM, and the peak GPU memory.  supIPM-FRL takes about $1.46$ times as long per epoch as FREM.  Each descent step of Algorithm~\ref{alg:supipm-frl} is preceded by $J_v$ discriminator updates and the compass search over $s$, which FREM does not perform.  Its peak memory is markedly smaller.  The estimator of Equation~(\ref{eq:eipm-estimator}) evaluates an MMD at every observation of the minibatch, whereas the estimator of Equation~(\ref{eq:empirical-supipm}) evaluates one weighted sum over the minibatch at a single sensitive value.
+Table~\ref{tab:cost} compares the computational cost of supIPM-FRL, with the compass search over $s$ of Section~\ref{sec:supipm-objective}, and of FREM on Adult.  FREM is the closest average-case counterpart of supIPM-FRL: both penalize a kernel-weighted discrepancy between the conditional and the marginal distribution of the representation, and they differ in the aggregation over $S$, the average in Equation~(\ref{eq:eipm-estimator}) versus the supremum in Equation~(\ref{eq:empirical-supipm}), and in the discriminator class.  Both methods use the same encoder, prediction head, batch size, hardware and timing procedure, with the settings of Appendix~\ref{app:real-settings}.  The table gives the mean and standard deviation of the training time per epoch, the time relative to FREM, and the peak GPU memory.  supIPM-FRL takes about $1.46$ times as long per epoch as FREM.  Each descent step of Algorithm~\ref{alg:supipm-frl} is preceded by $J_v$ discriminator updates and the compass search over $s$, which FREM does not perform.  The peak GPU memory usage of supIPM-FRL is markedly smaller.  The estimator of Equation~(\ref{eq:eipm-estimator}) evaluates an MMD at every observation of the minibatch, whereas the estimator of Equation~(\ref{eq:empirical-supipm}) evaluates one weighted sum over the minibatch at a single sensitive value.
 
 \begin{table}[!htb]
 \centering
