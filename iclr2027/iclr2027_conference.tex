@@ -547,9 +547,10 @@ Table~\ref{tab:datasets} in Appendix~\ref{app:real-experiments} gives further de
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.92\textwidth]{main/fig2g_own_head_all.pdf}
+  \vspace{-10pt}
   \caption{Prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$.}
   \label{fig:adult}
-  \vspace{-12pt}
+  \vspace{-4pt}
 \end{figure}
 
 \paragraph{Results.}  
@@ -559,9 +560,10 @@ Figure~\ref{fig:adult} shows the prediction-level disparity and Figure~\ref{fig:
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.92\textwidth]{main/fig3g_worst_head_all.pdf}
+  \vspace{-10pt}
   \caption{Prediction performance against the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$.}
   \label{fig:worst-case}
-  \vspace{-12pt}
+  \vspace{-4pt}
 \end{figure}
 
 The two measures differ because the prediction-level disparity concerns the trained head only, whereas the worst-case disparity concerns every head in $\mathcal{F}_1$.  A penalty on the prediction (Reg-GDP, Reg-HGR) or on a single adversary (ADV, LAFTR) constrains only the dependence on $S$ that this head or adversary detects, a penalty averaged over $S$ (FREM) can leave dependence at sensitive values of small probability, and a penalty on the two groups of a discretized $S$ (MMD, sIPM-LFR) can leave dependence within each group; a downstream head can exploit what remains.
