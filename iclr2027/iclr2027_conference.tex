@@ -472,7 +472,7 @@ Experimental details and further results are given in Appendices~\ref{app:synth-
 
 \paragraph{Measures.}  Prediction performance is the test accuracy for classification and the test $1-\mathrm{MAE}$ for regression, as in \citet{kong2025fair}.  Fairness is measured through the disparity of a prediction head $f$ at each sensitive value, $\Delta_{f}(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$.
 % whose supremum over $s$ is $\operatorname{GDP}_{\infty}(f\circ h)$ of Equation~(\ref{eq:linfty-gdp}).  
-The prediction-level disparity is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ for the head trained jointly with the encoder.  Since a representation may later serve other heads \citep{coston2021characterizing,jovanovic2023fare,luo2026fair}, we also measure the largest disparity that a downstream head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the logistic heads with weight norm at most $c$, and define the worst-case downstream disparity
+The prediction-level disparity is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ for the head trained jointly with the encoder.  Since a representation may later serve other heads \citep{coston2021characterizing,jovanovic2023fare,luo2026fair}, we also measure the largest disparity that a downstream head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the logistic heads with weight norm at most $c$, and define the worst-case disparity
 \begin{equation}
   \operatorname{GDP}_{\infty}(h;\mathcal{F}_c):=\sup_{f\in\mathcal{F}_c}\operatorname{GDP}_{\infty}(f\circ h).
   \label{eq:worst-case-gdp}
@@ -501,8 +501,11 @@ over $\lVert\mathbf{w}\rVert_2\le c$  and $\lambda_h=10^{3}$, so that the dispar
 % $S$ is uniform on an interval; the outcome $Y$ and one input variable depend on $S$ through a term concentrated near a value $s_0$, so that this dependence is confined to a set of small $\mathbb{P}_S$-probability, and $Y$ and a second input variable also depend on $S$ linearly; the generating equations are given in Appendix~\ref{app:synth-experiments}. 
 % With $S$ uniformly distributed on an interval, the outcome $Y$ and one input variable depend on $S$ through a term localized near $s_0$ in a region of small $\mathbb{P}_S$-probability.
 % The outcome $Y$ and a second input variable also depend linearly on $S$, with the full data-generating process specified in Appendix~\ref{app:synth-experiments}.
-We generate $S$ uniformly on an interval.  A single input variable depends on $S$ through a term concentrated near a value $s_0$, and the outcome $Y$ does not depend on $S$, so this dependence can be removed without loss of prediction performance.  The full setup is given in Appendix~\ref{app:synth-experiments}.
-We compare supIPM-FRL with FREM over a grid of penalty parameters, using the worst-case downstream disparity over $\mathcal{F}_1$ as the fairness measure.  Each curve joins the configurations in increasing order of the penalty parameter.
+We generate $S$ uniformly on an interval.  A single input variable depends on $S$ through a term concentrated near a value $s_0$, and the outcome $Y$ does not depend on $S$.
+% so this dependence can be removed without loss of prediction performance.  
+The full setup is given in Appendix~\ref{app:synth-experiments}.
+We compare supIPM-FRL with FREM over a grid of penalty parameters, using the worst-case downstream disparity over $\mathcal{F}_1$ as the fairness measure. 
+% Each curve joins the configurations in increasing order of the penalty parameter.
 
 \begin{figure}[!h]
   \centering
@@ -513,7 +516,7 @@ We compare supIPM-FRL with FREM over a grid of penalty parameters, using the wor
 
 \paragraph{Results.}  In the left panel of Figure~\ref{fig:simulation}, supIPM-FRL achieves lower disparity than FREM at matched prediction performance.
 % Because $Y$ does not depend on $S$, the dependence near $s_0$ can be removed without giving up prediction performance, and the left panel shows that supIPM-FRL does remove it: its curve runs horizontally before it turns downward. The right panel shows what each penalty leaves behind. 
-The circled points are the configurations with the smallest disparity that retain the prediction performance of the model trained without a penalty.  At these points FREM still exhibits a peak in $\widehat{\Delta}_{\hat{f}_1}(s)$ at $s_0$, whereas the $\widehat{\Delta}_{\hat{f}_1}(s)$ of supIPM-FRL at $s_0$ is markedly smaller and not distinguishable from its values elsewhere. 
+The circled points are the configurations with the smallest disparity that retain the prediction performance of the model trained without a penalty.  At these points FREM still exhibits a peak in $\widehat{\Delta}_{\hat{f}_1}(s)$ at $s_0$, whereas the $\widehat{\Delta}_{\hat{f}_1}(s)$ of supIPM-FRL at $s_0$ is markedly smaller. 
 This is the situation of Figure~\ref{fig:motivation}.  The neighborhood of $s_0$ contributes to the average in Equation~(\ref{eq:eipm}) only in proportion to its small probability. 
 Consequently, FREM may retain dependence localized near $s_0$.
 In contrast,  the supremum in Equation~(\ref{eq:supipm}) is attained near $s_0$, so supIPM-FRL controls this dependence directly. 
