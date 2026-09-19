@@ -445,7 +445,6 @@ Moreover, since $\epsilon_n \to 0$, $\mathcal{S}_n$ expands toward the boundary 
 
 
 Theorem~\ref{thm:uniform} and the H\"older bound in Equation~(\ref{eq:relu-holder}) yield the following corollary.  For $B>0$ let $\mathcal{H}^{\beta}_d(B)$ be the H\"older ball of Equation~(\ref{eq:holder-ball}) with radius $B$, and let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and exponent in Equation~(\ref{eq:relu-holder}), so that $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $\alpha_{d,\beta}=1$ for $\beta>(d+3)/2$.
-\newpage
 \begin{corollary}
 \label{cor:certificate}
 Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold, let $d\ge3$, and let $C$ and $c$ be the constants of Theorem~\ref{thm:uniform}.  For every $\delta\in(0,1)$ and  $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$, simultaneously for all  $h\in\mathcal{E}_n$,  $B>0$ and  $\beta>0$ with $\beta\ne(d+3)/2$,
@@ -496,7 +495,7 @@ We compare supIPM-FRL with FREM over a grid of penalty parameters, using the wor
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=0.7\textwidth]{main/fig1_simulation.pdf}
+  \includegraphics[width=0.8\textwidth]{main/fig1_simulation.pdf}
   \caption{Left: prediction performance against $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$; the upper left is favorable.  Right: $\widehat{\Delta}(s)$ of the heads $\hat{f}_1$ at the two circled points.}
   \label{fig:simulation}
 \end{figure}
