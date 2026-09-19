@@ -570,7 +570,7 @@ At the prediction level, supIPM-FRL is comparable to the other methods.  Under t
   \vspace{-4pt}
 \end{figure}
 
-The two measures differ because the prediction-level disparity concerns the trained head only, whereas the worst-case disparity concerns every head in $\mathcal{F}_1$.  A penalty on the prediction (Reg-GDP, Reg-HGR) or on a single adversary (ADV, LAFTR) constrains only the dependence on $S$ that this head or adversary detects, a penalty averaged over $S$ (FREM) can leave dependence at sensitive values of small probability, and a penalty on the two groups of a discretized $S$ (MMD, sIPM-LFR) can leave dependence within each group; a downstream head can exploit what remains.
+The two measures differ because the prediction-level disparity concerns the trained head only, whereas the worst-case disparity concerns every head in $\mathcal{F}_1$.  The other methods constrain the dependence on $S$ only on average over $S$, only within groups of a discretized $S$, or only through a single head or adversary, so a downstream head can use the dependence they leave.
 
 \Needspace{11\baselineskip}
 \begin{wrapfigure}{r}{0.42\textwidth}
