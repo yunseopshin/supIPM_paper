@@ -507,7 +507,9 @@ Let $S\sim\mathrm{Uniform}(0,1)$ and $\mathbf{X}=(\mathbf{X}_{\mathrm{task}},X_{
   \qquad
   Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+0.3\,\varepsilon_2\right),
 \end{equation*}
-with $s_0=0.5$, $\tau=0.043$, standard normal $\varepsilon_1,\varepsilon_2$, a fixed $\mathbf{u}$ and the logistic function $\sigma$.  Thus $\mathbf{X}$ depends on $S$ only through $X_{\mathrm{loc}}$, which is shifted only for $S$ near $s_0$, and $Y$ does not depend on $S$.  A representation that retains $X_{\mathrm{loc}}$ therefore differs across sensitive values near $s_0$, so a head using it has $\Delta_f(s)>0$ there and nowhere else.
+with $s_0=0.5$, $\tau=0.043$, standard normal $\varepsilon_1,\varepsilon_2$, a fixed $\mathbf{u}$ and the logistic function $\sigma$.  
+% Thus $\mathbf{X}$ depends on $S$ only through $X_{\mathrm{loc}}$, which is shifted only for $S$ near $s_0$, and $Y$ does not depend on $S$. 
+A representation that retains $X_{\mathrm{loc}}$ therefore differs across sensitive values near $s_0$, so a head using it has $\Delta_f(s)>0$ there and nowhere else.
 The remaining settings are given in Appendix~\ref{app:synth-experiments}.
 We compare supIPM-FRL with FREM over a grid of penalty parameters, using the worst-case downstream disparity over $\mathcal{F}_1$ as the fairness measure. 
 % Each curve joins the configurations in increasing order of the penalty parameter.
