@@ -470,13 +470,16 @@ The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through
 This section evaluates supIPM-FRL on simulated data and three tabular datasets.
 Experimental details and further results are given in Appendices~\ref{app:synth-experiments} and~\ref{app:real-experiments}, and the ablation studies in Appendix~\ref{app:ablation-studies}.
 
-\paragraph{Measures.}  Prediction performance is the test accuracy for classification and the test $1-\mathrm{MAE}$ for regression, as in \citet{kong2025fair}.  Fairness is measured through the disparity of a prediction head $f$ at each sensitive value, $\Delta_{f}(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$, whose supremum over $s$ is $\operatorname{GDP}_{\infty}(f\circ h)$ of Equation~(\ref{eq:linfty-gdp}).  The prediction-level disparity is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ for the head trained jointly with the encoder.  Since a representation may later serve other heads \citep{coston2021characterizing,jovanovic2023fare,luo2026fair}, we also measure the largest disparity that a downstream head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the logistic heads with weight norm at most $c$, and define the worst-case downstream disparity
+\paragraph{Measures.}  Prediction performance is the test accuracy for classification and the test $1-\mathrm{MAE}$ for regression, as in \citet{kong2025fair}.  Fairness is measured through the disparity of a prediction head $f$ at each sensitive value, $\Delta_{f}(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$.
+% whose supremum over $s$ is $\operatorname{GDP}_{\infty}(f\circ h)$ of Equation~(\ref{eq:linfty-gdp}).  
+The prediction-level disparity is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ for the head trained jointly with the encoder.  Since a representation may later serve other heads \citep{coston2021characterizing,jovanovic2023fare,luo2026fair}, we also measure the largest disparity that a downstream head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the logistic heads with weight norm at most $c$, and define the worst-case downstream disparity
 \begin{equation}
   \operatorname{GDP}_{\infty}(h;\mathcal{F}_c):=\sup_{f\in\mathcal{F}_c}\operatorname{GDP}_{\infty}(f\circ h).
   \label{eq:worst-case-gdp}
 \end{equation}
 % Every head in $\mathcal{F}_c$ has a bounded H\"older norm, so Corollary~\ref{cor:certificate} bounds Equation~(\ref{eq:worst-case-gdp}) in terms of the empirical supIPM.  
-All disparities are reported as kernel estimates on the test data; $\widehat{\Delta}_{f}(s)$ and $\widehat{\operatorname{GDP}}_{\infty}$ denote these estimates and are defined in Appendix~\ref{app:worst-case}.
+% All disparities are reported as kernel estimates on the test data; 
+$\widehat{\Delta}_{f}(s)$ and $\widehat{\operatorname{GDP}}_{\infty}$ denote these estimates and are defined in Appendix~\ref{app:worst-case}.
 
 \paragraph{Estimating the worst-case disparity.}  With the encoder held fixed, and with $\widehat{\operatorname{GDP}}_{\infty}$ and the empirical supervised risk $\widehat{\mathcal{R}}$ computed on the training data, we find
 \begin{equation}
@@ -1416,7 +1419,9 @@ The baselines share the encoder, the prediction head and the optimization settin
   \widehat{\operatorname{GDP}}_{\infty}(f\circ h):=\max_{s\in\mathcal{Q}}\widehat{\Delta}_{f}(s),
   \label{eq:gdp-estimate}
 \end{equation}
-where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel of bandwidth $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ of $S$.
+where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel of bandwidth selected when training procedure, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ of $S$.
+% $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}
+
 
 \paragraph{Worst-case downstream disparity.}  The head $\hat{f}_c$ of Equation~(\ref{eq:worst-case-estimate}) is computed with $\widehat{\operatorname{GDP}}_{\infty}$ of Equation~(\ref{eq:gdp-estimate}) and the empirical supervised risk $\widehat{\mathcal{R}}$ formed from the training sample, by projected gradient descent over $(\mathbf{w},b)$ from eight initial heads, with $\mathbf{w}$ projected onto the ball of radius $c$ after every step.  The reported value $\widehat{\operatorname{GDP}}_{\infty}(h;\mathcal{F}_c)=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$ of Section~\ref{sec:experiments} is computed on the test sample.
 
