@@ -273,7 +273,8 @@ This joint density induces the following conditional expectation of a bounded me
   \label{eq:pointwise-conditional}
 \end{equation}
 % As in Section~\ref{sec:frem}, the discriminator class $\mathcal{V}$ of this IPM specifies the prediction heads that the criterion controls.  
-With  $\mathbb{P}_{\mathbf{Z}\mid S=s}$ induced by the conditional density used in Equation~(\ref{eq:pointwise-conditional}), we define, for a discriminator class $\mathcal{V}$ on $\mathcal{Z}$,
+% With  $\mathbb{P}_{\mathbf{Z}\mid S=s}$ induced by the conditional density used in Equation~(\ref{eq:pointwise-conditional}), 
+Then, we define for a discriminator class $\mathcal{V}$ on $\mathcal{Z}$,
 \begin{align}
   \operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)
   &:=\sup_{s\in\mathcal{S}}
@@ -286,7 +287,9 @@ With  $\mathbb{P}_{\mathbf{Z}\mid S=s}$ induced by the conditional density used 
   \right|.
   \label{eq:supipm}
 \end{align}
-By definition, the constraint $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\rho$ for a fairness level $\rho\ge0$ bounds the discrepancy $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ by $\rho$ at every $s\in\mathcal{S}$, and hence $\left|\mathbb{E}[v(\mathbf{Z})\mid S=s]-\mathbb{E}[v(\mathbf{Z})]\right|$ by the same $\rho$ for every discriminator $v\in\mathcal{V}$.  Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so a representation with a small supIPM has a small EIPM as well.
+By definition, the constraint $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\rho$ for a fairness level $\rho\ge0$ bounds the discrepancy $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ by $\rho$ at every $s\in\mathcal{S}$.
+% and hence $\left|\mathbb{E}[v(\mathbf{Z})\mid S=s]-\mathbb{E}[v(\mathbf{Z})]\right|$ by the same $\rho$ for every discriminator $v\in\mathcal{V}$.  
+Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so a representation with a small supIPM has a small EIPM as well.
 % The converse fails without further regularity in $s$.
 
 A prediction head $f$ is also a function of the representation, and if $f\in\mathcal{V}$, the difference between the conditional and the marginal means of its prediction $f(\mathbf{Z})$ is at most $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ at every $s\in\mathcal{S}$, even in a region of small $\mathbb{P}_S$-probability.  For a bounded measurable $g$, \citet{jiang2022generalized} define generalized demographic parity (GDP) for a continuous sensitive attribute as
