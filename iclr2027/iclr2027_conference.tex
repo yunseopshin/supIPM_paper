@@ -1271,6 +1271,7 @@ The map $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$, and $\
 which is Equation~(\ref{eq:certificate}).  The event $\Omega_n$ depends on neither $h$, nor $B$, nor $\beta$, so the bound holds simultaneously for all of them.
 \end{proof}
 
+\raggedbottom
 \section{Details of Training supIPM-FRL}
 \label{app:algorithm}
 
@@ -1456,6 +1457,7 @@ where $\varepsilon_1,\varepsilon_2\sim N(0,1)$. And $S$, $\mathbf{X}_{\mathrm{ta
 
 The sensitive attribute affects the input only through $X_{\mathrm{loc}}$ alone and does not enter the outcome generating equation, so $Y$ is conditionally independent of $S$ given $\mathbf{X}_{\mathrm{task}}$ and a representation that discards the dependence near $s_0$ incurs no loss of prediction performance.  The disparity that remains under each measure therefore reflects the dependence that the measure fails to remove, not a trade-off against prediction performance.  Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.
 
+\flushbottom
 \subsection{Settings}
 \label{app:synth-settings}
 
