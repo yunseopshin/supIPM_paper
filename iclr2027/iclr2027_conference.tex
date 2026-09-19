@@ -440,7 +440,8 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist c
 If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta:=\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
 \end{theorem}
 
-Theorem~\ref{thm:uniform} shows that the fairness level attained on the sample over $\mathcal{S}_n$ transfers to the population over $\mathcal{S}_n$.  If $\widehat{D}_n(h)\le\rho$ for an encoder $h\in\mathcal{E}_n$, then $D_n(h)\le\rho+Cr_{n,\delta}$ with probability at least $1-\delta$.  The bound is uniform over $\mathcal{E}_n$, so it applies to the encoder that supIPM-FRL selects from the same sample.  Because $D_n(h)$ is a supremum over $\mathcal{S}_n$, the transfer holds at every sensitive value in $\mathcal{S}_n$ rather than on average.  
+Theorem~\ref{thm:uniform} shows that the fairness level attained on the sample over $\mathcal{S}_n$ transfers to the population over $\mathcal{S}_n$.  If $\widehat{D}_n(h)\le\rho$ for an encoder $h\in\mathcal{E}_n$, then $D_n(h)\le\rho+Cr_{n,\delta}$ with probability at least $1-\delta$.  The bound is uniform over $\mathcal{E}_n$, so it applies to the encoder that supIPM-FRL selects from the same sample.  
+% Because $D_n(h)$ is a supremum over $\mathcal{S}_n$, the transfer holds at every sensitive value in $\mathcal{S}_n$ rather than on average.  
 % One may expect the supremum over the sensitive domain and the representation dimension $d$ to slow the convergence.  The supremum enters $r_{n,\delta}$ only through the logarithmic factor in $\Gamma_{n,\delta}$, and $d$ enters $\Gamma_{n,\delta}$ linearly because $\mathcal{V}_{\mathrm{R}}$ is indexed by $d+1$ parameters, so the order of $r_{n,\delta}$ in $n$ is unchanged.  For an encoder class of bounded size, the bandwidth $\gamma_n\asymp(\log n/n)^{1/5}$ gives the rate $(\log n/n)^{2/5}$ of Theorem~\ref{thm:uniform}.
 For bounded $A_n$ and $\mathfrak{v}_n$, the bandwidth $\gamma_n\asymp(\log n/n)^{1/5}$ gives the rate $(\log n/n)^{2/5}$.  
 % This is the minimax rate for uniformly estimating a twice differentiable regression function on an interval \citep{stone1982optimal}, so the supremum over $s$ and the dimension $d$ do not slow the convergence in $n$.
@@ -555,7 +556,10 @@ Table~\ref{tab:datasets} in Appendix~\ref{app:real-experiments} gives further de
 
 \paragraph{Results.}  
 % Each point is the mean over five seeds with bars of $\pm1$ standard deviation, each curve traces the configurations of one method with the smallest disparity at each level of prediction performance, and the upper left is favorable. 
-Figure~\ref{fig:adult} shows the prediction-level disparity and Figure~\ref{fig:worst-case} the worst-case downstream disparity over $\mathcal{F}_1$ on the three datasets; the results with $S$ discretized at its mean and the worst-case curves over $\mathcal{F}_4$ and $\mathcal{F}_8$ are given in Appendix~\ref{app:real-tabular}.  At the prediction level, supIPM-FRL is comparable to the other methods.  Under the worst-case downstream disparity, supIPM-FRL attains a markedly smaller disparity than every other method at the same prediction performance on all three datasets, except at the lowest prediction performance on Crime, where the methods that use $S$ directly coincide with it.
+Figure~\ref{fig:adult} shows the prediction-level disparity and Figure~\ref{fig:worst-case} the worst-case downstream disparity over $\mathcal{F}_1$ on the three datasets.
+% the results with $S$ discretized at its mean and the worst-case curves over $\mathcal{F}_4$ and $\mathcal{F}_8$ are given in Appendix~\ref{app:real-tabular}.  
+At the prediction level, supIPM-FRL is comparable to the other methods.  Under the worst-case downstream disparity, supIPM-FRL attains a markedly smaller disparity than every other method at the same prediction performance on all three datasets, except at the lowest prediction performance on Crime.
+% , where the methods that use $S$ directly coincide with it.
 
 \begin{figure}[!htb]
   \centering
