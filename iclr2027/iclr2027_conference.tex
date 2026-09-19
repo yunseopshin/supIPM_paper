@@ -1751,13 +1751,14 @@ supIPM-FRL & $2.290\pm0.110$ & $1.46\times$ & 0.019 \\
 \section{Ablation Studies}
 \label{app:ablation-studies}
 
-This appendix examines three choices in the penalty of supIPM-FRL on the tabular datasets: the bandwidth of the smoothing kernel, the shape of the smoothing kernel, and the IPM class of the discriminators.  Each ablation varies one choice and holds the data splits, the encoder, the evaluation smoother of Appendix~\ref{app:worst-case} and every other setting of Appendix~\ref{app:real-settings} fixed.  Each ablation is reported as in Section~\ref{sec:exp-real}, with prediction performance on the vertical axis and the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$ on the horizontal axis, in one figure with panels for Adult, Crime and ACSIncome.
+This appendix examines three choices in the penalty of supIPM-FRL on the tabular datasets: the bandwidth of the smoothing kernel, its shape, and the class of the discriminators.  Each ablation varies one choice and holds every other setting of Appendix~\ref{app:real-settings} fixed.  Each figure reports prediction performance against the prediction-level disparity in the top row and against the worst-case downstream disparity over $\mathcal{F}_1$ in the bottom row, with one column per dataset.
 
 \subsection{Bandwidth}
 \label{app:ablation-bandwidth}
 
-The penalty of supIPM-FRL weights the observations by the kernel $K_{\gamma}$ in Equation~(\ref{eq:supipm-estimators}), and the bandwidth $\gamma$ determines the range of sensitive values over which the conditional distribution at $s$ is smoothed.  This ablation trains supIPM-FRL at $\gamma\in\{0.10,0.25,0.50\}$, where $0.25$ is the value of Table~\ref{tab:hyperparameters}, and varies only the bandwidth of the training penalty; the bandwidth of the evaluation smoother is held fixed.
-Figure~\ref{fig:app-ablation-bandwidth} reports the three bandwidths.  Their prediction-level curves nearly coincide, and they separate on the worst-case disparity.  At a matched level of prediction performance $\gamma=0.25$ attains a lower worst-case disparity than $\gamma=0.50$ on the three datasets and than $\gamma=0.10$ on Crime and ACSIncome, while on Adult the narrower bandwidth is the lower of the two.
+The bandwidth $\gamma$ of the kernel $K_{\gamma}$ in Equation~(\ref{eq:supipm-estimators}) sets the range of sensitive values over which the conditional distribution at $s$ is smoothed.  We train supIPM-FRL at $\gamma\in\{0.10,0.25,0.50\}$, where $0.25$ is the value of Table~\ref{tab:hyperparameters}, and leave the evaluation smoother unchanged.
+
+In Figure~\ref{fig:app-ablation-bandwidth} the prediction-level curves nearly coincide.  At a matched level of prediction performance $\gamma=0.25$ attains a lower worst-case disparity than $\gamma=0.50$ on the three datasets and than $\gamma=0.10$ on Crime and ACSIncome, while on Adult the narrower bandwidth is the lower of the two.
 
 \begin{figure}[!htb]
   \centering
@@ -1766,19 +1767,24 @@ Figure~\ref{fig:app-ablation-bandwidth} reports the three bandwidths.  Their pre
   \label{fig:app-ablation-bandwidth}
 \end{figure}
 \FloatBarrier
-% Previous bandwidth ablation (J_v = 2, prediction-level axis), superseded by the design above:
-% \begin{figure}[!htb]
-%   \centering
-%   \includegraphics[width=\textwidth]{appendix/figA9_penalty_bandwidth.pdf}
-%   \caption{Prediction performance against the prediction-level $\operatorname{GDP}_{\infty}$ for supIPM-FRL trained at $\gamma\in\{0.10,0.25,0.50\}$ standard deviations of $S$ on Adult (left), Crime (middle) and ACSIncome (right).}
-%   \label{fig:app-bandwidth}
-% \end{figure}
 
 \subsection{Smoothing Kernel}
 \label{app:ablation-kernel}
 
-The kernel $K_{\gamma}$ smooths the conditional distribution of $\mathbf{Z}$ given $S=s$ over the neighboring sensitive values, and its shape determines how these neighbors are weighted.  This ablation compares the Gaussian kernel used throughout with the Epanechnikov kernel, $K(u)\propto(1-u^2)_+$, the triangular kernel, $K(u)\propto(1-|u|)_+$, and the box kernel, $K(u)\propto\mathbf{1}\{|u|\le1\}$, where $u$ is the distance between two sensitive values in units of the bandwidth; the last three assign zero weight beyond a fixed distance from $s$.  The four kernels are scaled to the same second moment, so that the comparison isolates the shape of the kernel from its spread.
-Figure~\ref{fig:app-ablation-kernel} reports the four kernels.  At a matched level of prediction performance no kernel is uniformly best: the Gaussian attains the lowest worst-case disparity on Crime, the box kernel on ACSIncome and the compactly supported kernels on Adult, and each lies within a factor of $1.4$ of the Gaussian.  The kernels differ instead in the range of penalty values they admit.  With a compactly supported kernel the representation collapses to a constant predictor at a smaller $\lambda$, so those curves stop at a disparity the Gaussian still reaches with a model that predicts.
+The shape of $K_{\gamma}$ determines how the sensitive values neighboring $s$ are weighted.  Writing $u$ for the distance between two sensitive values in units of the bandwidth, we compare four shapes.
+\begin{itemize}[leftmargin=*, itemsep=0pt, topsep=2pt]
+  \item Gaussian, used throughout:
+    \begin{equation*} K(u)\propto\exp(-u^{2}/2). \end{equation*}
+  \item Epanechnikov:
+    \begin{equation*} K(u)\propto(1-u^{2})_{+}. \end{equation*}
+  \item Triangular:
+    \begin{equation*} K(u)\propto(1-|u|)_{+}. \end{equation*}
+  \item Box:
+    \begin{equation*} K(u)\propto\mathbf{1}\{|u|\le1\}. \end{equation*}
+\end{itemize}
+The last three vanish beyond a fixed distance from $s$, and the four are scaled to the same second moment, so that the comparison isolates the shape from the spread.
+
+In Figure~\ref{fig:app-ablation-kernel} no kernel is uniformly best at a matched level of prediction performance: the lowest worst-case disparity is attained by the Gaussian on Crime, by the box kernel on ACSIncome and by the compactly supported kernels on Adult, each within a factor of $1.4$ of the Gaussian.  The kernels differ instead in the penalty values they admit.  With a compactly supported kernel the representation collapses to a constant predictor at a smaller $\lambda$, so those curves stop at a disparity the Gaussian still reaches with a model that predicts.
 
 \begin{figure}[!htb]
   \centering
@@ -1791,8 +1797,9 @@ Figure~\ref{fig:app-ablation-kernel} reports the four kernels.  At a matched lev
 \subsection{IPM Class}
 \label{app:ablation-ipm-class}
 
-The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in Equation~(\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  This ablation replaces the ReLU class $\mathcal{V}_{\mathrm{R}}$ of Equation~(\ref{eq:relu-class}) by two other classes within the same supremum over $s$: the sigmoid discriminators $\sigma(\theta^\top\mathbf{z}+\mu)$ of sIPM-LFR \citep{kim2022learning}, and the unit ball of the Gaussian RKHS of FREM \citep{kong2025fair} with the kernel width of Appendix~\ref{app:real-baselines}, for which the IPM is the MMD.  We denote the three variants by sup-ReLU-IPM, which is supIPM-FRL as proposed, sup-sigmoid-IPM and sup-MMD.  Replacing supIPM-FRL by sIPM-LFR or by FREM would not isolate the IPM class, since these methods also change the aggregation over $S$: sIPM-LFR discretizes $S$ and FREM averages over $S$.  The encoder, the bandwidth, the compass search over $s$, the data splits and the numbers of updates are those of Appendix~\ref{app:real-settings}, and the grid of penalty values is chosen separately for each class, since the three IPMs are not on a common scale.
-Figure~\ref{fig:app-ablation-ipm-class} reports the three classes.  Their prediction-level curves are close, and sup-sigmoid-IPM stays close to sup-ReLU-IPM on the worst-case disparity as well.  sup-MMD does not: at a matched level of prediction performance its worst-case disparity is several times larger on the three datasets, and on Adult it is the largest of the three although its prediction-level disparity is the smallest.  The class of the discriminators therefore governs the worst-case disparity and leaves the prediction-level one nearly unchanged.
+The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in Equation~(\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  We replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of Equation~(\ref{eq:relu-class}), within the same supremum over $s$, by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ of sIPM-LFR \citep{kim2022learning} and by the unit ball of the Gaussian RKHS of FREM \citep{kong2025fair}, for which the IPM is the MMD, and call the three variants sup-ReLU-IPM, sup-sigmoid-IPM and sup-MMD.  The grid of penalty values is chosen separately for each class, since the three IPMs are not on a common scale.
+
+In Figure~\ref{fig:app-ablation-ipm-class} the three prediction-level curves are close.  At a matched level of prediction performance the worst-case disparity of sup-sigmoid-IPM is within a factor of $1.3$ of sup-ReLU-IPM, while that of sup-MMD is several times larger on the three datasets; on Adult it is the largest of the three although its prediction-level disparity is the smallest.  The class of the discriminators therefore governs the worst-case disparity and leaves the prediction-level one nearly unchanged.
 
 \begin{figure}[!htb]
   \centering
