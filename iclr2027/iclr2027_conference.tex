@@ -1366,14 +1366,25 @@ The second identity in Equation~(\ref{eq:mb-unbiased-value}) then follows from E
 \end{proof}
 
 By Proposition~\ref{prop:mini-batch}, the mini-batch gradient is unbiased for the gradient of $\mathcal{J}$ at the chosen sensitive value, discriminator and sign, provided that these are fixed before the mini-batch is drawn, and Algorithm~\ref{alg:supipm-frl-mb} follows this order.  Choosing them on the same mini-batch, or normalizing the kernel weights within the mini-batch, gives a biased estimate in general.
-
-The penalty of FREM in Equation~(\ref{eq:eipm-estimator}) takes, at each conditioning value, the square root of a quadratic form in the kernel \citep{kong2025fair}, so its value computed on a mini-batch is, in general, a biased estimate of the batch penalty.  Unbiased estimators exist for the squared MMD \citep{gretton2012kernel}, which is a different penalty, whereas the formulation above preserves the empirical supIPM penalty.
+Evaluating MMD penalty on mini-batches generally introduces bias.
+In contrast, ReLU-IPM admits unbiased mini-batch gradients.
+It also avoids pairwise kernel evaluations on representations.
+These computational advantages motivate our use of ReLU-IPM.
 
 
 \subsection{Algorithm}
 \label{app:algorithm-steps}
 
 Algorithm~\ref{alg:supipm-frl} repeats the three updates of Appendix~\ref{app:ascent} into $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by a compass search from newly initialized candidates, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The compass search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$, and the discriminator updates and the descent step use the step sizes $\alpha_v$ and $\alpha$.
+
+Algorithm~\ref{alg:supipm-frl-mb} is the mini-batch version of Algorithm~\ref{alg:supipm-frl} and follows the order of sampling required by Proposition~\ref{prop:mini-batch}.  The compass search, the candidate $s^{\star}$ and the signs $\chi_m:=\operatorname{sign}\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m)$, with $\operatorname{sign}(0):=1$, are computed on one mini-batch with $\Delta$ replaced by $|\Delta_{\mathcal{B}}|$, and each gradient step uses a new mini-batch drawn uniformly and independently of the preceding ones.  The ascent step uses
+\begin{equation}
+  H_{\mathcal{B}}(\mathbf{v})
+  :=\sum_{m=1}^{M}\chi_m\,\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m),
+  \label{eq:mb-stacked-ascent}
+\end{equation}
+whose gradient is, by the argument of Proposition~\ref{prop:mini-batch}, unbiased for that of the same sum with $\mathcal{B}$ replaced by $[n]$.  This batch sum equals $H(\mathbf{v})$ in Equation~(\ref{eq:stacked-objectives}) when each $\chi_m$ agrees with the sign of $\Delta_{[n]}(s^{\star};\theta_m,\mu_m)$, and its gradient equals $\nabla_{\mathbf{v}}H(\mathbf{v})$ when, in addition, each $\Delta_{[n]}(s^{\star};\theta_m,\mu_m)$ is nonzero.  The descent step uses $\mathcal{J}_{\mathcal{B}}$ of Equation~(\ref{eq:mb-objective}) at $(s^{\star},\theta_{m^{\star}},\mu_{m^{\star}},\chi_{m^{\star}})$, where $m^{\star}$ indexes the discriminator with the largest $|\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m)|$ on the preceding mini-batch.
+
 
 \begin{algorithm}[H]
 \caption{supIPM-FRL}
@@ -1400,13 +1411,6 @@ Algorithm~\ref{alg:supipm-frl} repeats the three updates of Appendix~\ref{app:as
 \end{algorithmic}
 \end{algorithm}
 
-Algorithm~\ref{alg:supipm-frl-mb} is the mini-batch version of Algorithm~\ref{alg:supipm-frl} and follows the order of sampling required by Proposition~\ref{prop:mini-batch}.  The compass search, the candidate $s^{\star}$ and the signs $\chi_m:=\operatorname{sign}\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m)$, with $\operatorname{sign}(0):=1$, are computed on one mini-batch with $\Delta$ replaced by $|\Delta_{\mathcal{B}}|$, and each gradient step uses a new mini-batch drawn uniformly and independently of the preceding ones.  The ascent step uses
-\begin{equation}
-  H_{\mathcal{B}}(\mathbf{v})
-  :=\sum_{m=1}^{M}\chi_m\,\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m),
-  \label{eq:mb-stacked-ascent}
-\end{equation}
-whose gradient is, by the argument of Proposition~\ref{prop:mini-batch}, unbiased for that of the same sum with $\mathcal{B}$ replaced by $[n]$.  This batch sum equals $H(\mathbf{v})$ in Equation~(\ref{eq:stacked-objectives}) when each $\chi_m$ agrees with the sign of $\Delta_{[n]}(s^{\star};\theta_m,\mu_m)$, and its gradient equals $\nabla_{\mathbf{v}}H(\mathbf{v})$ when, in addition, each $\Delta_{[n]}(s^{\star};\theta_m,\mu_m)$ is nonzero.  The descent step uses $\mathcal{J}_{\mathcal{B}}$ of Equation~(\ref{eq:mb-objective}) at $(s^{\star},\theta_{m^{\star}},\mu_{m^{\star}},\chi_{m^{\star}})$, where $m^{\star}$ indexes the discriminator with the largest $|\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m)|$ on the preceding mini-batch.
 
 \begin{algorithm}[H]
 \caption{supIPM-FRL with mini-batches}
