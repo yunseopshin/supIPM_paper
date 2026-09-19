@@ -466,15 +466,17 @@ The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through
 \section{Experiments}
 \label{sec:experiments}
 
-This section evaluates supIPM-FRL on simulated data, where the location $s_0$ of the dependence on $S$ is known, and on three tabular datasets, where we compare it with existing baselines. 
+% This section evaluates supIPM-FRL on simulated data, where the location $s_0$ of the dependence on $S$ is known, and on three tabular datasets, where we compare it with existing baselines. 
+This section evaluates supIPM-FRL on simulated data and three tabular datasets.
 Experimental details and further results are given in Appendices~\ref{app:synth-experiments} and~\ref{app:real-experiments}, and the ablation studies in Appendix~\ref{app:ablation-studies}.
 
-\paragraph{Measures.}  Prediction performance is the test accuracy for classification and the test $1-\mathrm{MAE}$ for regression, as in \citet{kong2025fair}.  The prediction-level disparity is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ of Equation~(\ref{eq:linfty-gdp}) for the head trained jointly with the encoder.  Since a representation may later serve other heads \citep{coston2021characterizing,jovanovic2023fare,langlade2025fairness,luo2026fair}, we also measure the largest disparity that a downstream head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the logistic heads with weight norm at most $c$, and define the worst-case downstream disparity
+\paragraph{Measures.}  Prediction performance is the test accuracy for classification and the test $1-\mathrm{MAE}$ for regression, as in \citet{kong2025fair}.  The prediction-level disparity is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ of Equation~(\ref{eq:linfty-gdp}) for the head trained jointly with the encoder.  Since a representation may later serve other heads \citep{coston2021characterizing,jovanovic2023fare,luo2026fair}, we also measure the largest disparity that a downstream head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the logistic heads with weight norm at most $c$, and define the worst-case downstream disparity
 \begin{equation}
   \operatorname{GDP}_{\infty}(h;\mathcal{F}_c):=\sup_{f\in\mathcal{F}_c}\operatorname{GDP}_{\infty}(f\circ h).
   \label{eq:worst-case-gdp}
 \end{equation}
-Every head in $\mathcal{F}_c$ has a bounded H\"older norm, so Corollary~\ref{cor:certificate} bounds Equation~(\ref{eq:worst-case-gdp}) in terms of the empirical supIPM.  For a head $f$ we write $\Delta(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$, so that $\operatorname{GDP}_{\infty}(f\circ h)=\sup_{s}\Delta(s)$.  All disparities are reported as kernel estimates on the test data; $\widehat{\Delta}(s)$ and $\widehat{\operatorname{GDP}}_{\infty}$ denote these estimates and are defined in Appendix~\ref{app:worst-case}.
+% Every head in $\mathcal{F}_c$ has a bounded H\"older norm, so Corollary~\ref{cor:certificate} bounds Equation~(\ref{eq:worst-case-gdp}) in terms of the empirical supIPM.  
+For a head $f$ we write $\Delta_{f}(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$, so that $\operatorname{GDP}_{\infty}(f\circ h)=\sup_{s}\Delta_{f}(s)$.  All disparities are reported as kernel estimates on the test data; $\widehat{\Delta}_{f}(s)$ and $\widehat{\operatorname{GDP}}_{\infty}$ denote these estimates and are defined in Appendix~\ref{app:worst-case}.
 
 \paragraph{Estimating the worst-case disparity.}  With the encoder held fixed, and with $\widehat{\operatorname{GDP}}_{\infty}$ and the empirical supervised risk $\widehat{\mathcal{R}}$ computed on the training data, we find
 \begin{equation}
@@ -498,13 +500,13 @@ We compare supIPM-FRL with FREM over a grid of penalty parameters, using the wor
 \begin{figure}[!h]
   \centering
   \includegraphics[width=0.8\textwidth]{main/fig1_simulation.pdf}
-  \caption{Left: prediction performance against $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$; the upper left is favorable.  Right: $\widehat{\Delta}(s)$ of the heads $\hat{f}_1$ at the two circled points.}
+  \caption{Left: prediction performance against $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$; the upper left is favorable.  Right: $\widehat{\Delta}_{\hat{f}_1}(s)$  at the two circled points.}
   \label{fig:simulation}
 \end{figure}
 
 \paragraph{Results.}  In the left panel of Figure~\ref{fig:simulation}, supIPM-FRL achieves lower disparity than FREM at matched prediction performance.
 % Because $Y$ does not depend on $S$, the dependence near $s_0$ can be removed without giving up prediction performance, and the left panel shows that supIPM-FRL does remove it: its curve runs horizontally before it turns downward. The right panel shows what each penalty leaves behind. 
-The circled points are the configurations with the smallest disparity that retain the prediction performance of the model trained without a penalty.  At these points FREM still exhibits a peak in $\widehat{\Delta}(s)$ at $s_0$, whereas the $\widehat{\Delta}(s)$ of supIPM-FRL at $s_0$ is markedly smaller and not distinguishable from its values elsewhere. 
+The circled points are the configurations with the smallest disparity that retain the prediction performance of the model trained without a penalty.  At these points FREM still exhibits a peak in $\widehat{\Delta}_{\hat{f}_1}(s)$ at $s_0$, whereas the $\widehat{\Delta}_{\hat{f}_1}(s)$ of supIPM-FRL at $s_0$ is markedly smaller and not distinguishable from its values elsewhere. 
 This is the situation of Figure~\ref{fig:motivation}.  The neighborhood of $s_0$ contributes to the average in Equation~(\ref{eq:eipm}) only in proportion to its small probability. 
 Consequently, FREM may retain dependence localized near $s_0$.
 In contrast,  the supremum in Equation~(\ref{eq:supipm}) is attained near $s_0$, so supIPM-FRL controls this dependence directly. 
@@ -544,7 +546,7 @@ The two measures differ because the prediction-level disparity concerns the trai
   \vspace{-13pt}
   \centering
   \includegraphics[width=0.34\textwidth]{main/fig5_profile_adult.pdf}
-  \caption{Adult: $\widehat{\Delta}(s)$ of the worst-case heads $\hat{f}_1$ of supIPM-FRL and FREM at matched test accuracy.}
+  \caption{Adult: $\widehat{\Delta}_{\hat{f}_1}(s)$  of supIPM-FRL and FREM at matched test accuracy.}
   \label{fig:profile-adult}
   \vspace{-10pt}
 \end{wrapfigure}
@@ -1409,9 +1411,9 @@ The baselines share the encoder, the prediction head and the optimization settin
 
 \paragraph{Prediction and fairness measures.}  All measures are computed on the test data, indexed here by $i=1,\ldots,n$.  Prediction performance is the accuracy for classification and $1-\mathrm{MAE}$ for regression.  Fairness is measured by the prediction-level disparity $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ and by the worst-case downstream disparity $\operatorname{GDP}_{\infty}(h_{\phi};\mathcal{F}_c)$ of Equation~(\ref{eq:worst-case-gdp}), with $c=1$ except in Appendix~\ref{app:real-tabular}.  Both use the estimates
 \begin{equation}
-  \widehat{\Delta}(s):=\Bigl|\sum_{i=1}^{n}\widehat{w}_{\tilde{\gamma}}(i;s)\,f(\mathbf{Z}_i)-\frac{1}{n}\sum_{i=1}^{n}f(\mathbf{Z}_i)\Bigr|,
+  \widehat{\Delta}_{f}(s):=\Bigl|\sum_{i=1}^{n}\widehat{w}_{\tilde{\gamma}}(i;s)\,f(\mathbf{Z}_i)-\frac{1}{n}\sum_{i=1}^{n}f(\mathbf{Z}_i)\Bigr|,
   \qquad
-  \widehat{\operatorname{GDP}}_{\infty}(f\circ h):=\max_{s\in\mathcal{Q}}\widehat{\Delta}(s),
+  \widehat{\operatorname{GDP}}_{\infty}(f\circ h):=\max_{s\in\mathcal{Q}}\widehat{\Delta}_{f}(s),
   \label{eq:gdp-estimate}
 \end{equation}
 where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel of bandwidth $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ of $S$.
