@@ -13,6 +13,8 @@
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{placeins}
+\usepackage{wrapfig}
+\usepackage{needspace}
 \graphicspath{{../figures/}{figures/}}
 \usepackage{algorithm}
 \usepackage{algorithmic}
@@ -519,8 +521,8 @@ Table~\ref{tab:datasets} in Appendix~\ref{app:real-experiments} gives further de
 
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.92\textwidth]{main/fig2p_adult.pdf}
-  \caption{Adult: test accuracy against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ (left, middle), and $\widehat{\Delta}(s)$ of the worst-case heads $\hat{f}_1$ of supIPM-FRL and FREM at the configurations with the smallest worst-case disparity among those whose test accuracy is within $0.004$ of the model trained without a penalty (right).}
+  \includegraphics[width=0.8\textwidth]{main/fig2m_own_head_adult.pdf}
+  \caption{Adult: test accuracy against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$.}
   \label{fig:adult}
   \vspace{-12pt}
 \end{figure}
@@ -535,7 +537,18 @@ Table~\ref{tab:datasets} in Appendix~\ref{app:real-experiments} gives further de
   \vspace{-12pt}
 \end{figure}
 
-The two measures differ because the prediction-level disparity concerns the trained head only, whereas the worst-case disparity concerns every head in $\mathcal{F}_1$.  A penalty on the prediction (Reg-GDP, Reg-HGR) or on a single adversary (ADV, LAFTR) constrains only the dependence on $S$ that this head or adversary detects, a penalty averaged over $S$ (FREM) can leave dependence at sensitive values of small probability, and a penalty on the two groups of a discretized $S$ (MMD, sIPM-LFR) can leave dependence within each group; a downstream head can exploit what remains.  supIPM-FRL instead constrains the discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ at every $s$ over all ReLU discriminators, so its fairness extends to every head in $\mathcal{F}_1$, in accordance with Corollary~\ref{cor:certificate}.  The right panel of Figure~\ref{fig:adult} shows this on Adult: at matched accuracy, the worst-case head of FREM attains a disparity many times larger than that of supIPM-FRL, whose disparity is small at every $s$.  Accordingly, the empirical supIPM on the test data in Appendix~\ref{app:real-measures} is smallest for supIPM-FRL on Adult and Crime at a matched level of prediction performance, although FREM attains a smaller value on ACSIncome.
+The two measures differ because the prediction-level disparity concerns the trained head only, whereas the worst-case disparity concerns every head in $\mathcal{F}_1$.  A penalty on the prediction (Reg-GDP, Reg-HGR) or on a single adversary (ADV, LAFTR) constrains only the dependence on $S$ that this head or adversary detects, a penalty averaged over $S$ (FREM) can leave dependence at sensitive values of small probability, and a penalty on the two groups of a discretized $S$ (MMD, sIPM-LFR) can leave dependence within each group; a downstream head can exploit what remains.
+
+\Needspace{11\baselineskip}
+\begin{wrapfigure}{r}{0.36\textwidth}
+  \vspace{-13pt}
+  \centering
+  \includegraphics[width=0.34\textwidth]{main/fig5_profile_adult.pdf}
+  \caption{Adult: $\widehat{\Delta}(s)$ of the worst-case heads $\hat{f}_1$ of supIPM-FRL and FREM at matched test accuracy.}
+  \label{fig:profile-adult}
+  \vspace{-10pt}
+\end{wrapfigure}
+supIPM-FRL instead constrains the discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ at every $s$ over all ReLU discriminators, so its fairness extends to every head in $\mathcal{F}_1$, in accordance with Corollary~\ref{cor:certificate}.  Figure~\ref{fig:profile-adult} shows this on Adult for the configurations with the smallest worst-case disparity among those whose test accuracy is within $0.004$ of the model trained without a penalty: the worst-case head of FREM attains a disparity many times larger than that of supIPM-FRL, whose disparity is small at every $s$.  Accordingly, the empirical supIPM on the test data in Appendix~\ref{app:real-measures} is smallest for supIPM-FRL on Adult and Crime at a matched level of prediction performance, although FREM attains a smaller value on ACSIncome.
 
 
 \section{Conclusion}
