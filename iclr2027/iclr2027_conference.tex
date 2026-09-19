@@ -546,15 +546,15 @@ Table~\ref{tab:datasets} in Appendix~\ref{app:real-experiments} gives further de
 
 \begin{figure}[!htb]
   \centering
-  \includegraphics[width=0.8\textwidth]{main/fig2m_own_head_adult.pdf}
-  \caption{Adult: test accuracy against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$.}
+  \includegraphics[width=0.92\textwidth]{main/fig2g_own_head_all.pdf}
+  \caption{Adult, Crime and ACSIncome: prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$.}
   \label{fig:adult}
   \vspace{-12pt}
 \end{figure}
 
 \paragraph{Results.}  
 % Each point is the mean over five seeds with bars of $\pm1$ standard deviation, each curve traces the configurations of one method with the smallest disparity at each level of prediction performance, and the upper left is favorable. 
-Figure~\ref{fig:adult} shows the prediction-level disparity on Adult, and Figure~\ref{fig:worst-case} the worst-case downstream disparity over $\mathcal{F}_1$ on the three datasets; the prediction-level curves on Crime and ACSIncome and the worst-case curves over $\mathcal{F}_4$ and $\mathcal{F}_8$ are given in Appendix~\ref{app:real-tabular}.  At the prediction level, supIPM-FRL is comparable to the other methods.  Under the worst-case downstream disparity, supIPM-FRL attains a markedly smaller disparity than every other method at the same prediction performance on all three datasets, except at the lowest prediction performance on Crime, where the methods that use $S$ directly coincide with it.
+Figure~\ref{fig:adult} shows the prediction-level disparity and Figure~\ref{fig:worst-case} the worst-case downstream disparity over $\mathcal{F}_1$ on the three datasets; the results with $S$ discretized at its mean and the worst-case curves over $\mathcal{F}_4$ and $\mathcal{F}_8$ are given in Appendix~\ref{app:real-tabular}.  At the prediction level, supIPM-FRL is comparable to the other methods.  Under the worst-case downstream disparity, supIPM-FRL attains a markedly smaller disparity than every other method at the same prediction performance on all three datasets, except at the lowest prediction performance on Crime, where the methods that use $S$ directly coincide with it.
 
 \begin{figure}[!htb]
   \centering
@@ -1472,7 +1472,7 @@ We also provide comparisons under alternative fairness measures, results on grap
 \subsubsection{Tabular Results}
 \label{app:real-tabular}
 
-Figure~\ref{fig:app-prediction-level} gives the prediction-level curves on Crime and ACSIncome, whose worst-case curves appear in Figure~\ref{fig:worst-case}.  Each figure in this appendix adds a third panel in which $S$ is discretized at its mean.  On both datasets supIPM-FRL, FREM and Reg-GDP have nearly the same prediction-level curve, and the binary-$S$ methods are close to them.  As on Adult, the methods are separated mainly by the worst-case disparity: a penalty on the fitted head, or an average over $S$, leaves a dependence on $S$ that a different head can exploit, whereas the supremum over $s$ and over the discriminators reduces it markedly.
+Figure~\ref{fig:app-prediction-level} repeats the prediction-level comparison of Figure~\ref{fig:adult} on Crime and ACSIncome with a third panel in which $S$ is discretized at its mean, as does every figure in this appendix.  On both datasets supIPM-FRL, FREM and Reg-GDP have nearly the same prediction-level curve, and the binary-$S$ methods are close to them.  As on Adult, the methods are separated mainly by the worst-case disparity: a penalty on the fitted head, or an average over $S$, leaves a dependence on $S$ that a different head can exploit, whereas the supremum over $s$ and over the discriminators reduces it markedly.
 
 \begin{figure}[!htb]
   \centering
