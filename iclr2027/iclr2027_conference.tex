@@ -292,7 +292,7 @@ By definition, the constraint $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)
 Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so a representation with a small supIPM has a small EIPM as well.
 % The converse fails without further regularity in $s$.
 
-A prediction head $f$ is also a function of the representation, and if $f\in\mathcal{V}$, the difference between the conditional and the marginal means of its prediction $f(\mathbf{Z})$ is at most $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ at every $s\in\mathcal{S}$, even in a region of small $\mathbb{P}_S$-probability.  For a bounded measurable $g$, \citet{jiang2022generalized} define generalized demographic parity (GDP) for a continuous sensitive attribute as
+A prediction head $f$ is also a function of the representation.  If $f\in\mathcal{V}$, Equation~(\ref{eq:supipm}) bounds the difference between the conditional and the marginal means of its prediction $f(\mathbf{Z})$ by $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ at every $s\in\mathcal{S}$, even in a region of small $\mathbb{P}_S$-probability.  For a bounded measurable $g$, \citet{jiang2022generalized} define generalized demographic parity (GDP) for a continuous sensitive attribute as
 \begin{equation}
   \operatorname{GDP}(g)
   :=\mathbb{E}_{S}\!\left[
@@ -303,7 +303,7 @@ A prediction head $f$ is also a function of the representation, and if $f\in\mat
   \right].
   \label{eq:gdp}
 \end{equation}
-For $g=f\circ h$, Equation~(\ref{eq:gdp}) averages this difference over $S$.  Replacing the average by a supremum, as in supIPM, we define $L_{\infty}$-generalized demographic parity ($\operatorname{GDP}_{\infty}$)
+For $g=f\circ h$, Equation~(\ref{eq:gdp}) averages $\left|\mathbb{E}[f(\mathbf{Z})\mid S]-\mathbb{E}[f(\mathbf{Z})]\right|$ over $S$.  Replacing the average by a supremum, as in supIPM, we define $L_{\infty}$-generalized demographic parity ($\operatorname{GDP}_{\infty}$)
 \begin{equation}
   \operatorname{GDP}_{\infty}(g)
   :=\sup_{s\in\mathcal{S}}
@@ -313,13 +313,13 @@ For $g=f\circ h$, Equation~(\ref{eq:gdp}) averages this difference over $S$.  Re
   \right|.
   \label{eq:linfty-gdp}
 \end{equation}
-For $f\in\mathcal{V}$, we thus obtain $\operatorname{GDP}_{\infty}(f\circ h)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so supIPM, defined before a prediction head is chosen, controls $\operatorname{GDP}_{\infty}(f\circ h)$ for all such heads simultaneously.
+We thus obtain $\operatorname{GDP}_{\infty}(f\circ h)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ for every $f\in\mathcal{V}$, so supIPM, defined before a prediction head is chosen, controls $\operatorname{GDP}_{\infty}(f\circ h)$ simultaneously for all heads in $\mathcal{V}$.
 
 It remains to choose the discriminator class $\mathcal{V}$.  
 A bound on $\operatorname{GDP}_{\infty}(f\circ h)$ for heads $f$ of bounded H\"older norm can be obtained by taking $\mathcal{V}$ to be the H\"older ball $\mathcal{H}^{\beta}_d$.
  The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in Equation~(\ref{eq:supipm}) is the ReLU-IPM.  Since $\mathcal{V}_{\mathrm{R}}$ and $\mathcal{H}^{\beta}_d$ are defined on $\mathbb{B}^d$, we restrict the encoder to take values in $\mathbb{B}^d$ hereafter, so that $\mathbf{Z}=h(\mathbf{X})\in\mathbb{B}^d$.  
 % In practice the restriction is imposed by normalizing the output of the encoder network, as described in Appendix~\ref{app:ascent}.  
-Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$ and hence on $\operatorname{GDP}_{\infty}(f\circ h)$ for every head $f\in\mathcal{H}^{\beta}_d$.  We next estimate $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ from a sample.
+Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$ and hence on $\operatorname{GDP}_{\infty}(f\circ h)$ for every head $f\in\mathcal{H}^{\beta}_d$.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
