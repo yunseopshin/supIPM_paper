@@ -15,6 +15,7 @@
 \usepackage{placeins}
 \usepackage{wrapfig}
 \usepackage{needspace}
+\usepackage{enumitem}
 \graphicspath{{../figures/}{figures/}}
 \usepackage{algorithm}
 \usepackage{algorithmic}
@@ -533,7 +534,12 @@ In contrast,  the supremum in Equation~(\ref{eq:supipm}) is attained near $s_0$,
 \subsection{Real data analysis}
 \label{sec:exp-real}
 
-\paragraph{Datasets.}  We use three tabular datasets: Adult ($Y$: income above \$50k, $S$: age; \citealp{adult_2}), Crime ($Y$: community violent crime rate, $S$: proportion of Black residents; \citealp{communities_and_crime_183}), and ACSIncome ($Y$: income in the 2018 American Community Survey, $S$: age; \citealp{ding2021retiring}). 
+\paragraph{Datasets.}  We use three tabular datasets.
+\begin{itemize}[leftmargin=*, itemsep=0pt, topsep=2pt]
+  \item Adult \citep{adult_2}: $Y$ is whether income exceeds \$50k and $S$ is age.
+  \item Crime \citep{communities_and_crime_183}: $Y$ is the violent crime rate of a community and $S$ is the proportion of Black residents.
+  \item ACSIncome \citep{ding2021retiring}: $Y$ is income in the 2018 American Community Survey and $S$ is age.
+\end{itemize}
 Table~\ref{tab:datasets} in Appendix~\ref{app:real-experiments} gives further details, and results on the graph datasets Pokec-z and Pokec-n \citep{takac2012data} are also provided there.
 
 \paragraph{Baselines.}  Four baselines use the continuous $S$ directly: FREM \citep{kong2025fair} of Section~\ref{sec:frem}, Reg-GDP \citep{jiang2022generalized} and Reg-HGR \citep{mary2019fairness}, which penalize the prediction by the GDP of Equation~(\ref{eq:gdp}) and by the HGR maximal correlation, and ADV \citep{zhang2018mitigating,kong2025fair}, which trains an adversary that predicts $S$ from the representation.  The other three, LAFTR \citep{madras2018learning}, MMD \citep{deka2023mmd} and sIPM-LFR \citep{kim2022learning}, are designed for a binary sensitive attribute: they are trained with $S$ discretized at its median and align the representations of the two groups.  All methods share the architecture of Appendix~\ref{app:real-settings}, are trained over a grid of penalty parameters with five random seeds, and are evaluated with the continuous $S$.
