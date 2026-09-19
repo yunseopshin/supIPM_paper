@@ -289,7 +289,7 @@ Then, we define for a discriminator class $\mathcal{V}$ on $\mathcal{Z}$,
 \end{align}
 By definition, the constraint $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\rho$ for a fairness level $\rho\ge0$ bounds the discrepancy $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ by $\rho$ at every $s\in\mathcal{S}$.
 % and hence $\left|\mathbb{E}[v(\mathbf{Z})\mid S=s]-\mathbb{E}[v(\mathbf{Z})]\right|$ by the same $\rho$ for every discriminator $v\in\mathcal{V}$.  
-Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so a representation with a small supIPM has a small EIPM as well.
+Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so a representation with a small supIPM has a small EIPM.
 % The converse fails without further regularity in $s$.
 
 A prediction head $f$ is also a function of the representation.  If $f\in\mathcal{V}$, Equation~(\ref{eq:supipm}) bounds the difference between the conditional and the marginal means of its prediction $f(\mathbf{Z})$ by $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ at every $s\in\mathcal{S}$, even in a region of small $\mathbb{P}_S$-probability.  For a bounded measurable $g$, \citet{jiang2022generalized} define generalized demographic parity (GDP) for a continuous sensitive attribute as
@@ -1347,7 +1347,7 @@ where $\varepsilon_1,\varepsilon_2\sim N(0,1)$. And $S$, $\mathbf{X}_{\mathrm{ta
 \end{equation}
 
 
-The sensitive attribute affects the input only through $X_{\mathrm{loc}}$ alone and does not enter the outcome generating equation, so $Y$ is conditionally independent of $S$ given $\mathbf{X}_{\mathrm{task}}$ and a representation that discards the dependence near $s_0$ incurs no loss of prediction performance.  The disparity that remains under each criterion therefore reflects the dependence that the criterion fails to remove, not a trade-off against prediction performance.  Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.
+The sensitive attribute affects the input only through $X_{\mathrm{loc}}$ alone and does not enter the outcome generating equation, so $Y$ is conditionally independent of $S$ given $\mathbf{X}_{\mathrm{task}}$ and a representation that discards the dependence near $s_0$ incurs no loss of prediction performance.  The disparity that remains under each measure therefore reflects the dependence that the measure fails to remove, not a trade-off against prediction performance.  Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.
 
 \subsection{Settings}
 \label{app:synth-settings}
