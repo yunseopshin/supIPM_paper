@@ -481,12 +481,16 @@ The prediction-level disparity is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{
 % All disparities are reported as kernel estimates on the test data; 
 $\widehat{\Delta}_{f}(s)$ and $\widehat{\operatorname{GDP}}_{\infty}$ denote these estimates and are defined in Appendix~\ref{app:worst-case}.
 
-\paragraph{Estimating the worst-case disparity.}  With the encoder held fixed, and with $\widehat{\operatorname{GDP}}_{\infty}$ and the empirical supervised risk $\widehat{\mathcal{R}}$ computed on the training data, we find
+\paragraph{Estimating the worst-case disparity.}  With the encoder held fixed, write $f_{\mathbf{w},b}(\mathbf{z}):=\sigma(\mathbf{w}^\top\mathbf{z}+b)$ and, on the training data, minimize
 \begin{equation}
-  \hat{f}_c:=\argmin_{f\in\mathcal{F}_c}\Bigl\{\widehat{\mathcal{R}}(f\circ h)-\lambda_h\,\widehat{\operatorname{GDP}}_{\infty}(f\circ h)\Bigr\}
+  \widetilde{\mathcal{L}}(\mathbf{w},b)
+  :=\frac{1}{n}\sum_{i=1}^n
+  \ell\!\left(f_{\mathbf{w},b}(\mathbf{Z}_i),Y_i\right)
+  -\lambda_h\,
+  \widehat{\operatorname{GDP}}_{\infty}(f_{\mathbf{w},b}\circ h)
   \label{eq:worst-case-estimate}
 \end{equation}
-by projected gradient descent over $(\mathbf{w},b)$, with $\lambda_h=10^{3}$ so that the disparity term dominates and $\hat{f}_c$ approximates the head attaining the supremum in Equation~(\ref{eq:worst-case-gdp}).  The reported value is the disparity of this head on the test data, $\widehat{\operatorname{GDP}}_{\infty}(h;\mathcal{F}_c):=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$; the optimization is described in Appendix~\ref{app:worst-case}.
+over $\lVert\mathbf{w}\rVert_2\le c$ by projected gradient descent, where $\ell$ is the supervised loss of Equation~(\ref{eq:supipm-penalized-objective}) and $\lambda_h=10^{3}$, so that the disparity term dominates.  The minimizer $\hat{f}_c:=f_{\hat{\mathbf{w}},\hat{b}}$ approximates the head attaining the supremum in Equation~(\ref{eq:worst-case-gdp}).  The reported value is the disparity of this head on the test data, $\widehat{\operatorname{GDP}}_{\infty}(h;\mathcal{F}_c):=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$; the optimization is described in Appendix~\ref{app:worst-case}.
 
 \subsection{Simulation study}
 \label{sec:exp-simulation}
@@ -1423,7 +1427,7 @@ where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref
 % $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}
 
 
-\paragraph{Worst-case downstream disparity.}  The head $\hat{f}_c$ of Equation~(\ref{eq:worst-case-estimate}) is computed with $\widehat{\operatorname{GDP}}_{\infty}$ of Equation~(\ref{eq:gdp-estimate}) and the empirical supervised risk $\widehat{\mathcal{R}}$ formed from the training sample, by projected gradient descent over $(\mathbf{w},b)$ from eight initial heads, with $\mathbf{w}$ projected onto the ball of radius $c$ after every step.  The reported value $\widehat{\operatorname{GDP}}_{\infty}(h;\mathcal{F}_c)=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$ of Section~\ref{sec:experiments} is computed on the test sample.
+\paragraph{Worst-case downstream disparity.}  The head $\hat{f}_c$ of Equation~(\ref{eq:worst-case-estimate}) is computed with $\widehat{\operatorname{GDP}}_{\infty}$ of Equation~(\ref{eq:gdp-estimate}) formed from the training sample, by projected gradient descent over $(\mathbf{w},b)$ from eight initial heads, with $\mathbf{w}$ projected onto the ball of radius $c$ after every step.  The reported value $\widehat{\operatorname{GDP}}_{\infty}(h;\mathcal{F}_c)=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$ of Section~\ref{sec:experiments} is computed on the test sample.
 
 \paragraph{Additional fairness measures.}  Appendix~\ref{app:real-measures} evaluates the methods under five further measures.  The kernel GDP and the binned GDP are two estimates of the GDP of Equation~(\ref{eq:gdp}). The former averages $\widehat{\Delta}(s)$ against a kernel density estimate of $S$, as in \citet{kong2025fair}, and the latter averages, over the distinct observed values of $S$, the absolute difference between the mean prediction at that value and the overall mean.  The empirical supIPM of Equation~(\ref{eq:empirical-supipm}) is computed on the test representation with the bandwidth $\gamma$ of the training penalty.  The last two measure the dependence between the prediction $\hat{Y}:=f_{\psi}(h_{\phi}(\mathbf{X}))$ and $S$: the HGR maximal correlation \citep{mary2019fairness} and the mutual information,
 \begin{equation}
