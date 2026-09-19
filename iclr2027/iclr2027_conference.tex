@@ -501,9 +501,14 @@ over $\lVert\mathbf{w}\rVert_2\le c$  and $\lambda_h=10^{3}$, so that the dispar
 % $S$ is uniform on an interval; the outcome $Y$ and one input variable depend on $S$ through a term concentrated near a value $s_0$, so that this dependence is confined to a set of small $\mathbb{P}_S$-probability, and $Y$ and a second input variable also depend on $S$ linearly; the generating equations are given in Appendix~\ref{app:synth-experiments}. 
 % With $S$ uniformly distributed on an interval, the outcome $Y$ and one input variable depend on $S$ through a term localized near $s_0$ in a region of small $\mathbb{P}_S$-probability.
 % The outcome $Y$ and a second input variable also depend linearly on $S$, with the full data-generating process specified in Appendix~\ref{app:synth-experiments}.
-We generate $S$ uniformly on an interval and an input $\mathbf{X}$ whose coordinates are independent of $S$, except one that is shifted when $S$ lies near a value $s_0$.  The input therefore depends on $S$ only in a neighborhood of $s_0$, and the outcome $Y$ does not depend on $S$, so a representation can discard this dependence without loss of prediction performance.
-% so this dependence can be removed without loss of prediction performance.  
-The full setup is given in Appendix~\ref{app:synth-experiments}.
+Let $S\sim\mathrm{Uniform}(0,1)$ and $\mathbf{X}=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{loc}},\mathbf{X}_{\mathrm{noise}})$, where $\mathbf{X}_{\mathrm{task}}\in\mathbb{R}^4$ and $\mathbf{X}_{\mathrm{noise}}\in\mathbb{R}^3$ are standard normal and independent of $S$, and
+\begin{equation*}
+  X_{\mathrm{loc}}:=3\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}+0.5\,\varepsilon_1,
+  \qquad
+  Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+0.3\,\varepsilon_2\right),
+\end{equation*}
+with $s_0=0.5$, $\tau=0.043$, standard normal $\varepsilon_1,\varepsilon_2$, a fixed $\mathbf{u}$ and the logistic function $\sigma$.  Thus $\mathbf{X}$ depends on $S$ only through $X_{\mathrm{loc}}$, which is shifted only for $S$ near $s_0$, and $Y$ does not depend on $S$.
+The remaining settings are given in Appendix~\ref{app:synth-experiments}.
 We compare supIPM-FRL with FREM over a grid of penalty parameters, using the worst-case downstream disparity over $\mathcal{F}_1$ as the fairness measure. 
 % Each curve joins the configurations in increasing order of the penalty parameter.
 
