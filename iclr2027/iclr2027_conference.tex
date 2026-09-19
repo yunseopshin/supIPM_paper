@@ -254,29 +254,7 @@ A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
   \label{fig:motivation}
 \end{figure}
 
-For a bounded measurable function $g:\mathcal{X}\to\mathbb{R}$, \citet{jiang2022generalized} define generalized demographic parity (GDP) for a continuous sensitive attribute as
-\begin{equation}
-  \operatorname{GDP}(g)
-  :=\mathbb{E}_{S}\!\left[
-    \left|
-      \mathbb{E}[g(\mathbf{X})\mid S]
-      -\mathbb{E}[g(\mathbf{X})]
-    \right|
-  \right].
-  \label{eq:gdp}
-\end{equation}
-
-Because Equation~(\ref{eq:gdp}) averages over $S$, a large discrepancy in a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{GDP}(g)$.  Figure~\ref{fig:motivation} illustrates such a case: the discrepancy is large at $s_0$, whose neighborhood has low probability and therefore contributes little to the average.  We therefore replace the average by a supremum and define $L_{\infty}$-generalized demographic parity ($\operatorname{GDP}_{\infty}$)
-\begin{equation}
-  \operatorname{GDP}_{\infty}(g)
-  :=\sup_{s\in\mathcal{S}}
-  \left|
-    \mathbb{E}[g(\mathbf{X})\mid S=s]
-    -\mathbb{E}[g(\mathbf{X})]
-  \right|.
-  \label{eq:linfty-gdp}
-\end{equation}
-The supremum in Equation~(\ref{eq:linfty-gdp}) requires the conditional expectation at every $s\in\mathcal{S}$.
+Because the EIPM in Equation~(\ref{eq:eipm}) averages the IPM between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ over $\mathbb{P}_S$, a large discrepancy in a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)$.  Figure~\ref{fig:motivation} illustrates such a case: the discrepancy is large at $s_0$, whose neighborhood has low probability and therefore contributes little to the average.  A small EIPM need not imply a small discrepancy at every sensitive value.  We therefore replace the average by a supremum over $\mathcal{S}$, which requires $\mathbb{P}_{\mathbf{Z}\mid S=s}$ at every $s\in\mathcal{S}$.
 % , not only for $\mathbb{P}_S$-almost every $s$.  
 We assume the following condition on the distribution of $S$.
 \begin{assumption}[Positive density]
@@ -287,16 +265,13 @@ Following \citet{kong2025fair}, we maintain Assumption~\ref{as:positive-density}
 % chosen so that $\int_{\mathcal{X}} p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})=p_S(s)$ for every $s\in\mathcal{S}$.  
 % Because a conditional expectation given $S=s$ is determined only up to a $\mathbb{P}_S$-null set of $s$, 
 % From this, a conditional expectation given $S=s$ is as follows
-This joint density induces the following conditional expectation:
+This joint density induces the following conditional expectation of a bounded measurable $g:\mathcal{X}\to\mathbb{R}$:
 \begin{equation}
   \mathbb{E}[g(\mathbf{X})\mid S=s]
   =\frac{1}{p_S(s)}\int_{\mathcal{X}} g(\mathbf{x})\,p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
   \qquad s\in\mathcal{S}.
   \label{eq:pointwise-conditional}
 \end{equation}
-Equation~(\ref{eq:pointwise-conditional}) makes $\operatorname{GDP}_{\infty}(g)$ in Equation~(\ref{eq:linfty-gdp}) well defined for every bounded measurable $g$.  For fair representation learning, however, $\operatorname{GDP}_{\infty}$ does not suffice, because $\operatorname{GDP}_{\infty}(f\circ h)$ can be evaluated only once the prediction head $f$ is fixed, whereas a representation must accommodate prediction heads that are unknown when it is learned.
-
-We therefore propose a criterion for the representation itself, which measures the discrepancy between the conditional and the marginal distribution of the representation at every $s$ through an IPM.  
 % As in Section~\ref{sec:frem}, the discriminator class $\mathcal{V}$ of this IPM specifies the prediction heads that the criterion controls.  
 With  $\mathbb{P}_{\mathbf{Z}\mid S=s}$ induced by the conditional density used in Equation~(\ref{eq:pointwise-conditional}), we define, for a discriminator class $\mathcal{V}$ on $\mathcal{Z}$,
 \begin{align}
@@ -311,15 +286,37 @@ With  $\mathbb{P}_{\mathbf{Z}\mid S=s}$ induced by the conditional density used 
   \right|.
   \label{eq:supipm}
 \end{align}
-Equation~(\ref{eq:supipm}) is the representation-level counterpart of $\operatorname{GDP}_{\infty}$, defined before a prediction head is chosen.
-By definition, the constraint $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\rho$ for a fairness level $\rho\ge0$ bounds $\left|\mathbb{E}[v(\mathbf{Z})\mid S=s]-\mathbb{E}[v(\mathbf{Z})]\right|$ by $\rho$ for every discriminator $v\in\mathcal{V}$ and every $s\in\mathcal{S}$.  Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so a representation with a small supIPM has a small EIPM as well.
+By definition, the constraint $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\rho$ for a fairness level $\rho\ge0$ bounds the discrepancy $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ by $\rho$ at every $s\in\mathcal{S}$, and hence $\left|\mathbb{E}[v(\mathbf{Z})\mid S=s]-\mathbb{E}[v(\mathbf{Z})]\right|$ by the same $\rho$ for every discriminator $v\in\mathcal{V}$.  Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so a representation with a small supIPM has a small EIPM as well.
 % The converse fails without further regularity in $s$.
 
+A prediction head $f$ is also a function of the representation, and if $f\in\mathcal{V}$, the difference between the conditional and the marginal means of its prediction $f(\mathbf{Z})$ is at most $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ at every $s\in\mathcal{S}$, even in a region of small $\mathbb{P}_S$-probability.  For a bounded measurable $g$, \citet{jiang2022generalized} define generalized demographic parity (GDP) for a continuous sensitive attribute as
+\begin{equation}
+  \operatorname{GDP}(g)
+  :=\mathbb{E}_{S}\!\left[
+    \left|
+      \mathbb{E}[g(\mathbf{X})\mid S]
+      -\mathbb{E}[g(\mathbf{X})]
+    \right|
+  \right].
+  \label{eq:gdp}
+\end{equation}
+For $g=f\circ h$, Equation~(\ref{eq:gdp}) averages this difference over $S$.  Replacing the average by a supremum, as in supIPM, we define $L_{\infty}$-generalized demographic parity ($\operatorname{GDP}_{\infty}$)
+\begin{equation}
+  \operatorname{GDP}_{\infty}(g)
+  :=\sup_{s\in\mathcal{S}}
+  \left|
+    \mathbb{E}[g(\mathbf{X})\mid S=s]
+    -\mathbb{E}[g(\mathbf{X})]
+  \right|.
+  \label{eq:linfty-gdp}
+\end{equation}
+For $f\in\mathcal{V}$, we thus obtain $\operatorname{GDP}_{\infty}(f\circ h)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so supIPM, defined before a prediction head is chosen, controls $\operatorname{GDP}_{\infty}(f\circ h)$ for all such heads simultaneously.
+
 It remains to choose the discriminator class $\mathcal{V}$.  
-A bound on downstream disparity for heads of bounded H\"older norm can be obtained by taking $\mathcal{V}$ to be the H"older ball $\mathcal{H}^{\beta}_d$.
+A bound on $\operatorname{GDP}_{\infty}(f\circ h)$ for heads $f$ of bounded H\"older norm can be obtained by taking $\mathcal{V}$ to be the H\"older ball $\mathcal{H}^{\beta}_d$.
  The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in Equation~(\ref{eq:supipm}) is the ReLU-IPM.  Since $\mathcal{V}_{\mathrm{R}}$ and $\mathcal{H}^{\beta}_d$ are defined on $\mathbb{B}^d$, we restrict the encoder to take values in $\mathbb{B}^d$ hereafter, so that $\mathbf{Z}=h(\mathbf{X})\in\mathbb{B}^d$.  
 % In practice the restriction is imposed by normalizing the output of the encoder network, as described in Appendix~\ref{app:ascent}.  
-The inequality in Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$.
+Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$ and hence on $\operatorname{GDP}_{\infty}(f\circ h)$ for every head $f\in\mathcal{H}^{\beta}_d$.  We next estimate $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ from a sample.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
