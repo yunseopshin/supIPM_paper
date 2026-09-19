@@ -24,6 +24,7 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 \renewcommand{\algorithmiccomment}[1]{\hfill$\triangleright$ #1}
@@ -315,11 +316,16 @@ For $g=f\circ h$, Equation~(\ref{eq:gdp}) averages $\left|\mathbb{E}[f(\mathbf{Z
 \end{equation}
 We thus obtain $\operatorname{GDP}_{\infty}(f\circ h)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ for every $f\in\mathcal{V}$, so supIPM, defined before a prediction head is chosen, controls $\operatorname{GDP}_{\infty}(f\circ h)$ simultaneously for all heads in $\mathcal{V}$.
 
+\subsection{Choice of the Discriminator Class}
+\label{sec:discriminator-choice}
+
 It remains to choose the discriminator class $\mathcal{V}$.  
 A bound on $\operatorname{GDP}_{\infty}(f\circ h)$ for heads $f$ of bounded H\"older norm can be obtained by taking $\mathcal{V}$ to be the H\"older ball $\mathcal{H}^{\beta}_d$.
  The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in Equation~(\ref{eq:supipm}) is the ReLU-IPM.  Since $\mathcal{V}_{\mathrm{R}}$ and $\mathcal{H}^{\beta}_d$ are defined on $\mathbb{B}^d$, we restrict the encoder to take values in $\mathbb{B}^d$ hereafter, so that $\mathbf{Z}=h(\mathbf{X})\in\mathbb{B}^d$.  
 % In practice the restriction is imposed by normalizing the output of the encoder network, as described in Appendix~\ref{app:ascent}.  
 Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$ and hence on $\operatorname{GDP}_{\infty}(f\circ h)$ for every head $f\in\mathcal{H}^{\beta}_d$.
+
+The ReLU class is also better suited to training with minibatches than the unit ball of a Gaussian RKHS used by FREM.  The MMD between two empirical distributions of $n$ representations requires the kernel at every pair of representations, that is, $O(n^2)$ kernel evaluations, and the closed-form penalty of FREM computed from the kernel sums and normalizations of a minibatch is not, in general, an unbiased estimate of its full-sample value.  In contrast, we show in Appendix~\ref{app:minibatch} that supIPM-FRL with the ReLU class admits minibatch learning.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
@@ -380,7 +386,7 @@ We alternate between gradient descent on $\mathcal{L}(\phi,\psi)$ and approximat
 To approximate this supremum, we use compass search over $s$ \citep{kolda2003optimization} and projected gradient ascent over $(\theta,\mu)$.
 This optimization scheme extends the computation of ReLU-IPM in \citet{park2026relu} by additionally maximizing over $s$.
 Because both procedures can converge to a local maximum, we use $T$ initial values of $s$ and $M$ discriminator initializations.  
-We refer to this training method as supIPM-FRL, which can be implemented efficiently using minibatches.  Further details and the full algorithm are provided in  Appendices~\ref{app:ascent} and ~\ref{app:algorithm-steps}, respectively.
+We refer to this training method as supIPM-FRL, which can be implemented efficiently using minibatches (Appendix~\ref{app:minibatch}).  Further details and the algorithms are provided in  Appendices~\ref{app:ascent} and ~\ref{app:algorithm-steps}, respectively.
 
 Section~\ref{sec:theory} shows that a small empirical supIPM yields a high-probability $\operatorname{GDP}_{\infty}$ bound for every downstream head of bounded Hölder norm.
 
@@ -1266,7 +1272,7 @@ which is Equation~(\ref{eq:certificate}).  The event $\Omega_n$ depends on neith
 \section{Details of Training supIPM-FRL}
 \label{app:algorithm}
 
-This appendix supplies the details of the learning procedure in Section~\ref{sec:supipm-objective}.  Appendix~\ref{app:ascent} describes the updates of  the sensitive values and the discriminators parameters together with the descent step for the encoder and the prediction head. And Appendix~\ref{app:algorithm-steps} summarizes these steps in Algorithm~\ref{alg:supipm-frl}.
+This appendix supplies the details of the learning procedure in Section~\ref{sec:supipm-objective}.  Appendix~\ref{app:ascent} describes the updates of  the sensitive values and the discriminators parameters together with the descent step for the encoder and the prediction head. Appendix~\ref{app:minibatch} writes the objective in Equation~(\ref{eq:supipm-penalized-objective}) in an equivalent form whose minibatch gradients are unbiased for fixed inner variables, and Appendix~\ref{app:algorithm-steps} summarizes the full-sample and the minibatch procedures in Algorithms~\ref{alg:supipm-frl} and~\ref{alg:supipm-frl-mb}.
 
 \subsection{The Ascent and Descent Steps}
 \label{app:ascent}
@@ -1290,10 +1296,80 @@ Then $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathb
 \end{equation}
 and $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $g$ and in $H$, respectively.  We write $\Pi_{A}$ for the projection onto a set $A$.  One compass search step with step size $\delta$ evaluates $g$ at the candidate $s^{(t)}$ and at the two points $\Pi_{\mathcal{S}}(s^{(t)}\pm\delta)$, moves the candidate to the point with the largest value, and halves $\delta$; the $T$ candidates are moved in parallel.  The search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$.  Since the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, one ascent step on $H$ updates all $M$ discriminator parameters, and after each step $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ projects each $\theta_m$ onto the unit sphere and each $\mu_m$ to $[-1,1]$.  The encoder and the prediction head are then updated by gradient descent on $\mathcal{L}(\phi,\psi)$ with the empirical supIPM replaced by $\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)$, that is, with the outer supremum taken over the $T$ candidates and the inner supremum over the $M$ discriminators.
 
+\subsection{Minibatch Learning}
+\label{app:minibatch}
+
+The updates of Appendix~\ref{app:ascent} use all $n$ observations.  For minibatch training, the absolute value and the supremum in Equation~(\ref{eq:empirical-supipm}) prevent the usual argument that an average over a random batch is unbiased for the average over the sample.  We therefore express the absolute value as a maximization over a sign and sample the resulting objective with the inner variables held fixed, which gives an equivalent stochastic min--max formulation of Equation~(\ref{eq:supipm-penalized-objective}).
+
+Throughout this subsection we condition on the sample $\mathcal{D}$, and the bandwidth $\gamma$ is fixed.  Write $[n]:=\{1,\ldots,n\}$, let the batch $\mathcal{B}$ be drawn uniformly from the subsets of $[n]$ of a fixed size $|\mathcal{B}|$, and let $\mathbb{E}_{\mathcal{B}}$ denote the expectation over this draw.  As in the proof of Theorem~\ref{thm:uniform}, write $\widehat{q}_{\gamma}(s):=n^{-1}\sum_{j=1}^{n}K_{\gamma}(S_j,s)$, so that $\widehat{w}_{\gamma}(i;s)=K_{\gamma}(S_i,s)/\{n\widehat{q}_{\gamma}(s)\}$ when $\widehat{q}_{\gamma}(s)>0$, with the zero-denominator convention of Section~\ref{sec:theory} otherwise.  The normalization $\widehat{q}_{\gamma}(s)$ uses all $n$ sensitive values and does not depend on the encoder, so at a given $s$ it costs $O(n)$ scalar kernel evaluations and no forward pass through $h_{\phi}$.
+
+\paragraph{An equivalent objective.}  Let $\chi\in\{-1,1\}$ be a sign, and collect the inner variables in $\boldsymbol{\vartheta}:=(s,\theta,\mu,\chi)\in\Theta:=\mathcal{S}\times\mathbb{S}^{d-1}\times[-1,1]\times\{-1,1\}$.  For a batch $\mathcal{B}\subseteq[n]$, with $\mathbf{Z}_i=h_{\phi}(\mathbf{X}_i)$ and the discriminator $v_{\theta,\mu}$ of Equation~(\ref{eq:relu-class}), define
+\begin{equation}
+\begin{aligned}
+  \Delta_{\mathcal{B}}(s;\theta,\mu)
+  &:=\frac{1}{|\mathcal{B}|}\sum_{i\in\mathcal{B}}
+     \bigl(n\widehat{w}_{\gamma}(i;s)-1\bigr)\,v_{\theta,\mu}(\mathbf{Z}_i),
+  \\
+  \mathcal{J}_{\mathcal{B}}(\phi,\psi;\boldsymbol{\vartheta})
+  &:=\frac{1}{|\mathcal{B}|}\sum_{i\in\mathcal{B}}
+     \ell\!\left(f_{\psi}(\mathbf{Z}_i),Y_i\right)
+     +\lambda\chi\,\Delta_{\mathcal{B}}(s;\theta,\mu),
+\end{aligned}
+  \label{eq:mb-objective}
+\end{equation}
+and write $\mathcal{J}:=\mathcal{J}_{[n]}$ for the full-sample objective.  Only the outer average is subsampled, and the factor $n$ and the weights $\widehat{w}_{\gamma}(i;s)$ retain their full-sample definitions.  Since $\Delta_{[n]}(s;\theta,\mu)$ is the signed sum inside the absolute value in Equation~(\ref{eq:discriminator-discrepancy}), we have $\Delta(s;\theta,\mu)=|\Delta_{[n]}(s;\theta,\mu)|$, and the identity $|x|=\max_{\chi\in\{-1,1\}}\chi x$ together with $\lambda\ge0$ gives
+\begin{equation}
+  \mathcal{L}(\phi,\psi)
+  =\sup_{\boldsymbol{\vartheta}\in\Theta}\mathcal{J}(\phi,\psi;\boldsymbol{\vartheta}).
+  \label{eq:mb-equivalent}
+\end{equation}
+Each sampled representation must be computed by the same encoder $h_{\phi}$ as in $\mathcal{J}$, so the output normalization of the encoder cannot use statistics of the batch.  The pointwise normalization of Appendix~\ref{app:ascent} satisfies this requirement.
+
+\begin{proposition}[Unbiased minibatch objective and gradients]
+\label{prop:minibatch}
+For every fixed $(\phi,\psi,\boldsymbol{\vartheta})$,
+\begin{equation}
+  \mathbb{E}_{\mathcal{B}}\bigl[\mathcal{J}_{\mathcal{B}}(\phi,\psi;\boldsymbol{\vartheta})\bigr]
+  =\mathcal{J}(\phi,\psi;\boldsymbol{\vartheta}),
+  \qquad
+  \mathcal{L}(\phi,\psi)
+  =\sup_{\boldsymbol{\vartheta}\in\Theta}
+   \mathbb{E}_{\mathcal{B}}\bigl[\mathcal{J}_{\mathcal{B}}(\phi,\psi;\boldsymbol{\vartheta})\bigr].
+  \label{eq:mb-unbiased-value}
+\end{equation}
+If $\ell(f_{\psi}(\mathbf{Z}_i),Y_i)$ and $v_{\theta,\mu}(\mathbf{Z}_i)$ are differentiable in one of $\phi$, $\psi$, $\theta$ and $\mu$ for every $i\in[n]$, with the other variables held fixed, then the gradient $\nabla$ with respect to that variable satisfies
+\begin{equation}
+  \mathbb{E}_{\mathcal{B}}\bigl[\nabla\mathcal{J}_{\mathcal{B}}(\phi,\psi;\boldsymbol{\vartheta})\bigr]
+  =\nabla\mathcal{J}(\phi,\psi;\boldsymbol{\vartheta}).
+  \label{eq:mb-unbiased-gradient}
+\end{equation}
+Both statements hold conditionally on all quantities computed before $\mathcal{B}$ is drawn, provided that $(\phi,\psi,\boldsymbol{\vartheta})$ is among these quantities and that $\mathcal{B}$ is drawn uniformly and independently of them.  Finally, suppose that $\boldsymbol{\vartheta}^{\star}$ maximizes $\mathcal{J}(\phi,\psi;\cdot)$ over $\Theta$ and is fixed before $\mathcal{B}$ is drawn, that $\mathcal{L}$ is differentiable at $(\phi,\psi)$, and that the condition above holds for $\phi$ and $\psi$ at $\boldsymbol{\vartheta}^{\star}$.  Then
+\begin{equation}
+  \mathbb{E}_{\mathcal{B}}\bigl[\nabla_{(\phi,\psi)}\mathcal{J}_{\mathcal{B}}(\phi,\psi;\boldsymbol{\vartheta}^{\star})\bigr]
+  =\nabla_{(\phi,\psi)}\mathcal{L}(\phi,\psi).
+  \label{eq:mb-envelope-gradient}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Fix $(\phi,\psi,\boldsymbol{\vartheta})$.  By Equation~(\ref{eq:mb-objective}), $\mathcal{J}_{\{i\}}=\ell(f_{\psi}(\mathbf{Z}_i),Y_i)+\lambda\chi\bigl(n\widehat{w}_{\gamma}(i;s)-1\bigr)v_{\theta,\mu}(\mathbf{Z}_i)$ for the single observation $i$, so that $\mathcal{J}_{\mathcal{B}}=|\mathcal{B}|^{-1}\sum_{i\in\mathcal{B}}\mathcal{J}_{\{i\}}$ and $\mathcal{J}=n^{-1}\sum_{i=1}^{n}\mathcal{J}_{\{i\}}$.  Under uniform sampling, $\mathbb{P}(i\in\mathcal{B})=|\mathcal{B}|/n$ for every $i\in[n]$, so
+\[
+  \mathbb{E}_{\mathcal{B}}\mathcal{J}_{\mathcal{B}}
+  =\frac{1}{|\mathcal{B}|}\sum_{i=1}^{n}\mathbb{P}(i\in\mathcal{B})\,\mathcal{J}_{\{i\}}
+  =\frac{1}{n}\sum_{i=1}^{n}\mathcal{J}_{\{i\}}
+  =\mathcal{J}.
+\]
+The second identity in Equation~(\ref{eq:mb-unbiased-value}) then follows from Equation~(\ref{eq:mb-equivalent}).  The expectation $\mathbb{E}_{\mathcal{B}}$ is a finite average over the subsets of $[n]$ of size $|\mathcal{B}|$, so it commutes with differentiation, and the same calculation with $\nabla\mathcal{J}_{\{i\}}$ in place of $\mathcal{J}_{\{i\}}$ gives Equation~(\ref{eq:mb-unbiased-gradient}).  Conditioning on the quantities computed before $\mathcal{B}$ is drawn fixes $(\phi,\psi,\boldsymbol{\vartheta})$ and leaves $\mathbb{P}(i\in\mathcal{B})=|\mathcal{B}|/n$, which gives the conditional statements.  For the last assertion, the map $(\phi',\psi')\mapsto\mathcal{L}(\phi',\psi')-\mathcal{J}(\phi',\psi';\boldsymbol{\vartheta}^{\star})$ is nonnegative by Equation~(\ref{eq:mb-equivalent}) and vanishes at $(\phi,\psi)$, where it therefore attains its minimum.  Its gradients with respect to $\phi$ and to $\psi$ at $(\phi,\psi)$ therefore vanish, so $\nabla_{(\phi,\psi)}\mathcal{L}(\phi,\psi)=\nabla_{(\phi,\psi)}\mathcal{J}(\phi,\psi;\boldsymbol{\vartheta}^{\star})$, and Equation~(\ref{eq:mb-unbiased-gradient}) completes the proof.
+\end{proof}
+
+Proposition~\ref{prop:minibatch} gives unbiased stochastic gradients for the equivalent min--max objective, provided that the sensitive value, the discriminator and the sign used in a gradient step are fixed before its batch is drawn, for example from an earlier batch.  If these inner variables only approximately maximize $\mathcal{J}(\phi,\psi;\cdot)$, the gradient is unbiased for that of $\mathcal{J}$ at these variables, and Equation~(\ref{eq:mb-envelope-gradient}) requires in addition an exact maximizer.  Choosing them on the same batch targets a different quantity, since $\mathbb{E}_{\mathcal{B}}[\sup_{\boldsymbol{\vartheta}\in\Theta}\mathcal{J}_{\mathcal{B}}(\phi,\psi;\boldsymbol{\vartheta})]\ge\sup_{\boldsymbol{\vartheta}\in\Theta}\mathbb{E}_{\mathcal{B}}[\mathcal{J}_{\mathcal{B}}(\phi,\psi;\boldsymbol{\vartheta})]=\mathcal{L}(\phi,\psi)$ and the inequality can be strict.  Likewise, replacing $\widehat{q}_{\gamma}(s)$ by the average of $K_{\gamma}(S_j,s)$ over $j\in\mathcal{B}$ makes $\Delta_{\mathcal{B}}(s;\theta,\mu)$ a ratio of batch averages minus a batch average, for which the first identity in Equation~(\ref{eq:mb-unbiased-value}) fails in general.  The proposition holds for every batch size, but it bounds neither the optimization error nor the variance of the gradients, which can be large for small batches when the kernel weights concentrate on few observations.  Restricting $s$ to $\mathcal{S}_n$ and taking $\gamma=\gamma_n$ gives the empirical penalty $\widehat{D}_n(h_{\phi})$ of Section~\ref{sec:theory}, so Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate} apply to this full-sample value for the learned encoder, which a maximum over finitely many candidates can underestimate.
+
+\paragraph{Comparison with the MMD penalty.}  At each conditioning value, the penalty of FREM in Equation~(\ref{eq:eipm-estimator}) is the square root of a quadratic form in the kernel evaluated at pairs of representations \citep{kong2025fair}, so its value computed from the kernel sums and normalizations of a batch is not, in general, an unbiased estimate of the full-sample penalty.  Squared MMD admits unbiased estimators based on sampled pairs \citep{gretton2012kernel}, so this difficulty concerns the closed-form penalty of FREM rather than minibatch learning with the MMD in general.  The formulation above instead preserves the empirical supIPM penalty itself.
+
 \subsection{Algorithm}
 \label{app:algorithm-steps}
 
-Algorithm~\ref{alg:supipm-frl} repeats the three updates of Appendix~\ref{app:ascent} into $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by a compass search from newly initialized candidates, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The compass search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$, and the discriminator updates and the descent step use the step sizes $\alpha_v$ and $\alpha$.  Every update depends on the data only through sums over the observations, so Algorithm~\ref{alg:supipm-frl} applies unchanged when these sums are computed on the current minibatch.
+Algorithm~\ref{alg:supipm-frl} repeats the three updates of Appendix~\ref{app:ascent} into $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by a compass search from newly initialized candidates, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The compass search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$, and the discriminator updates and the descent step use the step sizes $\alpha_v$ and $\alpha$.
 
 \begin{algorithm}[H]
 \caption{supIPM-FRL}
@@ -1317,6 +1393,33 @@ Algorithm~\ref{alg:supipm-frl} repeats the three updates of Appendix~\ref{app:as
 \ENDFOR
 \RETURN $h_{\phi}$, $f_{\psi}$
 \ENSURE encoder $h_{\phi}$ and prediction head $f_{\psi}$  
+\end{algorithmic}
+\end{algorithm}
+
+Algorithm~\ref{alg:supipm-frl-mb} is the minibatch version of Algorithm~\ref{alg:supipm-frl} and follows the order of sampling required by Proposition~\ref{prop:minibatch}.  The compass search, the candidate $s^{\star}$ and the signs $\chi_m:=\operatorname{sign}\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m)$, with $\operatorname{sign}(0):=1$, are computed on one batch with $\Delta$ replaced by $|\Delta_{\mathcal{B}}|$, and each gradient step uses a new batch drawn uniformly and independently of the preceding ones.  The ascent step uses
+\begin{equation}
+  H_{\mathcal{B}}(\mathbf{v})
+  :=\sum_{m=1}^{M}\chi_m\,\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m),
+  \label{eq:mb-stacked-ascent}
+\end{equation}
+whose gradient is, by the argument of Proposition~\ref{prop:minibatch}, unbiased for that of the same sum with $\mathcal{B}$ replaced by $[n]$.  This full-sample sum equals $H(\mathbf{v})$ in Equation~(\ref{eq:stacked-objectives}) when each $\chi_m$ agrees with the sign of $\Delta_{[n]}(s^{\star};\theta_m,\mu_m)$, and its gradient equals $\nabla_{\mathbf{v}}H(\mathbf{v})$ when, in addition, each $\Delta_{[n]}(s^{\star};\theta_m,\mu_m)$ is nonzero.  The descent step uses $\mathcal{J}_{\mathcal{B}}$ of Equation~(\ref{eq:mb-objective}) at $(s^{\star},\theta_{m^{\star}},\mu_{m^{\star}},\chi_{m^{\star}})$, where $m^{\star}$ indexes the discriminator with the largest $|\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m)|$ on the preceding batch.
+
+\begin{algorithm}[H]
+\caption{supIPM-FRL with minibatches}
+\label{alg:supipm-frl-mb}
+\begin{algorithmic}[1]
+\REQUIRE the inputs of Algorithm~\ref{alg:supipm-frl} and a batch size $|\mathcal{B}|$
+\STATE Initialize $\phi$, $\psi$, and $\mathbf{v}$ with $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]$
+\FOR{$r=1,\ldots,R$}
+  \FOR{$j=1,\ldots,J_v$}
+    \STATE Draw a batch $\mathcal{B}$ and run lines~\ref{alg:s-init}--\ref{alg:s-star} of Algorithm~\ref{alg:supipm-frl} with $\Delta$ replaced by $|\Delta_{\mathcal{B}}|$ \label{alg:mb-search}
+    \STATE $\chi_m\leftarrow\operatorname{sign}\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m)$ for $m\in[M]$ \label{alg:mb-sign}
+    \STATE Draw a new batch $\mathcal{B}$ and set $\mathbf{v}\leftarrow\Pi_{\mathbb{S}^{d-1}\times[-1,1]}\!\left(\mathbf{v}+\alpha_v\,\nabla_{\mathbf{v}}H_{\mathcal{B}}(\mathbf{v})\right)$
+  \ENDFOR
+  \STATE Repeat lines~\ref{alg:mb-search}--\ref{alg:mb-sign} with the updated $\mathbf{v}$, and set $m^{\star}\leftarrow\argmax_{m\in[M]}|\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m)|$
+  \STATE Draw a new batch $\mathcal{B}$ and set $(\phi,\psi)\leftarrow(\phi,\psi)-\alpha\,\nabla_{(\phi,\psi)}\mathcal{J}_{\mathcal{B}}\bigl(\phi,\psi;s^{\star},\theta_{m^{\star}},\mu_{m^{\star}},\chi_{m^{\star}}\bigr)$
+\ENDFOR
+\RETURN $h_{\phi}$, $f_{\psi}$
 \end{algorithmic}
 \end{algorithm}
 
