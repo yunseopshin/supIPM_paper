@@ -1702,8 +1702,7 @@ The comparison on the graphs is with the baselines that apply to a graph encoder
 \subsubsection{Matched-Performance Comparison}
 \label{app:real-matched}
 
-Table~\ref{tab:matched} compares the methods at similar levels of prediction performance. supIPM-FRL achieves the lowest prediction-level and worst-case disparity in every case except the prediction-level disparity on Crime, where it remains comparable to the smallest value. In particular, supIPM-FRL substantially outperforms all baselines in the worst-case downstream disparity on all three datasets. 
-Each dataset is compared at the prediction performance shown in the table, up to a margin of $0.004$. An entry is the smallest disparity the method attains there. A dash means that the method did not reach that performance. The best value in each row is in bold.
+Table~\ref{tab:matched} compares the methods at similar levels of prediction performance. supIPM-FRL achieves the lowest prediction-level and worst-case disparity in every case except the prediction-level disparity on Crime, where it remains comparable to the smallest value. In particular, supIPM-FRL substantially outperforms all baselines in the worst-case downstream disparity on all three datasets. Each dataset is compared at the prediction performance shown in the table, up to a margin of $0.004$.  An entry is the smallest disparity the method attains there.  A dash means that the method did not reach that performance.  The best value in each row is in bold.
 
 \begin{table}[!htb]
 \centering
@@ -1734,12 +1733,12 @@ worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- 
 \subsection{Computational Cost}
 \label{app:real-cost}
 
-Appendix~\ref{app:mini-batch} shows that supIPM-FRL admits mini-batch learning.  The MMD penalty of FREM carries no such guarantee, so it should be trained on the batch, that is, on the whole training sample.  Table~\ref{tab:cost} reports one gradient step on Adult under these two discriminators.  It also covers sup-MMD, the variant of Appendix~\ref{app:ablation-ipm-class} with the MMD in place of the ReLU discriminators.
+Appendix~\ref{app:mini-batch} shows that supIPM-FRL admits mini-batch learning.  The MMD penalty of FREM carries no such guarantee, so it should be trained on the batch, that is, on the whole training sample.  Table~\ref{tab:cost} reports one gradient step on Adult under these two regimes.  It also covers sup-MMD, the variant of Appendix~\ref{app:ablation-ipm-class} with the MMD in place of the ReLU discriminators.
 
 \begin{table}[H]
 \centering
 \footnotesize
-\caption{Computational cost on Adult.}
+\caption{One gradient step on Adult.}
 \label{tab:cost}
 \begin{tabular}{llrr}
 \toprule
@@ -1752,12 +1751,12 @@ sup-MMD    & batch ($32{,}000$) & \multicolumn{2}{c}{out of memory} \\
 \end{tabular}
 \end{table}
 
-The MMD evaluates the kernel at every pair of representations, so its memory grows quadratically and neither penalty fits the batch in the $24$ GB of the GPU.  In practice they are therefore trained with mini-batches, without the unbiasedness of Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} gives the same step as the mini-batch grows.  FREM already needs $8.5$ GB at $1{,}024$ observations, so these penalties can be trained only up to a mini-batch that fits in memory.  The memory of supIPM-FRL grows linearly and the batch fits in $129$ MB, while its time per step is dominated by the inner updates and varies little with the mini-batch.
+The MMD evaluates the kernel at every pair of representations, so its cost grows quadratically with the number of observations.  On the whole training sample this cost exceeds the $24$ GB of the GPU.  In practice they are therefore trained with mini-batches, without the unbiasedness of Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} gives the same step as the mini-batch grows.  FREM already needs $8.5$ GB at $1{,}024$ observations, so the memory of the GPU limits how large their mini-batch can be.  The memory of supIPM-FRL grows linearly and the whole training sample takes $129$ MB, while its time per step is dominated by the inner updates and varies little with the mini-batch.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{appendix/figAC_cost.pdf}
-  \caption{Computational cost on Adult as the mini-batch grows.  The cross marks the first size that exceeds the memory of the GPU.}
+  \caption{One gradient step on Adult as the mini-batch grows.  The cross marks the first size that exceeds the memory of the GPU.}
   \label{fig:cost}
 \end{figure}
 
