@@ -1461,7 +1461,6 @@ where $\varepsilon_1,\varepsilon_2\sim N(0,1)$. And $S$, $\mathbf{X}_{\mathrm{ta
 
 The sensitive attribute affects the input only through $X_{\mathrm{loc}}$ alone and does not enter the outcome generating equation, so $Y$ is conditionally independent of $S$ given $\mathbf{X}_{\mathrm{task}}$ and a representation that discards the dependence near $s_0$ incurs no loss of prediction performance.  The disparity that remains under each measure therefore reflects the dependence that the measure fails to remove, not a trade-off against prediction performance.  Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.
 
-\flushbottom
 \subsection{Settings}
 \label{app:synth-settings}
 
@@ -1734,43 +1733,55 @@ worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- 
 \subsection{Computational Cost}
 \label{app:real-cost}
 
-Table~\ref{tab:cost} compares the computational cost of supIPM-FRL, with the compass search over $s$ of Section~\ref{sec:supipm-objective}, and of FREM on Adult.  FREM is the closest average-case counterpart of supIPM-FRL: both penalize a kernel-weighted discrepancy between the conditional and the marginal distribution of the representation, and they differ in the aggregation over $S$, the average in Equation~(\ref{eq:eipm-estimator}) versus the supremum in Equation~(\ref{eq:empirical-supipm}), and in the discriminator class.  Both methods use the same encoder, prediction head, batch size, hardware and timing procedure, with the settings of Appendix~\ref{app:real-settings}.  The table gives the mean and standard deviation of the training time per epoch, the time relative to FREM, and the peak GPU memory.  supIPM-FRL takes about $1.46$ times as long per epoch as FREM.  Each descent step of Algorithm~\ref{alg:supipm-frl} is preceded by $J_v$ discriminator updates and the compass search over $s$, which FREM does not perform.  The peak GPU memory usage of supIPM-FRL is markedly smaller.  The estimator of Equation~(\ref{eq:eipm-estimator}) evaluates an MMD at every observation of the mini-batch, whereas the estimator of Equation~(\ref{eq:empirical-supipm}) evaluates one weighted sum over the mini-batch at a single sensitive value.
+Appendix~\ref{app:mini-batch} shows that supIPM-FRL admits mini-batch learning.  The MMD penalty of FREM carries no such guarantee, so it should be trained on the batch, that is, on the whole training sample.  Table~\ref{tab:cost} reports one gradient step on Adult under these two regimes.  It also covers sup-MMD, the variant of Appendix~\ref{app:ablation-ipm-class} with the MMD in place of the ReLU discriminators.
 
-\begin{table}[!htb]
+\begin{table}[H]
 \centering
 \footnotesize
-\caption{Computational cost on Adult: seconds per epoch, cost relative to FREM, and peak GPU memory.}
+\caption{One gradient step on Adult.}
 \label{tab:cost}
-\begin{tabular}{lrrr}
+\begin{tabular}{llrr}
 \toprule
-Method & seconds per epoch & relative cost & peak GPU memory (GB) \\
+Method & learning & seconds & peak memory (MB) \\
 \midrule
-FREM       & $1.570\pm0.040$ & $1.00\times$ & 8.280 \\
-supIPM-FRL & $2.290\pm0.110$ & $1.46\times$ & 0.019 \\
+supIPM-FRL & mini-batch ($1{,}024$) & 0.086 & 33 \\
+FREM       & batch ($32{,}000$) & \multicolumn{2}{c}{out of memory} \\
+sup-MMD    & batch ($32{,}000$) & \multicolumn{2}{c}{out of memory} \\
 \bottomrule
 \end{tabular}
 \end{table}
-\FloatBarrier
+
+The MMD evaluates the kernel at every pair of representations, so its memory grows quadratically and neither penalty fits the batch in the $24$ GB of the GPU.  In practice they are therefore trained with mini-batches, without the unbiasedness of Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} gives the same step as the mini-batch grows.  FREM already needs $8.5$ GB at $1{,}024$ observations, so these penalties can be trained only up to a mini-batch that fits in memory.  The memory of supIPM-FRL grows linearly and the batch fits in $129$ MB, while its time per step is dominated by the inner updates and varies little with the mini-batch.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{appendix/figAC_cost.pdf}
+  \caption{One gradient step on Adult as the mini-batch grows.  The cross marks the first size that exceeds the memory of the GPU.}
+  \label{fig:cost}
+\end{figure}
+
+This computational advantage, together with the guarantee of Appendix~\ref{app:mini-batch}, is the main reason for the ReLU discriminators of Section~\ref{sec:discriminator-choice}.
 
 \section{Ablation Studies}
 \label{app:ablation-studies}
 
-This appendix examines three choices in the penalty of supIPM-FRL on the tabular datasets: the bandwidth of the smoothing kernel, its shape, and the class of the discriminators.  Each ablation varies one choice and holds every other setting of Appendix~\ref{app:real-settings} fixed.  Each figure reports prediction performance against the prediction-level disparity in the top row and against the worst-case downstream disparity over $\mathcal{F}_1$ in the bottom row, with one column per dataset.
+This appendix examines two choices in the penalty of supIPM-FRL on the tabular datasets: the shape of the smoothing kernel and the class of the discriminators.  Each ablation varies one choice and holds every other setting of Appendix~\ref{app:real-settings} fixed.  Each figure reports prediction performance against the prediction-level disparity in the top row and against the worst-case downstream disparity over $\mathcal{F}_1$ in the bottom row, with one column per dataset.
 
-\subsection{Bandwidth}
-\label{app:ablation-bandwidth}
-
-The bandwidth $\gamma$ of the kernel $K_{\gamma}$ in Equation~(\ref{eq:supipm-estimators}) sets the range of sensitive values over which the conditional distribution at $s$ is smoothed.  We train supIPM-FRL at $\gamma\in\{0.10,0.25,0.50\}\,\widehat{\sigma}_S$ in place of the bandwidth of Appendix~\ref{app:synth-settings}, and leave the evaluation smoother unchanged.
-
-In Figure~\ref{fig:app-ablation-bandwidth} the prediction-level curves nearly coincide.  At a matched level of prediction performance $\gamma=0.25$ attains a lower worst-case disparity than $\gamma=0.50$ on the three datasets and than $\gamma=0.10$ on Crime and ACSIncome, while on Adult the narrower bandwidth is the lower of the two.
-
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[width=\textwidth]{appendix/figAB_bandwidth.pdf}
-  \caption{Prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ (top) and the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_{1})$ (bottom) for supIPM-FRL trained at $\gamma\in\{0.10,0.25,0.50\}$, on Adult (left), Crime (middle) and ACSIncome (right).}
-  \label{fig:app-ablation-bandwidth}
-\end{figure}
-\FloatBarrier
+% The bandwidth ablation is commented out for now.
+% \subsection{Bandwidth}
+% \label{app:ablation-bandwidth}
+%
+% The bandwidth $\gamma$ of the kernel $K_{\gamma}$ in Equation~(\ref{eq:supipm-estimators}) sets the range of sensitive values over which the conditional distribution at $s$ is smoothed.  We train supIPM-FRL at $\gamma\in\{0.10,0.25,0.50\}\,\widehat{\sigma}_S$ in place of the bandwidth of Appendix~\ref{app:synth-settings}, and leave the evaluation smoother unchanged.
+%
+% In Figure~\ref{fig:app-ablation-bandwidth} the prediction-level curves nearly coincide.  At a matched level of prediction performance $\gamma=0.25$ attains a lower worst-case disparity than $\gamma=0.50$ on the three datasets and than $\gamma=0.10$ on Crime and ACSIncome, while on Adult the narrower bandwidth is the lower of the two.
+%
+% \begin{figure}[!htb]
+%   \centering
+%   \includegraphics[width=\textwidth]{appendix/figAB_bandwidth.pdf}
+%   \caption{Prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ (top) and the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_{1})$ (bottom) for supIPM-FRL trained at $\gamma\in\{0.10,0.25,0.50\}$, on Adult (left), Crime (middle) and ACSIncome (right).}
+%   \label{fig:app-ablation-bandwidth}
+% \end{figure}
+% \FloatBarrier
 
 \subsection{Smoothing Kernel}
 \label{app:ablation-kernel}
