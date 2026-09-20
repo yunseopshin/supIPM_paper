@@ -566,7 +566,7 @@ Table~\ref{tab:datasets} in Appendix~\ref{app:real-experiments} gives further de
 % Each point is the mean over five seeds with bars of $\pm1$ standard deviation, each curve traces the configurations of one method with the smallest disparity at each level of prediction performance, and the upper left is favorable. 
 Figure~\ref{fig:adult} shows the prediction-level disparity and Figure~\ref{fig:worst-case} the worst-case downstream disparity over $\mathcal{F}_1$ on the three datasets.
 % the results with $S$ discretized at its mean and the worst-case curves over $\mathcal{F}_4$ and $\mathcal{F}_8$ are given in Appendix~\ref{app:real-tabular}.  
-At the prediction level, supIPM-FRL is comparable to the other methods.  Under the worst-case downstream disparity, supIPM-FRL attains a markedly smaller disparity than every other method at the same prediction performance on all three datasets, except at the lowest prediction performance on Crime.
+At the prediction level, supIPM-FRL is comparable to the other methods.  Under the worst-case downstream disparity, supIPM-FRL attains a markedly smaller disparity than every other method at the same prediction performance on all three datasets.
 % , where the methods that use $S$ directly coincide with it.
 
 \begin{figure}[!htb]
@@ -580,7 +580,8 @@ At the prediction level, supIPM-FRL is comparable to the other methods.  Under t
 
 The two measures differ because the prediction-level disparity concerns the trained head only, whereas the worst-case disparity concerns every head in $\mathcal{F}_1$.  
 % The other methods constrain the dependence on $S$ only on average over $S$, only within groups of a discretized $S$, or only through a single head or adversary, so a downstream head can use the dependence they leave.
-The baselines do not directly control the dependence between the representation and $S$ at every sensitive value. They may therefore achieve low disparity for the trained head while leaving dependence that another downstream head can exploit, leading to larger worst-case disparity.
+The baselines do not directly control the dependence between the representation and $S$ at every sensitive value. 
+They may therefore achieve low disparity for the trained head while leaving dependence that another downstream head can exploit, leading to larger worst-case disparity.
 \Needspace{11\baselineskip}
 \begin{wrapfigure}{r}{0.42\textwidth}
   \vspace{-13pt}
