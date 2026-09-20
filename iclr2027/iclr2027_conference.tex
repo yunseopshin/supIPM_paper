@@ -602,6 +602,8 @@ Figure~\ref{fig:profile-adult} shows this property on Adult. We consider setting
 
 \subsection{Ablation studies and additional results}
 
+Appendix~\ref{app:real-measures} compares the methods under five further fairness measures, and Appendix~\ref{app:real-graph} compares them on the graph datasets.  The computational cost is reported in Appendix~\ref{app:real-cost}.  Appendix~\ref{app:ablation-studies} ablates two choices in the penalty, (i) the shape of the smoothing kernel and (ii) the class of the discriminators.
+
 \section{Conclusion}
 \label{sec:conclusion}
 
@@ -1615,14 +1617,27 @@ We also provide comparisons under alternative fairness measures, results on grap
 \subsubsection{Tabular Results}
 \label{app:real-tabular}
 
-Figure~\ref{fig:app-prediction-level} repeats the prediction-level comparison of Figure~\ref{fig:adult} on Crime and ACSIncome with a third panel in which $S$ is discretized at its mean, as does every figure in this appendix.  On both datasets supIPM-FRL, FREM and Reg-GDP have nearly the same prediction-level curve, and the binary-$S$ methods are close to them.  As on Adult, the methods are separated mainly by the worst-case disparity: a penalty on the fitted head, or an average over $S$, leaves a dependence on $S$ that a different head can exploit, whereas the supremum over $s$ and over the discriminators reduces it markedly.
+Figure~\ref{fig:app-prediction-level} repeats the prediction-level comparison of Figure~\ref{fig:adult} on the three datasets with a third panel in which $S$ is discretized at its mean, as does every figure in this appendix.  On both datasets supIPM-FRL, FREM and Reg-GDP have nearly the same prediction-level curve, and the binary-$S$ methods are close to them.  As on Adult, the methods are separated mainly by the worst-case disparity: a penalty on the fitted head, or an average over $S$, leaves a dependence on $S$ that a different head can exploit, whereas the supremum over $s$ and over the discriminators reduces it markedly.
 
 \begin{figure}[!htb]
   \centering
+  \includegraphics[width=0.8\textwidth]{appendix/fig2_own_head_adult.pdf}\\[1pt]
   \includegraphics[width=0.8\textwidth]{appendix/fig2_own_head_crime.pdf}\\[1pt]
   \includegraphics[width=0.8\textwidth]{appendix/fig2_own_head_acs.pdf}
-  \caption{Prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ on Crime (top) and ACSIncome (bottom).}
+  \caption{Prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ on Adult (top), Crime (middle) and ACSIncome (bottom).}
   \label{fig:app-prediction-level}
+\end{figure}
+\FloatBarrier
+
+Figure~\ref{fig:app-c1} repeats the worst-case comparison of Figure~\ref{fig:worst-case} with the same third panel.
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_adult_c1.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_crime_c1.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA2_worst_head_budgets_acs_c1.pdf}
+  \caption{Prediction performance against the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_{1})$ on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \label{fig:app-c1}
 \end{figure}
 \FloatBarrier
 
@@ -1711,6 +1726,44 @@ The comparison on the graphs is with the baselines that apply to a graph encoder
   \includegraphics[width=0.72\textwidth]{appendix/figA7_graph_worst_head.pdf}
   \caption{Pokec-z (left) and Pokec-n (right): prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ (top) and the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$ (bottom).}
   \label{fig:app-graph}
+\end{figure}
+\FloatBarrier
+
+Figures~\ref{fig:app-graph-gdp-kernel}--\ref{fig:app-graph-mi} replace the disparity axis by the other measures of Appendix~\ref{app:worst-case}, as in Appendix~\ref{app:real-measures}.
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.72\textwidth]{appendix/figA7_graph_gdp_w_kernel.pdf}
+  \caption{Pokec-z (left) and Pokec-n (right): prediction performance against the kernel GDP.}
+  \label{fig:app-graph-gdp-kernel}
+\end{figure}
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.72\textwidth]{appendix/figA7_graph_gdp_wo_kernel.pdf}
+  \caption{Pokec-z (left) and Pokec-n (right): prediction performance against the binned GDP.}
+  \label{fig:app-graph-gdp-binned}
+\end{figure}
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.72\textwidth]{appendix/figA7_graph_sup_ipm.pdf}
+  \caption{Pokec-z (left) and Pokec-n (right): prediction performance against the empirical supIPM.}
+  \label{fig:app-graph-supipm}
+\end{figure}
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.72\textwidth]{appendix/figA7_graph_hgr.pdf}
+  \caption{Pokec-z (left) and Pokec-n (right): prediction performance against the HGR maximal correlation.}
+  \label{fig:app-graph-hgr}
+\end{figure}
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.72\textwidth]{appendix/figA7_graph_mi_y_s.pdf}
+  \caption{Pokec-z (left) and Pokec-n (right): prediction performance against the mutual information $I(\\hat{Y};S)$.}
+  \label{fig:app-graph-mi}
 \end{figure}
 \FloatBarrier
 
