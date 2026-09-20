@@ -551,7 +551,7 @@ In contrast,  the supremum in Equation~(\ref{eq:supipm}) is attained near $s_0$,
 \end{itemize}
 Table~\ref{tab:datasets} in Appendix~\ref{app:real-experiments} gives further details, and results on the graph datasets Pokec-z and Pokec-n \citep{takac2012data} are also provided there.
 
-\paragraph{Baselines.}  Four baselines use the continuous $S$ directly: FREM \citep{kong2025fair} of Section~\ref{sec:frem}, Reg-GDP \citep{jiang2022generalized} and Reg-HGR \citep{mary2019fairness}, which penalize the prediction by the GDP of Equation~(\ref{eq:gdp}) and by the HGR maximal correlation, and ADV \citep{zhang2018mitigating,kong2025fair}, which trains an adversary that predicts $S$ from the representation.  The other three, LAFTR \citep{madras2018learning}, MMD \citep{deka2023mmd} and sIPM-LFR \citep{kim2022learning}, are FRL methods for a categorical sensitive attribute; they are applied to $S$ discretized at its median.  All methods share the architecture of Appendix~\ref{app:real-settings}, are trained over a grid of penalty parameters with five random seeds.
+\paragraph{Baselines.}  Four baselines use the continuous $S$ directly: FREM \citep{kong2025fair} of Section~\ref{sec:frem}, Reg-GDP \citep{jiang2022generalized} and Reg-HGR \citep{mary2019fairness}, which penalize the prediction by the GDP of Equation~(\ref{eq:gdp}) and by the Hirschfeld-Gebelein-Renyi (HGR) maximal correlation, and ADV \citep{zhang2018mitigating,kong2025fair}, which trains an adversary that predicts $S$ from the representation.  The other three, LAFTR \citep{madras2018learning}, MMD \citep{deka2023mmd} and sIPM-LFR \citep{kim2022learning}, are FRL methods for a categorical sensitive attribute; they are applied to $S$ discretized at its median.  All methods share the architecture of Appendix~\ref{app:real-settings}, are trained over a grid of penalty parameters with five random seeds.
 
 \begin{figure}[!htb]
   \centering
@@ -1525,7 +1525,10 @@ The graph datasets Pokec-z and Pokec-n are the social-network graphs of \citet{k
 \subsection{Training Settings}
 \label{app:real-settings}
 
-On the tabular datasets, for every method the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer followed by the normalization of Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear; on the graph datasets the encoder is the GCN of Appendix~\ref{app:real-datasets}.  Table~\ref{tab:hyperparameters} gives the batch size, the number of epochs, the learning rate and the weight decay, which are common to all methods, together with the settings of supIPM-FRL in the notation of Algorithm~\ref{alg:supipm-frl}: the number $M$ of discriminators, the number $J_v$ of discriminator updates with step size $\alpha_v$, and the number $T$ of candidate sensitive values and the initial step size $\delta_0$ of the compass search over $s$, which stops once its step size falls below $\gamma/8$.  The bandwidth $\gamma$ is that of Appendix~\ref{app:synth-settings}.  The penalty parameter $\lambda$ of supIPM-FRL takes values between $0.003$ and $3$.  The running times and peak GPU memory usage in Appendix~\ref{app:real-cost} are measured on a single NVIDIA GeForce RTX 3090 GPU with 24 GB of memory under PyTorch 2.0.1 and CUDA 11.7.
+On the tabular datasets, for every method the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer followed by the normalization of Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear; on the graph datasets the encoder is the GCN of Appendix~\ref{app:real-datasets}.  Table~\ref{tab:hyperparameters} gives the batch size, the number of epochs, the learning rate and the weight decay, which are common to all methods.  For supIPM-FRL, it gives the number $M$ of discriminators and the number $J_v$ of discriminator updates with step size $\alpha_v$.  The last two columns are the number $T$ of candidate sensitive values and the initial step size $\delta_0$ of the compass search over $s$, which stops once its step size falls below $\gamma/8$.
+The bandwidth $\gamma$ follows the rule of Appendix~\ref{app:synth-settings}.
+The penalty parameter $\lambda$ of supIPM-FRL takes values between $0.003$ and $3$. 
+The running times and peak GPU memory usage in Appendix~\ref{app:real-cost} are measured on a single NVIDIA GeForce RTX 3090 GPU with 24 GB of memory under PyTorch 2.0.1 and CUDA 11.7.
 
 \begin{table}[!htb]
 \centering
@@ -1551,7 +1554,7 @@ Pokec-z / Pokec-n    & 1024 & 100 & $10^{-3}$ & 0         & 100 & 10 & $10^{-2}$
 The baselines share the encoder, the prediction head and the optimization settings of Appendix~\ref{app:real-settings}, and differ from supIPM-FRL only in their fairness term and its penalty values.  Their configurations are as follows.
 \begin{itemize}
   \item FREM \citep{kong2025fair} penalizes the empirical EIPM of Equation~(\ref{eq:eipm-estimator}) with the RKHS unit ball of a Gaussian kernel of bandwidth $1.0$.  The kernel bandwidth on $S$ is $0.03$, $0.05$ or $0.07$, and the penalty values lie between $0.01$ and $3$.
-  \item Reg-GDP \citep{jiang2022generalized} and Reg-HGR \citep{mary2019fairness} penalize a kernel estimate of GDP and an estimate of the HGR maximal correlation of the prediction and $S$, respectively, with penalty values between $0.02$ and $100$.
+  \item Reg-GDP \citep{jiang2022generalized} and Reg-HGR \citep{mary2019fairness} penalize a kernel estimate of GDP and an estimate of the Hirschfeld-Gebelein-Renyi (HGR) maximal correlation of the prediction and $S$, respectively, with penalty values between $0.02$ and $100$.
   \item ADV \citep{zhang2018mitigating} trains an adversary to predict $S$ from the representation, with penalty values between $5$ and $5\times10^{4}$.
   \item LAFTR \citep{madras2018learning}, MMD \citep{deka2023mmd} and sIPM-LFR \citep{kim2022learning} align the representations of the two groups of a binarized $S$ through an adversary, the MMD and an IPM with sigmoid discriminators, respectively.  $S$ is binarized at its median or at its mean, and the penalty values lie between $0.1$ and $10$.
 \end{itemize}
@@ -1578,14 +1581,15 @@ where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref
   \operatorname{HGR}(\hat{Y},S)
   &:=\sup_{g_1,g_2}\operatorname{Corr}\bigl(g_1(\hat{Y}),g_2(S)\bigr),\\
   I(\hat{Y};S)
-  &:=\int p_{\hat{Y}S}(\hat{y},s)\log\frac{p_{\hat{Y}S}(\hat{y},s)}{p_{\hat{Y}}(\hat{y})\,p_S(s)}\,\mathrm{d}\hat{y}\,\mathrm{d}s,
+  &:=\int p_{\hat{Y},S}(\hat{y},s)\log\frac{p_{\hat{Y},S}(\hat{y},s)}{p_{\hat{Y}}(\hat{y})\,p_S(s)}\,\mathrm{d}\hat{y}\,\mathrm{d}s,
 \end{aligned}
 \label{eq:hgr-mi}
 \end{equation}
-where the supremum is over non-constant functions with finite second moments and $p_{\hat{Y}S}$, $p_{\hat{Y}}$ and $p_S$ are the joint and the marginal densities.  Both vanish if and only if $\hat{Y}$ and $S$ are independent.  The HGR is estimated as in \citet{mary2019fairness} from a kernel density estimate of the joint distribution of $(\hat{Y},S)$, and the mutual information with the nearest-neighbor estimator of \citet{kraskov2004estimating} and \citet{ross2014mutual}.
+where the supremum is over non-constant functions with finite second moments and $p_{\hat{Y},S}$, $p_{\hat{Y}}$ and $p_S$ are the joint and the marginal densities.  Both vanish if and only if $\hat{Y}$ and $S$ are independent.  The HGR is estimated as in \citet{mary2019fairness} from a kernel density estimate of the joint distribution of $(\hat{Y},S)$, and the mutual information with the nearest-neighbor estimator of \citet{kraskov2004estimating} and \citet{ross2014mutual}.
 
-Every curve in Section~\ref{sec:exp-real} and in this appendix retains, at each level of prediction performance, the smallest disparity over the evaluated penalty values and settings, and shows the mean over five seeds with $\pm1$ standard deviation.
 
+In Section~\ref{sec:exp-real} and in this appendix, each point of a curve is one penalty value $\lambda$, trained with five random seeds.
+The point is the mean over the seeds, and the bars give one standard deviation of the prediction performance and of the fairness measure.
 \subsection{Additional Results}
 \label{app:real-additional}
 
