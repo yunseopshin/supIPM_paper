@@ -595,7 +595,7 @@ Another downstream head can exploit that dependence, which raises the worst-case
 \end{wrapfigure}
 
 In contrast, supIPM-FRL controls the largest ReLU-IPM between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ over the sensitive domain. Corollary~\ref{cor:certificate} shows that the empirical supIPM uniformly controls a downstream disparity over all sensitive values.
-Figure~\ref{fig:profile-adult} shows this this property on Adult. We consider settings with test accuracy within $0.004$ of the baseline accuracy at $\lambda=0$. Among these settings, we select the one with the lowest worst-case disparity for each method. At comparable test accuracy, supIPM-FRL keeps disparity low across the sensitive domain even for the worst-case head, whereas FREM exhibits substantially larger disparities.
+Figure~\ref{fig:profile-adult} shows this property on Adult. We consider settings with test accuracy within $0.004$ of the baseline accuracy at $\lambda=0$. For each method we take the setting with the lowest worst-case disparity among them. At comparable test accuracy, supIPM-FRL keeps disparity low across the sensitive domain even for the worst-case head, whereas FREM exhibits substantially larger disparities.
   
   % on Adult for the configurations with the smallest worst-case disparity among those whose test accuracy is within $0.004$ of the model trained without a penalty. the worst-case head of FREM attains a disparity many times larger than that of supIPM-FRL, whose disparity is small at every $s$.  Accordingly, the empirical supIPM on the test data in Appendix~\ref{app:real-measures} is smallest for supIPM-FRL on Adult and Crime at a matched level of prediction performance, although FREM attains a smaller value on ACSIncome.
 
