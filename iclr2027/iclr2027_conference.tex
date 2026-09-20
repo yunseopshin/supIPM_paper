@@ -326,7 +326,7 @@ A bound on $\operatorname{GDP}_{\infty}(f\circ h)$ for heads $f$ of bounded H\"o
 Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$ and hence on $\operatorname{GDP}_{\infty}(f\circ h)$ for every head $f\in\mathcal{H}^{\beta}_d$.
 The ReLU class is also better suited to training with mini-batches than MMD used by FREM.  
 Computing empirical MMD requires $O(n^2)$ kernel evaluations. 
-MMD's mini-batch penalty is generally a biased estimate of the penalty computed on the entire training sample.
+In general, the MMD computed on a mini-batch is a biased estimate of the MMD computed on the entire training sample.  Training with the MMD therefore requires the entire sample.
 In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM-FRL with the ReLU class admits mini-batch learning.
 
 \subsection{Estimation of supIPM}
