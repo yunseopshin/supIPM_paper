@@ -1702,7 +1702,8 @@ The comparison on the graphs is with the baselines that apply to a graph encoder
 \subsubsection{Matched-Performance Comparison}
 \label{app:real-matched}
 
-Table~\ref{tab:matched} compares the methods at similar levels of prediction performance. supIPM-FRL achieves the lowest prediction-level and worst-case disparity in every case except the prediction-level disparity on Crime, where it remains comparable to the smallest value. In particular, supIPM-FRL substantially outperforms all baselines in the worst-case downstream disparity on all three datasets. For each method and each measure, the entry is the smallest disparity among the configurations whose prediction performance lies within $0.004$ of the stated level, and a dash indicates that no configuration lies within this margin.  The smallest value in each row is in bold.
+Table~\ref{tab:matched} compares the methods at similar levels of prediction performance. supIPM-FRL achieves the lowest prediction-level and worst-case disparity in every case except the prediction-level disparity on Crime, where it remains comparable to the smallest value. In particular, supIPM-FRL substantially outperforms all baselines in the worst-case downstream disparity on all three datasets. 
+Each dataset is compared at the prediction performance shown in the table, up to a margin of $0.004$. An entry is the smallest disparity the method attains there. A dash means that the method did not reach that performance. The best value in each row is in bold.
 
 \begin{table}[!htb]
 \centering
@@ -1733,12 +1734,12 @@ worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- 
 \subsection{Computational Cost}
 \label{app:real-cost}
 
-Appendix~\ref{app:mini-batch} shows that supIPM-FRL admits mini-batch learning.  The MMD penalty of FREM carries no such guarantee, so it should be trained on the batch, that is, on the whole training sample.  Table~\ref{tab:cost} reports one gradient step on Adult under these two regimes.  It also covers sup-MMD, the variant of Appendix~\ref{app:ablation-ipm-class} with the MMD in place of the ReLU discriminators.
+Appendix~\ref{app:mini-batch} shows that supIPM-FRL admits mini-batch learning.  The MMD penalty of FREM carries no such guarantee, so it should be trained on the batch, that is, on the whole training sample.  Table~\ref{tab:cost} reports one gradient step on Adult under these two discriminators.  It also covers sup-MMD, the variant of Appendix~\ref{app:ablation-ipm-class} with the MMD in place of the ReLU discriminators.
 
 \begin{table}[H]
 \centering
 \footnotesize
-\caption{One gradient step on Adult.}
+\caption{Computational cost on Adult.}
 \label{tab:cost}
 \begin{tabular}{llrr}
 \toprule
@@ -1756,7 +1757,7 @@ The MMD evaluates the kernel at every pair of representations, so its memory gro
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{appendix/figAC_cost.pdf}
-  \caption{One gradient step on Adult as the mini-batch grows.  The cross marks the first size that exceeds the memory of the GPU.}
+  \caption{Computational cost on Adult as the mini-batch grows.  The cross marks the first size that exceeds the memory of the GPU.}
   \label{fig:cost}
 \end{figure}
 
