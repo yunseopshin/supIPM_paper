@@ -1751,7 +1751,7 @@ sup-MMD    & batch ($32{,}000$) & \multicolumn{2}{c}{out of memory} \\
 \end{tabular}
 \end{table}
 
-The MMD evaluates the kernel at every pair of representations, so its cost grows quadratically with the number of observations.  On the whole training sample this cost exceeds the $24$ GB of the GPU.  In practice they are therefore trained with mini-batches, without the unbiasedness of Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} gives the same step as the mini-batch grows.  FREM already needs $8.5$ GB at $1{,}024$ observations, so the memory of the GPU limits how large their mini-batch can be.  The memory of supIPM-FRL grows linearly and the whole training sample takes $129$ MB, while its time per step is dominated by the inner updates and varies little with the mini-batch.
+The MMD evaluates the kernel at every pair of representations, so its cost grows quadratically with the number of observations.  On the whole batch, this cost exceeds the $24$ GB of the GPU.  In practice, they are therefore trained with mini-batches, without the unbiasedness such as Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} gives the computational cost as the mini-batch grows.  FREM already needs $8.5$ GB at $1{,}024$ observations.  The memory of supIPM-FRL grows linearly and the whole training sample takes $129$ MB, while its time per step is almost same with the mini-batch.
 
 \begin{figure}[H]
   \centering
