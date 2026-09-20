@@ -1465,9 +1465,9 @@ The sensitive attribute affects the input only through $X_{\mathrm{loc}}$ alone 
 \subsection{Settings}
 \label{app:synth-settings}
 
-Table~\ref{tab:synth-settings} gives the training settings of supIPM-FRL in the notation of Algorithm~\ref{alg:supipm-frl}.  
+Table~\ref{tab:synth-settings} gives the training settings of supIPM-FRL in the notation of Algorithm~\ref{alg:supipm-frl}.  Following the experimental setting of \citet{jiang2022generalized}, the bandwidth of the kernel $K_{\gamma}$ is $\gamma=\widehat{\sigma}_S\,(3n/4)^{-1/5}$, where $\widehat{\sigma}_S$ is the sample standard deviation of $S_1,\ldots,S_n$.
 % The encoder, the prediction head and the optimizer are those of the real datasets in Appendix~\ref{app:real-settings}, except that the weight decay is zero so that $X_{\mathrm{loc}}$ is not removed by regularization alone. 
-For each of five seeds, training and test samples of size $5{,}000$ and a validation sample of size $1{,}000$ are drawn. supIPM-FRL is trained with $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$ and FREM with $\lambda\in\{0.05,0.1,0.2,0.5,1,2\}$ at each of two kernel bandwidths.  The worst-case downstream disparity is computed as in Appendix~\ref{app:worst-case}, with the conditional expectations in $\widehat{\operatorname{GDP}}_{\infty}$ estimated with a kernel of bandwidth $0.03$ in place of $\tilde{\gamma}$. 
+For each of five seeds, training and test samples of size $5{,}000$ and a validation sample of size $1{,}000$ are drawn. supIPM-FRL is trained with $\lambda\in\{0,0.01,0.03,0.1,0.3,1,3\}$ and FREM with $\lambda\in\{0.05,0.1,0.2,0.5,1,2\}$ at each of two kernel bandwidths.  The worst-case downstream disparity is computed as in Appendix~\ref{app:worst-case}.
 % since the local term has width $0.043$, which is smaller than Silverman's bandwidth of $0.193$ at $n=5{,}000$.
 % rather than at Silverman's bandwidth, which is too wide to resolve the localized dependence at $n=5{,}000$; Appendix~\ref{app:ablation-bandwidth} shows that this choice leaves every ranking unchanged.
 
@@ -1476,11 +1476,11 @@ For each of five seeds, training and test samples of size $5{,}000$ and a valida
 \footnotesize
 \caption{Training settings for the simulation.}
 \label{tab:synth-settings}
-\begin{tabular}{rrllrrrlrr}
+\begin{tabular}{rrllrrlrr}
 \toprule
-batch & epochs & learning rate & weight decay & $\gamma$ & $M$ & $J_v$ & $\alpha_v$ & $T$ & $\delta_0$ \\
+batch & epochs & learning rate & weight decay & $M$ & $J_v$ & $\alpha_v$ & $T$ & $\delta_0$ \\
 \midrule
-200 & 200 & $10^{-3}$ & 0 & 0.25 & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
+200 & 200 & $10^{-3}$ & 0 & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1525,7 +1525,7 @@ The graph datasets Pokec-z and Pokec-n are the social-network graphs of \citet{k
 \subsection{Training Settings}
 \label{app:real-settings}
 
-On the tabular datasets, for every method the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer followed by the normalization of Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear; on the graph datasets the encoder is the GCN of Appendix~\ref{app:real-datasets}.  Table~\ref{tab:hyperparameters} gives the batch size, the number of epochs, the learning rate and the weight decay, which are common to all methods, together with the settings of supIPM-FRL in the notation of Algorithm~\ref{alg:supipm-frl}: the bandwidth $\gamma$ of the kernel $K_{\gamma}$, the number $M$ of discriminators, the number $J_v$ of discriminator updates with step size $\alpha_v$, and the number $T$ of candidate sensitive values and the initial step size $\delta_0$ of the compass search over $s$, which stops once its step size falls below $\gamma/8$.  The penalty parameter $\lambda$ of supIPM-FRL takes values between $0.003$ and $3$.  The running times and peak GPU memory usage in Appendix~\ref{app:real-cost} are measured on a single NVIDIA GeForce RTX 3090 GPU with 24 GB of memory under PyTorch 2.0.1 and CUDA 11.7.
+On the tabular datasets, for every method the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer followed by the normalization of Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear; on the graph datasets the encoder is the GCN of Appendix~\ref{app:real-datasets}.  Table~\ref{tab:hyperparameters} gives the batch size, the number of epochs, the learning rate and the weight decay, which are common to all methods, together with the settings of supIPM-FRL in the notation of Algorithm~\ref{alg:supipm-frl}: the number $M$ of discriminators, the number $J_v$ of discriminator updates with step size $\alpha_v$, and the number $T$ of candidate sensitive values and the initial step size $\delta_0$ of the compass search over $s$, which stops once its step size falls below $\gamma/8$.  The bandwidth $\gamma$ is that of Appendix~\ref{app:synth-settings}.  The penalty parameter $\lambda$ of supIPM-FRL takes values between $0.003$ and $3$.  The running times and peak GPU memory usage in Appendix~\ref{app:real-cost} are measured on a single NVIDIA GeForce RTX 3090 GPU with 24 GB of memory under PyTorch 2.0.1 and CUDA 11.7.
 
 \begin{table}[!htb]
 \centering
@@ -1533,14 +1533,14 @@ On the tabular datasets, for every method the encoder is a two-layer network wit
 \caption{Training settings.}
 \label{tab:hyperparameters}
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{lrrllrrllrr}
+\begin{tabular}{lrrllrllrr}
 \toprule
-Dataset & batch & epochs & learning rate & weight decay & $\gamma$ & $M$ & $J_v$ & $\alpha_v$ & $T$ & $\delta_0$ \\
+Dataset & batch & epochs & learning rate & weight decay & $M$ & $J_v$ & $\alpha_v$ & $T$ & $\delta_0$ \\
 \midrule
-Adult                & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
-Crime                & 200  & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
-ACSIncome            & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 0.25 & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
-Pokec-z / Pokec-n    & 1024 & 100 & $10^{-3}$ & 0         & 0.25 & 100 & 10 & $10^{-2}$ & 17 & 0.108 \\
+Adult                & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
+Crime                & 200  & 200 & $10^{-3}$ & $10^{-2}$ & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
+ACSIncome            & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
+Pokec-z / Pokec-n    & 1024 & 100 & $10^{-3}$ & 0         & 100 & 10 & $10^{-2}$ & 17 & 0.108 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1566,7 +1566,7 @@ The baselines share the encoder, the prediction head and the optimization settin
   \widehat{\operatorname{GDP}}_{\infty}(f\circ h):=\max_{s\in\mathcal{Q}}\widehat{\Delta}_{f}(s),
   \label{eq:gdp-estimate}
 \end{equation}
-where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel of bandwidth selected when training procedure, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ of $S$.
+where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel whose bandwidth $\tilde{\gamma}$ follows the rule of Appendix~\ref{app:synth-settings}, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ of $S$.
 % $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}
 
 
@@ -1756,7 +1756,7 @@ This appendix examines three choices in the penalty of supIPM-FRL on the tabular
 \subsection{Bandwidth}
 \label{app:ablation-bandwidth}
 
-The bandwidth $\gamma$ of the kernel $K_{\gamma}$ in Equation~(\ref{eq:supipm-estimators}) sets the range of sensitive values over which the conditional distribution at $s$ is smoothed.  We train supIPM-FRL at $\gamma\in\{0.10,0.25,0.50\}$, where $0.25$ is the value of Table~\ref{tab:hyperparameters}, and leave the evaluation smoother unchanged.
+The bandwidth $\gamma$ of the kernel $K_{\gamma}$ in Equation~(\ref{eq:supipm-estimators}) sets the range of sensitive values over which the conditional distribution at $s$ is smoothed.  We train supIPM-FRL at $\gamma\in\{0.10,0.25,0.50\}\,\widehat{\sigma}_S$ in place of the bandwidth of Appendix~\ref{app:synth-settings}, and leave the evaluation smoother unchanged.
 
 In Figure~\ref{fig:app-ablation-bandwidth} the prediction-level curves nearly coincide.  At a matched level of prediction performance $\gamma=0.25$ attains a lower worst-case disparity than $\gamma=0.50$ on the three datasets and than $\gamma=0.10$ on Crime and ACSIncome, while on Adult the narrower bandwidth is the lower of the two.
 
