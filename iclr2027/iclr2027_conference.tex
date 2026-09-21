@@ -165,22 +165,27 @@ across all of the domain of continuous sensitive attributes.
 \subsection{Fair representation using EIPM}
 \label{sec:frem}
 
-We observe an input $\mathbf{X}\in\mathcal{X}$, an outcome $Y\in\mathcal{Y}$, and a continuous sensitive attribute $S$ taking values in  $\mathcal{S}\subset \mathbb{R}^r.$ For notational simplicity,  we only consider the case $r=1$ and let $\mathcal{S}=[0,1].$
-The proposed algorithm, however, can easily modified for high-dimensional continuous sensitive attributes. See Remark xx for discussions.
+We observe an input $\mathbf{X}\in\mathcal{X}$, an outcome $Y\in\mathcal{Y}$, and a continuous sensitive attribute $S$ taking values in  $\mathcal{S}\subset \mathbb{R}^r.$ For notational simplicity,  we only consider the case of $r=1$ and let $\mathcal{S}=[0,1].$
+The proposed algorithm, however, can easily modified for high-dimensional continuous sensitive attributes. {\bf See Remark xx for discussions.}
 
-An encoder $h:\mathcal{X}\to\mathcal{Z}$ maps $\mathbf{X}$ to a representation $\mathbf{Z}=h(\mathbf{X})$ in the representation space $\mathcal{Z}=\mathbb{R}^d.$A prediction head $f:\mathcal{Z}\to\mathbb{R}$ maps the representation to a real-valued prediction, and $f\circ h$ denotes the composed prediction model.  When the encoder and the prediction head are parameterized, we write them as $h_{\phi}$ and $f_{\psi}$ with parameters $\phi$ and $\psi$.  We write $\mathbb{P}_S$ for the distribution of $S$, $\mathbb{P}_{\mathbf{Z}}$ for the marginal distribution of $\mathbf{Z}$, and $\mathbb{P}_{\mathbf{Z}\mid S=s}$ for the conditional distribution of $\mathbf{Z}$ given $S=s$.  
+An encoder $h:\mathcal{X}\to\mathcal{Z}$ maps $\mathbf{X}$ to a representation $\mathbf{Z}=h(\mathbf{X})$ in the representation space $\mathcal{Z}\subset \mathbb{R}^d.$ A prediction head $f:\mathcal{Z}\to\mathbb{R}$ maps the representation to a real-valued prediction, and $f\circ h$ denotes the composed prediction model
+which maps an input to a prediction value. 
+% When the encoder and the prediction head are parameterized, we write them as $h_{\phi}$ and $f_{\psi}$ with parameters $\phi$ and $\psi,$ respectively. 
+We write $\mathbb{P}_S$ for the distribution of $S$, $\mathbb{P}_{\mathbf{Z}}$ for the distribution of $\mathbf{Z}$, and $\mathbb{P}_{\mathbf{Z}\mid S=s}$ for the conditional distribution of $\mathbf{Z}$ given $S=s$.  
 % Equality $\mathbb{P}_{\mathbf{Z}\mid S=s}=\mathbb{P}_{\mathbf{Z}}$ for $\mathbb{P}_S$-almost every $s$ is equivalent to independence of $\mathbf{Z}$ and $S$, and this independence is inherited by every measurable function of $\mathbf{Z}$.
 
-The discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ is measured using a discriminator class $\mathcal{V}$, a class of real-valued discriminator functions on $\mathcal{Z}$. The IPM associated with $\mathcal{V}$ between two probability measures $\mathbb{P}$ and $\mathbb{Q}$ \citep{muller1997integral,sriperumbudur2012empirical} is defined as
+The discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ is measured using the IPM
+with an discriminator class $\mathcal{V}$, a class of real-valued discriminator functions on $\mathcal{Z}$. 
+The IPM associated with $\mathcal{V}$ between two probability measures $\mathbb{P}$ and $\mathbb{Q}$ \citep{muller1997integral,sriperumbudur2012empirical} is defined as
 \begin{equation}
   \operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})
   :=\sup_{v\in\mathcal{V}}
   \left|\int v(\mathbf{z})\,\mathrm{d}\mathbb{P}(\mathbf{z})-\int v(\mathbf{z})\,\mathrm{d}\mathbb{Q}(\mathbf{z})\right|.
   \label{eq:prelim-ipm}
 \end{equation}
-We say that $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions if $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})=0$ implies $\mathbb{P}=\mathbb{Q}$.  The class $\mathcal{V}$ determines which prediction heads the IPM controls, because $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})$ bounds $\left|\int v\,\mathrm{d}\mathbb{P}-\int v\,\mathrm{d}\mathbb{Q}\right|$ for every $v\in\mathcal{V}$.
+We say that $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions if $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})=0$ implies %$\mathbb{P}=\mathbb{Q}$.  The class $\mathcal{V}$ determines which prediction heads the IPM controls, because $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})$ bounds $\left|\int v\,\mathrm{d}\mathbb{P}-\int v\,\mathrm{d}\mathbb{Q}\right|$ for every $v\in\mathcal{V}$.
 
-For a continuous sensitive attribute, \citet{kong2025fair} define the expectation
+For a continuous sensitive attribute, \citet{kong2025fair} defines the expectation
 of integral probability metric (EIPM) as
 \begin{equation}
   \operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)
@@ -189,19 +194,19 @@ of integral probability metric (EIPM) as
   \,\mathrm{d}\mathbb{P}_S(s)
   \label{eq:eipm}
 \end{equation}
-and propose fair representation using EIPM (FREM).
-If $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions, then $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)=0$ implies $\mathbb{P}_{\mathbf{Z}\mid S=s}=\mathbb{P}_{\mathbf{Z}}$ for $\mathbb{P}_S$-almost every $s$.
+and proposes an FRL algorithm using EIPM (FREM).
+If $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)=0$ implies $\mathbb{P}_{\mathbf{Z}\mid S=s}=\mathbb{P}_{\mathbf{Z}}$ for $\mathbb{P}_S$-almost every $s$.
 
-Given the sample $\mathcal{D}=\{(\mathbf{X}_i,S_i,Y_i)\}_{i=1}^n$ and $\mathbf{Z}_i=h(\mathbf{X}_i)$, FREM estimates the conditional distribution at each observed $S_i$ by kernel weighting,
+Given the training data $\mathcal{D}=\{(\mathbf{X}_i,S_i,Y_i)\}_{i=1}^n$ and $\mathbf{Z}_i=h(\mathbf{X}_i)$, FREM estimates the conditional distribution at each observed $S_i$ by kernel weighting,
 \begin{equation}
-  \widehat{\mathbb{P}}^{(-i),\gamma}_{\mathbf{Z}\mid S=S_i}
-  :=\sum_{j\ne i}\widehat{w}^{(-i)}_{\gamma}(j)\,\delta_{\mathbf{Z}_j},
+  \widehat{\mathbb{P}}^{(-i),\gamma}_{\mathbf{Z}\mid S=S_i}(\cdot)
+  :=\sum_{j\ne i}\widehat{w}^{(-i)}_{\gamma}(j)\,\delta_{\mathbf{Z}_j}(\cdot),
   \qquad
   \widehat{w}^{(-i)}_{\gamma}(j)
   :=\frac{K_{\gamma}(S_j,S_i)}{\sum_{r\ne i}K_{\gamma}(S_r,S_i)},
   \label{eq:frem-conditional}
 \end{equation}
-where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$, $\delta_{\mathbf{z}}$ denotes the point mass at $\mathbf{z}$, and the superscript $(-i)$ indicates that observation $i$ is left out.  Comparing Equation~(\ref{eq:frem-conditional}) with the leave-one-out empirical marginal distribution $\widehat{\mathbb{P}}^{(-i)}_{\mathbf{Z}}=(n-1)^{-1}\sum_{j\ne i}\delta_{\mathbf{Z}_j}$ yields the estimator
+where $K_{\gamma}$ is a given kernel on $\mathcal{S}$ with  the bandwidth $\gamma>0$, $\delta_{\mathbf{z}}(\cdot)$ denotes the point mass at $\mathbf{z}$, and the superscript $(-i)$ indicates that observation $i$ is left out.  Comparing $\widehat{\mathbb{P}}^{(-i),\gamma}_{\mathbf{Z}\mid S=S_i}(\cdot)$ with the leave-one-out empirical marginal distribution $\widehat{\mathbb{P}}^{(-i)}_{\mathbf{Z}}(\cdot)=(n-1)^{-1}\sum_{j\ne i}\delta_{\mathbf{Z}_j}(\cdot)$ yields the estimator
 \begin{equation}
   \widehat{\operatorname{EIPM}}^{\gamma}_{\mathcal{V}}(\mathbf{Z};S)
   :=\frac{1}{n}\sum_{i=1}^n
@@ -210,7 +215,9 @@ where $K_{\gamma}$ is a kernel on $\mathcal{S}$ with bandwidth $\gamma>0$, $\del
         \widehat{\mathbb{P}}^{(-i)}_{\mathbf{Z}}\right).
   \label{eq:eipm-estimator}
 \end{equation}
-With a general discriminator class, this estimator requires a separate maximization at every $S_i$, which FREM avoids by taking $\mathcal{V}$ to be the unit ball of a reproducing kernel Hilbert space (RKHS), for which each IPM is the MMD and has a closed-form kernel expression \citep{gretton2012kernel,kong2025fair}.  For a supervised loss $\ell$ and a penalty parameter $\lambda\ge 0$, FREM then trains the encoder and the prediction head by minimizing
+With a general discriminator class, this estimator requires a separate maximization for calculating $\operatorname{IPM}_{\mathcal{V}}$ at every $S_i$, which is computationally demanding.
+FREM avoids this problem by taking $\mathcal{V}$ to be the unit ball of a reproducing kernel Hilbert space (RKHS), for which each IPM is the MMD and has a closed-form kernel expression \citep{gretton2012kernel,kong2025fair}.  
+For a supervised loss $\ell$ and a penalty parameter $\lambda\ge 0$, FREM then trains the encoder $h$ and the prediction head $f$ by minimizing
 \begin{equation}
   \frac{1}{n}\sum_{i=1}^n \ell\!\left(f(\mathbf{Z}_i),Y_i\right)
   +\lambda\,\widehat{\operatorname{EIPM}}^{\gamma}_{\mathcal{V}}(\mathbf{Z};S).
@@ -220,9 +227,12 @@ With a general discriminator class, this estimator requires a separate maximizat
 \subsection{ReLU-IPM}
 \label{sec:relu-ipm}
 
-The RKHS unit ball of Section~\ref{sec:frem} determines the prediction heads that EIPM controls, and for the Gaussian kernel this RKHS contains only infinitely differentiable functions, so a prediction head of lower smoothness need not belong to $\mathcal{V}$.  \citet{park2026relu} address this restriction with ReLU-IPM, an IPM whose discriminator class is indexed by a finite-dimensional parameter and which nevertheless controls the disparity of every prediction head of bounded H\"older norm.
+It turns out that EIPM can controls fairness violation of $f \circ h$ only when $f$ belongs to the discriminator class $\mathcal{V}$.
+When $\mathcal{V}$ is the RKHS with the Gaussian kernel, it contains only infinitely differentiable functions, so a prediction head of lower smoothness may not belong to $\mathcal{V}$.  
+% The RKHS unit ball of Section~\ref{sec:frem} determines the prediction heads that EIPM controls,
+To overcome this restriction, \citet{park2026relu} considers ReLU-IPM, an IPM whose discriminator class is indexed by a finite-dimensional parameter. ReLU-IPM controls the fairness violation of H\"older smooth prediction head.
 
-Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$ be the unit ball and $\mathbb{S}^{d-1}:=\{\theta\in\mathbb{R}^d:\lVert\theta\rVert_2=1\}$ the unit sphere.  \citet{park2026relu} define the ReLU discriminator class on $\mathbb{B}^d$ by
+Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$ be the unit ball and let $\mathbb{S}^{d-1}:=\{\theta\in\mathbb{R}^d:\lVert\theta\rVert_2=1\}$ be the unit sphere. \citet{park2026relu} defines the ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ on $\mathbb{B}^d$ by
 \begin{equation}
   \mathcal{V}_{\mathrm{R}}
   :=\left\{
@@ -231,28 +241,26 @@ Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$
   \right\},
   \label{eq:relu-class}
 \end{equation}
-where $(a)_+:=\max\{a,0\}$.  The ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, Equation~(\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  
-Despite its finite-dimensional parameterization, ReLU-IPM separates probability distributions on $\mathbb{B}^d$, while keeping the supremum computationally tractable.
-\citet{park2026relu} evaluate ReLU-IPM between empirical distributions by gradient ascent over $(\theta,\mu)$, projecting $\theta$ back onto the unit sphere after each step.
+where $(a)_+:=\max\{a,0\}$.  
+% ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, Equation~(\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  
+Despite its finite-dimensional parameterization of the discriminator class, ReLU-IPM separates probability distributions on $\mathbb{B}^d$, while keeping its computation tractable.
+\citet{park2026relu} computes ReLU-IPM between two distributions by applying a gradient ascent over $(\theta,\mu)$,  and projecting $\theta$ back onto the unit sphere in each update.
 
-To specify the prediction heads that ReLU-IPM controls, fix a smoothness index $\beta>0$ and let $k$ be the largest integer strictly smaller than $\beta$.  Let $\partial^{\mathbf{a}}$ denote the partial derivative indexed by a multi-index $\mathbf{a}\in\mathbb{N}_0^d$ of order $|\mathbf{a}|=a_1+\cdots+a_d$.  Then the $\beta$-H\"older norm of a $k$ times continuously differentiable function $v:\mathbb{B}^d\to\mathbb{R}$ and the $\beta$-H\"older ball on $\mathbb{B}^d$ are
+To specify class of the prediction heads that ReLU-IPM controls, fix a smoothness index $\beta>0$ and let $k$ be the largest integer strictly smaller than $\beta$.  Let $\partial^{\mathbf{a}}$ denote the partial derivative indexed by a multi-index $\mathbf{a}\in\mathbb{N}_0^d$ of order $|\mathbf{a}|=a_1+\cdots+a_d$.  Then the $\beta$-H\"older norm of a $k$ times continuously differentiable function $v:\mathbb{B}^d\to\mathbb{R}$ and the $\beta$-H\"older ball on $\mathbb{B}^d$ are defined as
 \begin{equation}
-\begin{aligned}
   \lVert v\rVert_{\mathcal{H}^{\beta}}
-  &:=\max\left\{
+  :=\max\left\{
     \max_{|\mathbf{a}|\le k}\,\sup_{\mathbf{z}\in\mathbb{B}^d}
       \left|\partial^{\mathbf{a}}v(\mathbf{z})\right|,\;
     \max_{|\mathbf{a}|=k}\,\sup_{\mathbf{z}\ne\mathbf{z}'\in\mathbb{B}^d}
       \frac{\left|\partial^{\mathbf{a}}v(\mathbf{z})-\partial^{\mathbf{a}}v(\mathbf{z}')\right|}
            {\lVert\mathbf{z}-\mathbf{z}'\rVert_2^{\beta-k}}
-  \right\},
-  \\
-  \mathcal{H}^{\beta}_d
-  &:=\left\{v\in C^{k}(\mathbb{B}^d):\lVert v\rVert_{\mathcal{H}^{\beta}}\le 1\right\},
-\end{aligned}
+  \right\}
   \label{eq:holder-ball}
 \end{equation}
-and H\"older-IPM denotes $\operatorname{IPM}_{\mathcal{H}^{\beta}_d}$.  \citet{park2026relu} prove that, for $d\ge3$ and every $\beta>0$ with $\beta\ne(d+3)/2$, there exists a constant $C$ depending only on $d$ and $\beta$ such that, for all probability measures $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$,
+and $  \mathcal{H}^{\beta}_d
+  :=\left\{v\in C^{k}(\mathbb{B}^d):\lVert v\rVert_{\mathcal{H}^{\beta}}\le 1\right\}.$
+ \citet{park2026relu} prove that, for $d\ge3$ and every $\beta>0$ with $\beta\ne(d+3)/2$, there exists a constant $C$ depending only on $d$ and $\beta$ such that, for all probability measures $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$,
 \begin{equation}
   \operatorname{IPM}_{\mathcal{H}^{\beta}_d}(\mathbb{P},\mathbb{Q})
   \le C
@@ -264,12 +272,12 @@ and H\"older-IPM denotes $\operatorname{IPM}_{\mathcal{H}^{\beta}_d}$.  \citet{p
   \end{cases}
   \label{eq:relu-holder}
 \end{equation}
-A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
+This results implies that we can control H\"older-IPM by controlling ReLU-IPM, and thus control fairness violation of H\"older smooth prediction heads.
 
 \section{supIPM for fair representation learning}
 \label{sec:supipm}
 
-\subsection{Uniform Fairness over the Sensitive Domain}
+\subsection{Uniform Fairness over the entire sensitive domain}
 \label{sec:supipm-criterion}
 
 \begin{figure}[t]
@@ -279,27 +287,33 @@ A bound on ReLU-IPM therefore implies a bound on the H\"older-IPM.
   \label{fig:motivation}
 \end{figure}
 
-Because the EIPM in Equation~(\ref{eq:eipm}) averages the IPM between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ over $\mathbb{P}_S$, a large discrepancy in a region of small $\mathbb{P}_S$-probability can contribute little to $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)$.  Figure~\ref{fig:motivation} illustrates such a case: the discrepancy is large at $s_0$, whose neighborhood has low probability and therefore contributes little to the average.  A small EIPM need not imply a small discrepancy at every sensitive value.  We therefore replace the average by a supremum over $\mathcal{S}$, which requires $\mathbb{P}_{\mathbf{Z}\mid S=s}$ at every $s\in\mathcal{S}$.
+Because the EIPM in (\ref{eq:eipm}) averages the IPM between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ over $\mathbb{P}_S$, a large discrepancy of $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ at $s$ in a region of small $\mathbb{P}_S$-probability could contribute little to $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)$, and thus reducing  $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)$ may not reduce the $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ for all $s \in \mathcal{S}$.  
+Figure~\ref{fig:motivation} illustrates such a case: $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ could be large at $s$ at which $\mathbb{P}_{S}$-probability is small even when $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)$ is small, because a small EIPM need not imply a small discrepancy at every sensitive value. 
+To control $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ for all $s$, in this paper we take the supremum instead of the expectation with respect to $s$.
+That is, we control $\sup_{s \in \mathcal{S}} \operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}}) $ instead of EIPM.
+
+%For $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ to be properly defined,
 % , not only for $\mathbb{P}_S$-almost every $s$.  
-We assume the following condition on the distribution of $S$.
-\begin{assumption}[Positive density]
-\label{as:positive-density}
-$S$ has a density $p_S$ with respect to the Lebesgue measure $\mathrm{Leb}$ on $\mathcal{S}$, and $0<c_S\le p_S(s)\le C_S<\infty$ for every $s\in\mathcal{S}$.
-\end{assumption}
-Following \citet{kong2025fair}, we maintain Assumption~\ref{as:positive-density} throughout.  Let $\nu$ be a $\sigma$-finite measure on $\mathcal{X}$ and let $p(\mathbf{x},s)$ be a joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$. 
+%we assume the following condition on the distribution of $S$ throughout this paper.
+%\begin{assumption}[Positive density]
+%\label{as:positive-density}
+%$\mathbb{P}_S$ has a density $p_S$ with respect to the Lebesgue measure on $\mathcal{S}$, and $0<c_S\le p_S(s)\le C_S<\infty$ for every $s\in\mathcal{S}$.
+%\end{assumption}
+
+%Let $\nu$ be a $\sigma$-finite measure on $\mathcal{X}$ and let $p(\mathbf{x},s)$ be a joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$. 
 % chosen so that $\int_{\mathcal{X}} p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})=p_S(s)$ for every $s\in\mathcal{S}$.  
 % Because a conditional expectation given $S=s$ is determined only up to a $\mathbb{P}_S$-null set of $s$, 
 % From this, a conditional expectation given $S=s$ is as follows
-This joint density induces the following conditional expectation of a bounded measurable $g:\mathcal{X}\to\mathbb{R}$:
-\begin{equation}
-  \mathbb{E}[g(\mathbf{X})\mid S=s]
-  =\frac{1}{p_S(s)}\int_{\mathcal{X}} g(\mathbf{x})\,p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
-  \qquad s\in\mathcal{S}.
-  \label{eq:pointwise-conditional}
-\end{equation}
+%This joint density induces the following conditional expectation of a bounded measurable $g:\mathcal{X}\to\mathbb{R}$:
+%\begin{equation}
+%  \mathbb{E}[g(\mathbf{X})\mid S=s]
+%  =\frac{1}{p_S(s)}\int_{\mathcal{X}} g(\mathbf{x})\,p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
+%  \qquad s\in\mathcal{S}.
+%  \label{eq:pointwise-conditional}
+%\end{equation}
 % As in Section~\ref{sec:frem}, the discriminator class $\mathcal{V}$ of this IPM specifies the prediction heads that the criterion controls.  
 % With  $\mathbb{P}_{\mathbf{Z}\mid S=s}$ induced by the conditional density used in Equation~(\ref{eq:pointwise-conditional}), 
-Then, we define for a discriminator class $\mathcal{V}$ on $\mathcal{Z}$,
+We define 
 \begin{align}
   \operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)
   &:=\sup_{s\in\mathcal{S}}
@@ -312,12 +326,14 @@ Then, we define for a discriminator class $\mathcal{V}$ on $\mathcal{Z}$,
   \right|.
   \label{eq:supipm}
 \end{align}
-By definition, the constraint $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\rho$ for a fairness level $\rho\ge0$ bounds the discrepancy $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ by $\rho$ at every $s\in\mathcal{S}$.
+By definition, the constraint $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\rho$ for $\rho\ge0$ bounds 
+$\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ by $\rho$ at every $s\in\mathcal{S}$.
 % and hence $\left|\mathbb{E}[v(\mathbf{Z})\mid S=s]-\mathbb{E}[v(\mathbf{Z})]\right|$ by the same $\rho$ for every discriminator $v\in\mathcal{V}$.  
-Because an average never exceeds a supremum, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so a representation with a small supIPM has a small EIPM.
+Because the average never exceeds the supremum, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$, so a representation with a small supIPM also has a small EIPM.
 % The converse fails without further regularity in $s$.
+%In addition, if $f\in\mathcal{V}$, (\ref{eq:supipm}) bounds the difference between the conditional and the marginal means of its prediction $f(\mathbf{Z})$ by $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ at every $s\in\mathcal{S}.$  
 
-A prediction head $f$ is also a function of the representation.  If $f\in\mathcal{V}$, Equation~(\ref{eq:supipm}) bounds the difference between the conditional and the marginal means of its prediction $f(\mathbf{Z})$ by $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ at every $s\in\mathcal{S}$, even in a region of small $\mathbb{P}_S$-probability.  For a bounded measurable $g$, \citet{jiang2022generalized} define generalized demographic parity (GDP) for a continuous sensitive attribute as
+For a bounded measurable function $g:\mathcal{X}\rightarrow \mathbb{R},$ \citet{jiang2022generalized} defines generalized demographic parity (GDP) for a continuous sensitive attribute as
 \begin{equation}
   \operatorname{GDP}(g)
   :=\mathbb{E}_{S}\!\left[
@@ -328,7 +344,7 @@ A prediction head $f$ is also a function of the representation.  If $f\in\mathca
   \right].
   \label{eq:gdp}
 \end{equation}
-For $g=f\circ h$, Equation~(\ref{eq:gdp}) averages $\left|\mathbb{E}[f(\mathbf{Z})\mid S]-\mathbb{E}[f(\mathbf{Z})]\right|$ over $S$.  Replacing the average by a supremum, as in supIPM, we define $L_{\infty}$-generalized demographic parity ($\operatorname{GDP}_{\infty}$)
+For $g=f\circ h$, $\operatorname{GDP}(g)$ averages $\left|\mathbb{E}[f(\mathbf{Z})\mid S]-\mathbb{E}[f(\mathbf{Z})]\right|$ over $S$.  Replacing the average by the supremum, as in supIPM, we define supGDP ($\operatorname{GDP}_{\infty}$) as
 \begin{equation}
   \operatorname{GDP}_{\infty}(g)
   :=\sup_{s\in\mathcal{S}}
@@ -338,38 +354,52 @@ For $g=f\circ h$, Equation~(\ref{eq:gdp}) averages $\left|\mathbb{E}[f(\mathbf{Z
   \right|.
   \label{eq:linfty-gdp}
 \end{equation}
-We thus obtain $\operatorname{GDP}_{\infty}(f\circ h)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ for every $f\in\mathcal{V}$, so supIPM, defined before a prediction head is chosen, controls $\operatorname{GDP}_{\infty}(f\circ h)$ simultaneously for all heads in $\mathcal{V}$.
+Note that $\operatorname{GDP}_{\infty}(f\circ h)\le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ as long as  $f\in\mathcal{V}$, 
+and so we can control the fairness violation of $f(\mathbf{Z})$ for all $f\in \mathcal{V}$ 
+in view of $\operatorname{GDP}(g)$ and $\operatorname{GDP}_{\infty}(g)$
+by controlling $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$.
+
 
 \subsection{Choice of the Discriminator Class}
 \label{sec:discriminator-choice}
 
 It remains to choose the discriminator class $\mathcal{V}$.  
-A bound on $\operatorname{GDP}_{\infty}(f\circ h)$ for heads $f$ of bounded H\"older norm can be obtained by taking $\mathcal{V}$ to be the H\"older ball $\mathcal{H}^{\beta}_d$.
- The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in Equation~(\ref{eq:supipm}) is the ReLU-IPM.  Since $\mathcal{V}_{\mathrm{R}}$ and $\mathcal{H}^{\beta}_d$ are defined on $\mathbb{B}^d$, we restrict the encoder to take values in $\mathbb{B}^d$ hereafter, so that $\mathbf{Z}=h(\mathbf{X})\in\mathbb{B}^d$.  
-% In practice the restriction is imposed by normalizing the output of the encoder network, as described in Appendix~\ref{app:ascent}.  
-Equation~(\ref{eq:relu-holder}) applies to $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ at every $s\in\mathcal{S}$, so a bound on $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ implies a bound on $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$ and hence on $\operatorname{GDP}_{\infty}(f\circ h)$ for every head $f\in\mathcal{H}^{\beta}_d$.
-The ReLU class is also better suited to training with mini-batches than MMD used by FREM.  
-Computing empirical MMD requires $O(n^2)$ kernel evaluations. 
-In general, the MMD computed on a mini-batch is a biased estimate of the MMD computed on the entire training sample \citep{lee2026fair}.  Training with the MMD therefore requires the entire sample.
-In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM-FRL with the ReLU class admits mini-batch learning.
+Note that $\operatorname{GDP}_{\infty}(f\circ h)$ for heads $f$ with a bounded H\"older norm is bounded by
+$\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S).$
+However, computation of $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$
+is not easy because $\mathcal{H}^{\beta}_d$ is not easily parameterizable.
+To resolve this problem, we use ReLU-IPM. Since the discriminator class of ReLU-IPM has finite parameters,
+computation of $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$ can be done without much hamper.
+Moreover, the inequality (\ref{eq:relu-holder}) implies
+that $\operatorname{GDP}_{\infty}(f\circ h)$ is bounded by $\operatorname{supIPM}_{\mathcal{V}_R}(\mathbf{Z};S)$
+under regularity conditions.
+
+ % The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in (\ref{eq:supipm}) is the ReLU-IPM.  
+The ReLU-IPM is better then MMD from computational point of view.  
+Computing EIPM with MMD requires $O(n^3)$ evaluations at each update.
+In contrast, supReLU-IPM only needs $O(n)$ computation at each update.
+Moreover, a mini-batch learning is not possible for EIPM with MMD \citep{lee2026fair}, and thus  
+$O(n^2)$ memories are required. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM-FRL with the ReLU-IPM admits a mini-batch learning.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
 
-For the sample $\mathcal{D}$ of Section~\ref{sec:frem}, let $\mathbf{Z}_i=h_{\phi}(\mathbf{X}_i)$.  Estimating supIPM requires the conditional distribution $\mathbb{P}_{\mathbf{Z}\mid S=s}$ at every $s\in\mathcal{S}$, whereas FREM requires it only at the observed values $S_i$.  We therefore adapt the kernel-weighted construction of Equation~(\ref{eq:frem-conditional}) to an arbitrary $s$, for which the leave-one-out correction is not needed because $s$ is no longer tied to an observation:
+%For the sample $\mathcal{D}$ of Section~\ref{sec:frem}, let $\mathbf{Z}_i=h_{\phi}(\mathbf{X}_i)$.  Estimating supIPM requires the conditional distribution $\mathbb{P}_{\mathbf{Z}\mid S=s}$ at every $s\in\mathcal{S}$, whereas FREM requires it only at the observed values $S_i$.  We therefore adapt the kernel-weighted construction of (\ref{eq:frem-conditional}) to an arbitrary $s$, for which the leave-one-out correction is not needed because $s$ is no longer tied to an observation:
+Similar to EIPM, we can estimate supIPM with the ReLU discriminator class by kernel techniques. Let
 \begin{equation}
   \widehat{w}_{\gamma}(i;s)
   :=\frac{K_{\gamma}(S_i,s)}{\sum_{j=1}^n K_{\gamma}(S_j,s)},
   \qquad
-  \widehat{\mathbb{P}}^{\gamma}_{\mathbf{Z}\mid S=s}
+  \widehat{\mathbb{P}}^{\gamma}_{\mathbf{Z}\mid S=s}(\cdot)
   :=\sum_{i=1}^n\widehat{w}_{\gamma}(i;s)\,
-  \delta_{\mathbf{Z}_i},
+  \delta_{\mathbf{Z}_i}(\cdot),
   \qquad
-  \widehat{\mathbb{P}}_{\mathbf{Z}}
-  :=\frac{1}{n}\sum_{i=1}^n\delta_{\mathbf{Z}_i},
+  \widehat{\mathbb{P}}_{\mathbf{Z}}(\cdot)
+  :=\frac{1}{n}\sum_{i=1}^n\delta_{\mathbf{Z}_i}(\cdot),
   \label{eq:supipm-estimators}
 \end{equation}
-where $K_{\gamma}$ is the kernel of Section~\ref{sec:frem}.  The weights sum to one over $i$, so that $\widehat{\mathbb{P}}^{\gamma}_{\mathbf{Z}\mid S=s}$ is a probability distribution, and they place more weight on observations whose sensitive values are close to $s$.  Substituting the two empirical distributions into Equation~(\ref{eq:supipm}) yields
+where $K_{\gamma}$ is a given kernel.  We propose to estimate supIPM with the ReLU discriminator class by
+%The weights sum to one over $i$, so that $\widehat{\mathbb{P}}^{\gamma}_{\mathbf{Z}\mid S=s}$ is a probability distribution, and they place more weight on observations whose sensitive values are close to $s$.  Substituting the two empirical distributions into (\ref{eq:supipm}) yields
 \begin{align}
   \widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}
   (\mathbf{Z};S)
@@ -386,9 +416,11 @@ where $K_{\gamma}$ is the kernel of Section~\ref{sec:frem}.  The weights sum to 
   \right|.
   \label{eq:empirical-supipm}
 \end{align}
-Unlike Equation~(\ref{eq:eipm-estimator}), Equation~(\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  
+We prove in Theorem xx of Section xx that this estimator converges to the population supIPM
+with a properly chose kernel and bandwidth.
+%Unlike (\ref{eq:eipm-estimator}), (\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  
 % When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can maximize the discrepancy. 
-Section~\ref{sec:supipm-objective} introduces supIPM-FRL, which uses this empirical supIPM to learn representations with worst-case fairness control.
+%Section~\ref{sec:supipm-objective} introduces supIPM-FRL, which uses this empirical supIPM to learn representations with worst-case fairness control.
 
 \subsection{Fair Representation Learning with supIPM}
 \label{sec:supipm-objective}
@@ -410,10 +442,10 @@ where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ 
 % Equation~(\ref{eq:supipm-penalized-objective}) is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)\le\rho$, as in Section~\ref{sec:supipm-criterion}.
 Equation~(\ref{eq:supipm-penalized-objective}) gives a penalized formulation of empirical supervised risk minimization subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)\le\rho$.
 
-The empirical supIPM in Equation~(\ref{eq:empirical-supipm}) is a supremum over the sensitive value $s$ and over the discriminator parameter $(\theta,\mu)$.
+The empirical supIPM in (\ref{eq:empirical-supipm}) is a supremum over the sensitive value $s$ and over the discriminator parameter $(\theta,\mu)$.
 % , so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem.  
 % We solve it by alternating gradient descent in $(\phi,\psi)$ with compass search \citep{kolda2003optimization} in $s$ and projected gradient ascent in $(\theta,\mu)$, which extends the computation of ReLU-IPM in \citet{park2026relu} to the additional supremum over $s$. 
-We alternate between gradient descent on $\mathcal{L}(\phi,\psi)$ and approximating the supremum in Equation~(14) with $(\phi,\psi)$ fixed. 
+We alternate between gradient descent on $\mathcal{L}(\phi,\psi)$ and approximating the supremum in Equation~\ref{eq:supipm-penalized-objective} with $(\phi,\psi)$ fixed. 
 To approximate this supremum, we use compass search over $s$ \citep{kolda2003optimization} and projected gradient ascent over $(\theta,\mu)$.
 This optimization scheme extends the computation of ReLU-IPM in \citet{park2026relu} by additionally maximizing over $s$.
 Because both procedures can converge to a local maximum, we use $T$ initial values of $s$ and $M$ discriminator initializations.  
@@ -1919,7 +1951,10 @@ With a compactly supported kernel the representation collapses to a constant pre
 
 The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in Equation~(\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  We replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of Equation~(\ref{eq:relu-class}), within the same supremum over $s$, by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ of sIPM-LFR \citep{kim2022learning} and by the unit ball of the Gaussian RKHS of FREM \citep{kong2025fair}.  The grid of penalty values is chosen separately for each class, since the three IPMs are not on a common scale.
 
-In Figure~\ref{fig:app-ablation-ipm-class} the three prediction-level curves are close.  At a matched level of prediction performance the worst-case disparity of sup-sigmoid-IPM is within a factor of $1.3$ of sup-ReLU-IPM, while that of sup-MMD is several times larger on the three datasets; on Adult it is the largest of the three although its prediction-level disparity is the smallest.  The class of the discriminators therefore governs the worst-case disparity and leaves the prediction-level one nearly unchanged.
+In Figure~\ref{fig:app-ablation-ipm-class}, the three discriminator classes yield similar prediction-level curves.
+ReLU-IPM and sigmoid-IPM achieve comparable worst-case disparity.
+Their relative performance varies with the dataset and penalty strength.
+Both achieve lower worst-case disparity than MMD at comparable prediction performance.
 
 \begin{figure}[!htb]
   \centering
