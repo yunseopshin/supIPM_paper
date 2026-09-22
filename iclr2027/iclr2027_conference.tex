@@ -1790,6 +1790,22 @@ Figure~\ref{fig:app-c1} repeats the worst-case comparison of Figure~\ref{fig:wor
 \end{figure}
 \FloatBarrier
 
+\paragraph{A larger head class.}  The heads of $\mathcal{F}_c$ are linear in the representation.  Writing
+\begin{equation*}
+  \mathcal{F}'_c:=\bigl\{\sigma(\mathbf{w}_2^{\top}\operatorname{relu}(\mathbf{W}_1\mathbf{z}+\mathbf{b}_1)+b_2):\ \lVert\mathbf{W}_1\rVert_2\le1,\ \lVert\mathbf{w}_2\rVert_2\le c\bigr\}
+\end{equation*}
+for the two-layer heads of the same Lipschitz bound, we repeat the comparison over $\mathcal{F}'_1$ in Figure~\ref{fig:app-mlp-head}; the heads are fitted as in Appendix~\ref{app:worst-case} with $16$ hidden units, projecting $\mathbf{W}_1$ onto the spectral-norm ball and $\mathbf{w}_2$ onto the ball of radius $c$ after every step.  Since $\operatorname{relu}(t)-\operatorname{relu}(-t)=t$, two hidden units reproduce any linear head and $\mathcal{F}_c\subset\mathcal{F}'_c$, so the worst case over $\mathcal{F}'_c$ cannot be the smaller of the two.  It is barely the larger: every method's worst-case disparity rises by at most a few percent and the ordering is the one of Section~\ref{sec:exp-real}, so the comparison does not rest on the heads being linear.
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.8\textwidth]{appendix/figA_worst_head_mlp2_adult.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA_worst_head_mlp2_crime.pdf}\\[1pt]
+  \includegraphics[width=0.8\textwidth]{appendix/figA_worst_head_mlp2_acs.pdf}
+  \caption{Prediction performance against the worst-case downstream disparity over the two-layer heads, $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}'_{1})$, on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \label{fig:app-mlp-head}
+\end{figure}
+\FloatBarrier
+
 \subsubsection{Alternative Fairness Measures}
 \label{app:real-measures}
 
@@ -2002,6 +2018,21 @@ The ReLU and the sigmoid discriminators attain comparable worst-case disparity, 
   \includegraphics[width=0.92\textwidth]{appendix/figAB_disc.pdf}
   \caption{Prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ (top) and the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_{1})$ (bottom) for supIPM-FRL trained with each discriminator class, on Adult (left), Crime (middle) and ACSIncome (right).}
   \label{fig:app-ablation-ipm-class}
+\end{figure}
+\FloatBarrier
+
+\subsection{Candidate Sensitive Values}
+\label{app:ablation-T}
+
+The search over $s$ of Appendix~\ref{app:ascent} starts from $T$ candidate sensitive values, so $T$ is how many basins of $\Delta(\cdot\,;\theta,\mu)$ it can find.  This ablation trains supIPM-FRL at $T\in\{5,10,15,20,25,30\}$ alongside the reported $T=17$, and reads every arm on the same seeds and penalty values.
+
+Figure~\ref{fig:app-ablation-T} reports the seven settings.  They are indistinguishable: on Crime the curves coincide, and on Adult and ACSIncome the differences between them lie within one standard deviation over the seeds and show no trend in $T$.
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=\textwidth]{appendix/figAB_T.pdf}
+  \caption{Prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ (top) and the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_{1})$ (bottom) for supIPM-FRL trained at $T\in\{5,\ldots,30\}$, on Adult (left), Crime (middle) and ACSIncome (right).}
+  \label{fig:app-ablation-T}
 \end{figure}
 \FloatBarrier
 
