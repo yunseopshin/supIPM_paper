@@ -42,6 +42,7 @@
 \newtheorem{corollary}[theorem]{Corollary}
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{remark}{Remark}
 \renewcommand{\algorithmicrequire}{\textbf{Input:}}
 \renewcommand{\algorithmicensure}{\textbf{Output:}}
 \renewcommand{\algorithmiccomment}[1]{\hfill$\triangleright$ #1}
@@ -170,7 +171,7 @@ across all of the domain of continuous sensitive attributes.
 \label{sec:frem}
 
 We observe an input $\mathbf{X}\in\mathcal{X}$, an outcome $Y\in\mathcal{Y}$, and a continuous sensitive attribute $S$ taking values in  $\mathcal{S}\subset \mathbb{R}^r.$ For notational simplicity,  we only consider the case of $r=1$ and let $\mathcal{S}=[0,1].$
-The proposed algorithm, however, can be easily modified for high-dimensional continuous sensitive attributes. {\bf See Remark xx for discussions.}
+The proposed algorithm, however, can be easily modified for high-dimensional continuous sensitive attributes. See Remark \ref{rem:multivariate-sensitive} for discussions.
 
 An encoder $h:\mathcal{X}\to\mathcal{Z}$ maps $\mathbf{X}$ to a representation $\mathbf{Z}$ in the representation space $\mathcal{Z}\subset \mathbb{R}^d.$ A prediction head $f:\mathcal{Z}\to\mathbb{R}$ maps the representation to a real-valued prediction, and $f\circ h$ denotes the composed prediction model
 which maps an input to a prediction value. 
@@ -448,6 +449,19 @@ We refer to this training method as supIPM-FRL, which can be implemented efficie
 
 Section~\ref{sec:theory} shows that, with high probability, a small empirical supIPM yields a small $\operatorname{GDP}_{\infty}$ on an interior region of $\mathcal{S}$ for every downstream head of bounded H\"older norm.
 
+\begin{remark}[Multivariate sensitive attributes]
+\label{rem:multivariate-sensitive}
+For $S\in\mathcal{S}\subset\mathbb{R}^r$ with $r>1$, we use a multivariate kernel 
+\begin{equation*}
+    K_{\gamma}(s',s)=\gamma^{-r}\prod_{k=1}^r K((s'_k-s_k)/\gamma)
+\end{equation*}
+where $K(\cdot)$ is a univariate kernel in (\ref{eq:supipm-estimators}).
+We approximate the supremum in (\ref{eq:empirical-supipm}) by compass search over $\mathcal{S}$  along each coordinate, together with projected gradient ascent over $(\theta,\mu)$.
+With $T$ initial candidate vectors, each compass search iteration evaluates at most $T(2r+1)$ sensitive values \citep{kolda2003optimization}.
+Thus, for fixed $T$, the number of evaluations per iteration grows linearly with $r$, making supIPM-FRL straightforward to extend to multivariate sensitive attributes without hampering computation.
+\end{remark}
+
+
 \section{Theoretical Analysis}
 \label{sec:theory}
 
@@ -477,9 +491,10 @@ Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate} are stated on the 
 \end{aligned}
   \label{eq:interior}
 \end{equation}
-To bound $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)-\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ uniformly over a class $\mathcal{E}_n$ of encoders, we assume four conditions, stated in Appendix~\ref{app:assumptions}.  Assumption~\ref{as:positive-density} requires $\mathbb{P}_S$ to have a density $p_S$ with $0<c_S\le p_S\le C_S<\infty$ on $\mathcal{S}$, and Appendix~\ref{app:assumptions} then fixes a joint density $p(\mathbf{x},s)$ of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$, for a $\sigma$-finite measure $\nu$ on $\mathcal{X}$, and a version of the conditional expectation given $S=s$ at every $s\in\mathcal{S}$.  Assumption~\ref{as:smooth-density} requires an i.i.d. sample and a joint density of $(\mathbf{X},S)$ that is twice continuously differentiable in $s$, with integrable envelopes $M_1$ and $M_2$ for the two derivatives.  Assumption~\ref{as:kernel} requires a bounded, symmetric and Lipschitz kernel $K$ in $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$, together with a bandwidth $\gamma_n\to0$.
+To bound the difference between $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ and $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ uniformly over a class $\mathcal{E}_n$ of encoders, we assume four conditions, stated in Appendix~\ref{app:assumptions}.  Assumption~\ref{as:positive-density} requires $\mathbb{P}_S$ to have a density $p_S$ with $0<c_S\le p_S\le C_S<\infty$ on $\mathcal{S}$.  Assumption~\ref{as:smooth-density} requires a joint density of $(\mathbf{X},S)$ that is twice continuously differentiable in $s$, with integrable envelopes $M_1$ and $M_2$.  Assumption~\ref{as:kernel} requires a bounded, symmetric and Lipschitz kernel $K$ in $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$, together with a bandwidth $\gamma_n\to0$.
 % that is at most $\min\{\epsilon_n,1/2\}$ and for which the kernel centered at any $s\in\mathcal{S}_n$ places mass at most $\gamma_n^2$ outside $\mathcal{S}$.  
-Assumption~\ref{as:encoder} requires the encoders in $\mathcal{E}_n$ to take values in $\mathbb{B}^d$ and to have covering number at most $(A_n/\eta)^{\mathfrak{v}_n}$ in the supremum norm at every radius $\eta\in(0,1]$, so that $A_n$ and $\mathfrak{v}_n$ measure its size.  For $0<\delta<1$, let
+Assumption~\ref{as:encoder} requires the encoder class $\mathcal{E}_n$ have covering number at most $(A_n/\eta)^{\mathfrak{v}_n}$ in the supremum norm at every radius $\eta\in(0,1]$.  
+To state the uniform convergence rate, let $0<\delta<1$ and define
 \begin{equation}
   \Gamma_{n,\delta}
   :=(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma_n}+\log\frac{1}{\delta},
@@ -489,7 +504,7 @@ Assumption~\ref{as:encoder} requires the encoders in $\mathcal{E}_n$ to take val
   \label{eq:rate}
 \end{equation}
 
-\begin{theorem}[Uniform convergence of the empirical supIPM]
+\begin{theorem}[Uniform convergence rate of the empirical supIPM]
 \label{thm:uniform}
 Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist constants $C,c>0$, depending only on $c_S$, $C_S$, $K$, $\lVert M_1\rVert_{L_1(\nu)}$ and $\lVert M_2\rVert_{L_1(\nu)}$, such that for every $\delta\in(0,1)$ and every $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$,
 \begin{equation}
@@ -501,15 +516,16 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist c
 If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta:=\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
 \end{theorem}
 
-Theorem~\ref{thm:uniform} shows that the fairness level attained on the sample over $\mathcal{S}_n$ transfers to the population over $\mathcal{S}_n$.  If $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)\le\rho$ for an encoder $h\in\mathcal{E}_n$, then $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)\le\rho+Cr_{n,\delta}$ with probability at least $1-\delta$.  The bound is uniform over $\mathcal{E}_n$, so it applies to the encoder that supIPM-FRL selects from the same sample.  
+Theorem~\ref{thm:uniform} shows that the fairness level attained on the sample over $\mathcal{S}_n$ transfers to the population over $\mathcal{S}_n$.  If $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)\le\rho$ for an encoder $h\in\mathcal{E}_n$, then $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)\le\rho+Cr_{n,\delta}$ with probability at least $1-\delta$.  
+The bound is uniform over $\mathcal{E}_n$, so it applies to the encoder that supIPM-FRL obtains from the same sample.  
 % Because $D_n(h)$ is a supremum over $\mathcal{S}_n$, the transfer holds at every sensitive value in $\mathcal{S}_n$ rather than on average.  
 % One may expect the supremum over the sensitive domain and the representation dimension $d$ to slow the convergence.  The supremum enters $r_{n,\delta}$ only through the logarithmic factor in $\Gamma_{n,\delta}$, and $d$ enters $\Gamma_{n,\delta}$ linearly because $\mathcal{V}_{\mathrm{R}}$ is indexed by $d+1$ parameters, so the order of $r_{n,\delta}$ in $n$ is unchanged.  For an encoder class of bounded size, the bandwidth $\gamma_n\asymp(\log n/n)^{1/5}$ gives the rate $(\log n/n)^{2/5}$ of Theorem~\ref{thm:uniform}.
-For bounded $A_n$ and $\mathfrak{v}_n$, the bandwidth $\gamma_n\asymp(\log n/n)^{1/5}$ gives the rate $(\log n/n)^{2/5}$.  
+% For bounded $A_n$ and $\mathfrak{v}_n$, the bandwidth $\gamma_n\asymp(\log n/n)^{1/5}$ gives the rate $(\log n/n)^{2/5}$.  
 % This is the minimax rate for uniformly estimating a twice differentiable regression function on an interval \citep{stone1982optimal}, so the supremum over $s$ and the dimension $d$ do not slow the convergence in $n$.
 Moreover, since $\epsilon_n \to 0$, $\mathcal{S}_n$ expands toward the boundary as the sample size grows, so every fixed sensitive value in the interior of $\mathcal{S}$ is eventually covered.
 
 
-Theorem~\ref{thm:uniform} and the H\"older bound in Equation~(\ref{eq:relu-holder}) yield the following corollary.  For $B>0$ let $\mathcal{H}^{\beta}_d(B)$ be the H\"older ball of Equation~(\ref{eq:holder-ball}) with radius $B$, and let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and exponent in Equation~(\ref{eq:relu-holder}), so that $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $\alpha_{d,\beta}=1$ for $\beta>(d+3)/2$.
+Theorem~\ref{thm:uniform} and inequality in (\ref{eq:relu-holder}) yield the following corollary.  For $B>0$ let $\mathcal{H}^{\beta}_d(B)$ be the H\"older ball of (\ref{eq:holder-ball}) with radius $B$, and let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and exponent in (\ref{eq:relu-holder}), so that $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $\alpha_{d,\beta}=1$ for $\beta>(d+3)/2$.
 \begin{corollary}
 \label{cor:certificate}
 Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold, let $d\ge3$, and let $C$ and $c$ be the constants of Theorem~\ref{thm:uniform}.  For every $\delta\in(0,1)$ and  $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$, simultaneously for all  $h\in\mathcal{E}_n$,  $B>0$ and  $\beta>0$ with $\beta\ne(d+3)/2$,
@@ -521,9 +537,13 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold, let $d\ge3$, a
   \label{eq:certificate}
 \end{equation}
 \end{corollary}
-Thus $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ bounds $\operatorname{GDP}_{\infty,n}(f\circ h)$, and hence $\left|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]\right|$ at every $s\in\mathcal{S}_n$, uniformly over all heads $f\in\mathcal{H}^{\beta}_d(B)$.
+% This corollary shows that by learning an encoder $h$ with a small $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$, supIPM-FRL controls the fairness violation $\operatorname{GDP}_{\infty,n}(f\circ h)$ uniformly over all prediction heads $f\in\mathcal{H}^{\beta}_d(B)$.
+This corollary shows that by learning an encoder $h$ with a small empirical supIPM, supIPM-FRL controls the worst-case fairness violation over all prediction heads $f\in\mathcal{H}^{\beta}_d(B)$.
+
+
+% Thus $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ bounds $\operatorname{GDP}_{\infty,n}(f\circ h)$, and hence $\left|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]\right|$ at every $s\in\mathcal{S}_n$, uniformly over all heads $f\in\mathcal{H}^{\beta}_d(B)$.
 % The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$, so the single quantity $\widehat{D}_n(h)$ controls the $\operatorname{GDP}_{\infty}$ of every H\"older prediction head over $\mathcal{S}_n$.  
-The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and equals one when $\beta>(d+3)/2$.
+% The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and equals one when $\beta>(d+3)/2$.
 
 
 \section{Experiments}
@@ -533,16 +553,19 @@ The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through
 This section evaluates supIPM-FRL on simulated data and three tabular datasets.
 Experimental details are given in Appendices~\ref{app:synth-experiments} and~\ref{app:real-experiments}.
 
-\paragraph{Measures.}  Prediction performance is the test accuracy for classification and the test $1-\mathrm{MAE}$ for regression.  Fairness is measured through the disparity of a prediction head $f$ at each sensitive value, $\Delta_{f}(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$.
-% whose supremum over $s$ is $\operatorname{GDP}_{\infty}(f\circ h)$ of Equation~(\ref{eq:linfty-gdp}).  
-The prediction-level disparity is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ for the head trained jointly with the encoder.  Since a representation may later serve other heads \citep{coston2021characterizing,jovanovic2023fare,luo2026fair}, we also measure the largest disparity that a downstream head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the logistic heads with weight norm at most $c$, where $\sigma(t):=(1+e^{-t})^{-1}$, and define the worst-case disparity
+\paragraph{Measures.}  Prediction performance is the test accuracy for classification and the test $1-\mathrm{MAE}$ for regression.  Fairness is measured through the disparity of a prediction head $f$ at each sensitive value:
 \begin{equation}
-  \operatorname{GDP}_{\infty}(h;\mathcal{F}_c):=\sup_{f\in\mathcal{F}_c}\operatorname{GDP}_{\infty}(f\circ h).
+    \Delta_{f}(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|.
+\end{equation}
+% whose supremum over $s$ is $\operatorname{GDP}_{\infty}(f\circ h)$ of Equation~(\ref{eq:linfty-gdp}).  
+The prediction-level disparity is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi}) = \sup_{s} \Delta_{f_{\psi}}(s)$ for the head trained jointly with the encoder.  Since a representation may later serve other heads \citep{coston2021characterizing,jovanovic2023fare,luo2026fair}, we also measure the largest disparity that a downstream head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the logistic heads with weight norm at most $c$, where $\sigma(t):=(1+e^{-t})^{-1}$, and define the worst-case disparity as
+\begin{equation}
+  \operatorname{GDP}_{\infty}(h_{\phi};\mathcal{F}_c):=\sup_{f\in\mathcal{F}_c}\operatorname{GDP}_{\infty}(f\circ h_{\phi}) = \sup_{f\in\mathcal{F}_c} \sup_{s \in \mathcal{S}} \Delta_{f}(s).
   \label{eq:worst-case-gdp}
 \end{equation}
 % Every head in $\mathcal{F}_c$ has a bounded H\"older norm, so Corollary~\ref{cor:certificate} bounds Equation~(\ref{eq:worst-case-gdp}) in terms of the empirical supIPM.  
 % All disparities are reported as kernel estimates on the test data; 
-$\widehat{\Delta}_{f}(s)$ and $\widehat{\operatorname{GDP}}_{\infty}$ denote these estimates and are defined in Appendix~\ref{app:worst-case}.
+$\widehat{\Delta}_{f}$ and $\widehat{\operatorname{GDP}}_{\infty}$ denote these estimates and are defined in Appendix~\ref{app:worst-case}.
 
 \paragraph{Estimating the worst-case disparity.}  With the encoder held fixed, write $f_{\mathbf{w},b}(\mathbf{z}):=\sigma(\mathbf{w}^\top\mathbf{z}+b)$ and, on the training data, minimize
 \begin{equation}
@@ -550,10 +573,10 @@ $\widehat{\Delta}_{f}(s)$ and $\widehat{\operatorname{GDP}}_{\infty}$ denote the
   :=\frac{1}{n}\sum_{i=1}^n
   \ell\!\left(f_{\mathbf{w},b}(\mathbf{Z}_i),Y_i\right)
   -\lambda_h\,
-  \widehat{\operatorname{GDP}}_{\infty}(f_{\mathbf{w},b}\circ h)
+  \widehat{\operatorname{GDP}}_{\infty}(f_{\mathbf{w},b}\circ h_\phi)
   \label{eq:worst-case-estimate}
 \end{equation}
-over $\lVert\mathbf{w}\rVert_2\le c$ and $b\in\mathbb{R}$, with $\lambda_h=10^{3}$ so that the disparity term dominates.  The minimizer $\hat{f}_c$ approximates the head attaining the supremum in Equation~(\ref{eq:worst-case-gdp}), and the worst-case disparity is estimated on the test data by $\widehat{\operatorname{GDP}}_{\infty}(h;\mathcal{F}_c):=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$.
+over $\lVert\mathbf{w}\rVert_2\le c$ and $b\in\mathbb{R}$, with $\lambda_h=10^{3}$ so that the disparity term dominates.  The minimizer $\hat{f}_c$ approximates the head attaining the supremum in Equation~(\ref{eq:worst-case-gdp}), and the worst-case disparity is estimated on the test data by $\widehat{\operatorname{GDP}}_{\infty}(h_\phi;\mathcal{F}_c):=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h_\phi)$.
 
 \subsection{Simulation study}
 \label{sec:exp-simulation}
