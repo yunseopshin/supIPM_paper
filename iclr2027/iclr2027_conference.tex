@@ -166,16 +166,16 @@ across all of the domain of continuous sensitive attributes.
 \label{sec:frem}
 
 We observe an input $\mathbf{X}\in\mathcal{X}$, an outcome $Y\in\mathcal{Y}$, and a continuous sensitive attribute $S$ taking values in  $\mathcal{S}\subset \mathbb{R}^r.$ For notational simplicity,  we only consider the case of $r=1$ and let $\mathcal{S}=[0,1].$
-The proposed algorithm, however, can easily modified for high-dimensional continuous sensitive attributes. {\bf See Remark xx for discussions.}
+The proposed algorithm, however, can be easily modified for high-dimensional continuous sensitive attributes. {\bf See Remark xx for discussions.}
 
 An encoder $h:\mathcal{X}\to\mathcal{Z}$ maps $\mathbf{X}$ to a representation $\mathbf{Z}=h(\mathbf{X})$ in the representation space $\mathcal{Z}\subset \mathbb{R}^d.$ A prediction head $f:\mathcal{Z}\to\mathbb{R}$ maps the representation to a real-valued prediction, and $f\circ h$ denotes the composed prediction model
 which maps an input to a prediction value. 
-% When the encoder and the prediction head are parameterized, we write them as $h_{\phi}$ and $f_{\psi}$ with parameters $\phi$ and $\psi,$ respectively. 
+% The parameterized encoder $h_{\phi}$ and prediction head $f_{\psi}$ are introduced in Section~\ref{sec:supipm-objective}.
 We write $\mathbb{P}_S$ for the distribution of $S$, $\mathbb{P}_{\mathbf{Z}}$ for the distribution of $\mathbf{Z}$, and $\mathbb{P}_{\mathbf{Z}\mid S=s}$ for the conditional distribution of $\mathbf{Z}$ given $S=s$.  
 % Equality $\mathbb{P}_{\mathbf{Z}\mid S=s}=\mathbb{P}_{\mathbf{Z}}$ for $\mathbb{P}_S$-almost every $s$ is equivalent to independence of $\mathbf{Z}$ and $S$, and this independence is inherited by every measurable function of $\mathbf{Z}$.
 
 The discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ is measured using the IPM
-with an discriminator class $\mathcal{V}$, a class of real-valued discriminator functions on $\mathcal{Z}$. 
+with a discriminator class $\mathcal{V}$, a class of real-valued discriminator functions on $\mathcal{Z}$. 
 The IPM associated with $\mathcal{V}$ between two probability measures $\mathbb{P}$ and $\mathbb{Q}$ \citep{muller1997integral,sriperumbudur2012empirical} is defined as
 \begin{equation}
   \operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})
@@ -183,9 +183,9 @@ The IPM associated with $\mathcal{V}$ between two probability measures $\mathbb{
   \left|\int v(\mathbf{z})\,\mathrm{d}\mathbb{P}(\mathbf{z})-\int v(\mathbf{z})\,\mathrm{d}\mathbb{Q}(\mathbf{z})\right|.
   \label{eq:prelim-ipm}
 \end{equation}
-We say that $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions if $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})=0$ implies %$\mathbb{P}=\mathbb{Q}$.  The class $\mathcal{V}$ determines which prediction heads the IPM controls, because $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})$ bounds $\left|\int v\,\mathrm{d}\mathbb{P}-\int v\,\mathrm{d}\mathbb{Q}\right|$ for every $v\in\mathcal{V}$.
+We say that $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions if $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})=0$ implies $\mathbb{P}=\mathbb{Q}$.  %The class $\mathcal{V}$ determines which prediction heads the IPM controls, because $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P},\mathbb{Q})$ bounds $\left|\int v\,\mathrm{d}\mathbb{P}-\int v\,\mathrm{d}\mathbb{Q}\right|$ for every $v\in\mathcal{V}$.
 
-For a continuous sensitive attribute, \citet{kong2025fair} defines the expectation
+For a continuous sensitive attribute, \citet{kong2025fair} define the expectation
 of integral probability metric (EIPM) as
 \begin{equation}
   \operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)
@@ -194,8 +194,8 @@ of integral probability metric (EIPM) as
   \,\mathrm{d}\mathbb{P}_S(s)
   \label{eq:eipm}
 \end{equation}
-and proposes an FRL algorithm using EIPM (FREM).
-If $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)=0$ implies $\mathbb{P}_{\mathbf{Z}\mid S=s}=\mathbb{P}_{\mathbf{Z}}$ for $\mathbb{P}_S$-almost every $s$.
+and propose an FRL algorithm using EIPM (FREM).
+If $\operatorname{IPM}_{\mathcal{V}}$ separates probability distributions, $\operatorname{EIPM}_{\mathcal{V}}(\mathbf{Z};S)=0$ implies $\mathbb{P}_{\mathbf{Z}\mid S=s}=\mathbb{P}_{\mathbf{Z}}$ for $\mathbb{P}_S$-almost every $s$.
 
 Given the training data $\mathcal{D}=\{(\mathbf{X}_i,S_i,Y_i)\}_{i=1}^n$ and $\mathbf{Z}_i=h(\mathbf{X}_i)$, FREM estimates the conditional distribution at each observed $S_i$ by kernel weighting,
 \begin{equation}
@@ -227,12 +227,12 @@ For a supervised loss $\ell$ and a penalty parameter $\lambda\ge 0$, FREM then t
 \subsection{ReLU-IPM}
 \label{sec:relu-ipm}
 
-It turns out that EIPM can controls fairness violation of $f \circ h$ only when $f$ belongs to the discriminator class $\mathcal{V}$.
+It turns out that EIPM can control fairness violation of $f \circ h$ only when $f$ belongs to the discriminator class $\mathcal{V}$.
 When $\mathcal{V}$ is the RKHS with the Gaussian kernel, it contains only infinitely differentiable functions, so a prediction head of lower smoothness may not belong to $\mathcal{V}$.  
 % The RKHS unit ball of Section~\ref{sec:frem} determines the prediction heads that EIPM controls,
-To overcome this restriction, \citet{park2026relu} considers ReLU-IPM, an IPM whose discriminator class is indexed by a finite-dimensional parameter. ReLU-IPM controls the fairness violation of H\"older smooth prediction head.
+To overcome this restriction, \citet{park2026relu} consider ReLU-IPM, an IPM whose discriminator class is indexed by a finite-dimensional parameter. ReLU-IPM controls the fairness violation of H\"older smooth prediction heads.
 
-Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$ be the unit ball and let $\mathbb{S}^{d-1}:=\{\theta\in\mathbb{R}^d:\lVert\theta\rVert_2=1\}$ be the unit sphere. \citet{park2026relu} defines the ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ on $\mathbb{B}^d$ by
+Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$ be the unit ball and let $\mathbb{S}^{d-1}:=\{\theta\in\mathbb{R}^d:\lVert\theta\rVert_2=1\}$ be the unit sphere. \citet{park2026relu} define the ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ on $\mathbb{B}^d$ by
 \begin{equation}
   \mathcal{V}_{\mathrm{R}}
   :=\left\{
@@ -244,7 +244,7 @@ Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$
 where $(a)_+:=\max\{a,0\}$.  
 % ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, Equation~(\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  
 Despite its finite-dimensional parameterization of the discriminator class, ReLU-IPM separates probability distributions on $\mathbb{B}^d$, while keeping its computation tractable.
-\citet{park2026relu} computes ReLU-IPM between two distributions by applying a gradient ascent over $(\theta,\mu)$,  and projecting $\theta$ back onto the unit sphere in each update.
+\citet{park2026relu} compute ReLU-IPM between two distributions by applying a gradient ascent over $(\theta,\mu)$,  and projecting $\theta$ back onto the unit sphere in each update.
 
 To specify class of the prediction heads that ReLU-IPM controls, fix a smoothness index $\beta>0$ and let $k$ be the largest integer strictly smaller than $\beta$.  Let $\partial^{\mathbf{a}}$ denote the partial derivative indexed by a multi-index $\mathbf{a}\in\mathbb{N}_0^d$ of order $|\mathbf{a}|=a_1+\cdots+a_d$.  Then the $\beta$-H\"older norm of a $k$ times continuously differentiable function $v:\mathbb{B}^d\to\mathbb{R}$ and the $\beta$-H\"older ball on $\mathbb{B}^d$ are defined as
 \begin{equation}
@@ -272,7 +272,7 @@ and $  \mathcal{H}^{\beta}_d
   \end{cases}
   \label{eq:relu-holder}
 \end{equation}
-This results implies that we can control H\"older-IPM by controlling ReLU-IPM, and thus control fairness violation of H\"older smooth prediction heads.
+This result implies that we can control H\"older-IPM by controlling ReLU-IPM, and thus control fairness violation of H\"older smooth prediction heads.
 
 \section{supIPM for fair representation learning}
 \label{sec:supipm}
@@ -294,26 +294,13 @@ That is, we control $\sup_{s \in \mathcal{S}} \operatorname{IPM}_{\mathcal{V}}(\
 
 %For $\operatorname{IPM}_{\mathcal{V}}(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}})$ to be properly defined,
 % , not only for $\mathbb{P}_S$-almost every $s$.  
-%we assume the following condition on the distribution of $S$ throughout this paper.
-%\begin{assumption}[Positive density]
-%\label{as:positive-density}
-%$\mathbb{P}_S$ has a density $p_S$ with respect to the Lebesgue measure on $\mathcal{S}$, and $0<c_S\le p_S(s)\le C_S<\infty$ for every $s\in\mathcal{S}$.
-%\end{assumption}
-
-%Let $\nu$ be a $\sigma$-finite measure on $\mathcal{X}$ and let $p(\mathbf{x},s)$ be a joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$. 
-% chosen so that $\int_{\mathcal{X}} p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})=p_S(s)$ for every $s\in\mathcal{S}$.  
-% Because a conditional expectation given $S=s$ is determined only up to a $\mathbb{P}_S$-null set of $s$, 
+% The positive-density assumption (as:positive-density), the joint density $p(\mathbf{x},s)$ and the conditional expectation (eq:pointwise-conditional) are stated in Appendix~\ref{app:assumptions}.
+% chosen so that $\int_{\mathcal{X}} p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})=p_S(s)$ for every $s\in\mathcal{S}$.
+% Because a conditional expectation given $S=s$ is determined only up to a $\mathbb{P}_S$-null set of $s$,
 % From this, a conditional expectation given $S=s$ is as follows
-%This joint density induces the following conditional expectation of a bounded measurable $g:\mathcal{X}\to\mathbb{R}$:
-%\begin{equation}
-%  \mathbb{E}[g(\mathbf{X})\mid S=s]
-%  =\frac{1}{p_S(s)}\int_{\mathcal{X}} g(\mathbf{x})\,p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
-%  \qquad s\in\mathcal{S}.
-%  \label{eq:pointwise-conditional}
-%\end{equation}
 % As in Section~\ref{sec:frem}, the discriminator class $\mathcal{V}$ of this IPM specifies the prediction heads that the criterion controls.  
 % With  $\mathbb{P}_{\mathbf{Z}\mid S=s}$ induced by the conditional density used in Equation~(\ref{eq:pointwise-conditional}), 
-We define 
+We define the supremum integral probability metric (supIPM) as
 \begin{align}
   \operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)
   &:=\sup_{s\in\mathcal{S}}
@@ -333,7 +320,7 @@ Because the average never exceeds the supremum, $\operatorname{EIPM}_{\mathcal{V
 % The converse fails without further regularity in $s$.
 %In addition, if $f\in\mathcal{V}$, (\ref{eq:supipm}) bounds the difference between the conditional and the marginal means of its prediction $f(\mathbf{Z})$ by $\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S)$ at every $s\in\mathcal{S}.$  
 
-For a bounded measurable function $g:\mathcal{X}\rightarrow \mathbb{R},$ \citet{jiang2022generalized} defines generalized demographic parity (GDP) for a continuous sensitive attribute as
+For a bounded measurable function $g:\mathcal{X}\rightarrow \mathbb{R},$ \citet{jiang2022generalized} define generalized demographic parity (GDP) for a continuous sensitive attribute as
 \begin{equation}
   \operatorname{GDP}(g)
   :=\mathbb{E}_{S}\!\left[
@@ -344,7 +331,7 @@ For a bounded measurable function $g:\mathcal{X}\rightarrow \mathbb{R},$ \citet{
   \right].
   \label{eq:gdp}
 \end{equation}
-For $g=f\circ h$, $\operatorname{GDP}(g)$ averages $\left|\mathbb{E}[f(\mathbf{Z})\mid S]-\mathbb{E}[f(\mathbf{Z})]\right|$ over $S$.  Replacing the average by the supremum, as in supIPM, we define supGDP ($\operatorname{GDP}_{\infty}$) as
+For $g=f\circ h$, $\operatorname{GDP}(g)$ averages $\left|\mathbb{E}[f(\mathbf{Z})\mid S]-\mathbb{E}[f(\mathbf{Z})]\right|$ over $S$.  Replacing the average by the supremum, as in Equation~(\ref{eq:supipm}), we define $L_{\infty}$-generalized demographic parity ($\operatorname{GDP}_{\infty}$) as
 \begin{equation}
   \operatorname{GDP}_{\infty}(g)
   :=\sup_{s\in\mathcal{S}}
@@ -368,16 +355,16 @@ Note that $\operatorname{GDP}_{\infty}(f\circ h)$ for heads $f$ with a bounded H
 $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S).$
 However, computation of $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$
 is not easy because $\mathcal{H}^{\beta}_d$ is not easily parameterizable.
-To resolve this problem, we use ReLU-IPM. Since the discriminator class of ReLU-IPM has finite parameters,
-computation of $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$ can be done without much hamper.
+To resolve this problem, we use ReLU-IPM, that is, we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$ in Equation~(\ref{eq:supipm}) and control $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$. Since the discriminator class of ReLU-IPM has finite parameters,
+computation of $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ can be done without much hamper.
 Moreover, the inequality (\ref{eq:relu-holder}) implies
-that $\operatorname{GDP}_{\infty}(f\circ h)$ is bounded by $\operatorname{supIPM}_{\mathcal{V}_R}(\mathbf{Z};S)$
+that $\operatorname{GDP}_{\infty}(f\circ h)$ is bounded by $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$
 under regularity conditions.
 
  % The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in (\ref{eq:supipm}) is the ReLU-IPM.  
-The ReLU-IPM is better then MMD from computational point of view.  
+The ReLU-IPM is better than MMD from computational point of view.  
 Computing EIPM with MMD requires $O(n^3)$ evaluations at each update.
-In contrast, supReLU-IPM only needs $O(n)$ computation at each update.
+In contrast, $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ only needs $O(n)$ computation at each update.
 Moreover, a mini-batch learning is not possible for EIPM with MMD \citep{lee2026fair}, and thus  
 $O(n^2)$ memories are required. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM-FRL with the ReLU-IPM admits a mini-batch learning.
 
@@ -385,20 +372,20 @@ $O(n^2)$ memories are required. In contrast, we show in Appendix~\ref{app:mini-b
 \label{sec:supipm-estimation}
 
 %For the sample $\mathcal{D}$ of Section~\ref{sec:frem}, let $\mathbf{Z}_i=h_{\phi}(\mathbf{X}_i)$.  Estimating supIPM requires the conditional distribution $\mathbb{P}_{\mathbf{Z}\mid S=s}$ at every $s\in\mathcal{S}$, whereas FREM requires it only at the observed values $S_i$.  We therefore adapt the kernel-weighted construction of (\ref{eq:frem-conditional}) to an arbitrary $s$, for which the leave-one-out correction is not needed because $s$ is no longer tied to an observation:
-Similar to EIPM, we can estimate supIPM with the ReLU discriminator class by kernel techniques. Let
+Similar to EIPM, we can estimate $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ by kernel techniques. Let
 \begin{equation}
   \widehat{w}_{\gamma}(i;s)
   :=\frac{K_{\gamma}(S_i,s)}{\sum_{j=1}^n K_{\gamma}(S_j,s)},
-  \qquad
+  \quad
   \widehat{\mathbb{P}}^{\gamma}_{\mathbf{Z}\mid S=s}(\cdot)
   :=\sum_{i=1}^n\widehat{w}_{\gamma}(i;s)\,
   \delta_{\mathbf{Z}_i}(\cdot),
-  \qquad
+  \quad
   \widehat{\mathbb{P}}_{\mathbf{Z}}(\cdot)
   :=\frac{1}{n}\sum_{i=1}^n\delta_{\mathbf{Z}_i}(\cdot),
   \label{eq:supipm-estimators}
 \end{equation}
-where $K_{\gamma}$ is a given kernel.  We propose to estimate supIPM with the ReLU discriminator class by
+where $K_{\gamma}$ is a given kernel.  We propose to estimate $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ by
 %The weights sum to one over $i$, so that $\widehat{\mathbb{P}}^{\gamma}_{\mathbf{Z}\mid S=s}$ is a probability distribution, and they place more weight on observations whose sensitive values are close to $s$.  Substituting the two empirical distributions into (\ref{eq:supipm}) yields
 \begin{align}
   \widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}
@@ -416,8 +403,8 @@ where $K_{\gamma}$ is a given kernel.  We propose to estimate supIPM with the Re
   \right|.
   \label{eq:empirical-supipm}
 \end{align}
-We prove in Theorem xx of Section xx that this estimator converges to the population supIPM
-with a properly chose kernel and bandwidth.
+We prove in Theorem~\ref{thm:uniform} of Section~\ref{sec:theory} that this estimator converges to the population supIPM
+with a properly chosen kernel and bandwidth.
 %Unlike (\ref{eq:eipm-estimator}), (\ref{eq:empirical-supipm}) takes the largest estimated discrepancy over all of $\mathcal{S}$.  
 % When $K_{\gamma}$ is differentiable, the weights are differentiable in $s$, so gradient ascent over $\mathcal{S}$ can maximize the discrepancy. 
 %Section~\ref{sec:supipm-objective} introduces supIPM-FRL, which uses this empirical supIPM to learn representations with worst-case fairness control.
@@ -427,31 +414,35 @@ with a properly chose kernel and bandwidth.
 %s^* 찾는 알고리즘 수정 처음엔 0.3 0.5 0.7 중에 큰거 0.7이 뽑혔으면 이제 0.6 0.7 0.8 중에 큰거. 0.6이 뽑혔으면 0.55 0.6 0.65 중 큰거... 이런식으로 찾는 알고리즘으로 수정.
 % The empirical supIPM of Section~\ref{sec:supipm-estimation} measures the fairness of any encoder on the sample.  
 To learn fair representations, we use the empirical supIPM of Section~\ref{sec:supipm-estimation} as a fairness penalty.
-We jointly train the encoder $h_\phi$ and prediction head $f_\psi$ by minimizing the penalized supervised risk
+Let $h_{\phi}$ and $f_{\psi}$ be the encoder and the prediction head with parameters $\phi$ and $\psi$, respectively, and write $\mathbf{Z}_i(\phi):=h_{\phi}(\mathbf{X}_i)$.
+For $s\in\mathcal{S}$, $\theta\in\mathbb{S}^{d-1}$ and $\mu\in[-1,1]$, let
 % To learn a fair representation with the supIPM, we add this estimate as a penalty to the supervised risk and train the encoder $h_{\phi}$ and the prediction head $f_{\psi}$ jointly by minimizing
 \begin{equation}
-  \mathcal{L}(\phi,\psi)
+  \mathcal{L}(\phi,\psi;s,\theta,\mu)
   :=\frac{1}{n}\sum_{i=1}^n
-  \ell\!\left(f_{\psi}(\mathbf{Z}_i),Y_i\right)
-  +\lambda\,
-  \widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}
-  (\mathbf{Z};S),
+  \ell\!\left(f_{\psi}(\mathbf{Z}_i(\phi)),Y_i\right)
+  +\lambda\left|
+    \sum_{i=1}^n
+    \left(\widehat{w}_{\gamma}(i;s)-\frac{1}{n}\right)
+    (\theta^\top\mathbf{Z}_i(\phi)+\mu)_+
+  \right|,
   \label{eq:supipm-penalized-objective}
 \end{equation}
 where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  
+We jointly train the encoder and the prediction head by solving $\min_{\phi,\psi}\mathcal{L}(\phi,\psi)$ with $\mathcal{L}(\phi,\psi):=\sup_{s,\theta,\mu}\mathcal{L}(\phi,\psi;s,\theta,\mu)$.
 % Equation~(\ref{eq:supipm-penalized-objective}) is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)\le\rho$, as in Section~\ref{sec:supipm-criterion}.
-Equation~(\ref{eq:supipm-penalized-objective}) gives a penalized formulation of empirical supervised risk minimization subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)\le\rho$.
+Since $\lambda\ge0$, this problem is a penalized formulation of empirical supervised risk minimization subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)\le\rho$.
 
-The empirical supIPM in (\ref{eq:empirical-supipm}) is a supremum over the sensitive value $s$ and over the discriminator parameter $(\theta,\mu)$.
 % , so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem.  
 % We solve it by alternating gradient descent in $(\phi,\psi)$ with compass search \citep{kolda2003optimization} in $s$ and projected gradient ascent in $(\theta,\mu)$, which extends the computation of ReLU-IPM in \citet{park2026relu} to the additional supremum over $s$. 
-We alternate between gradient descent on $\mathcal{L}(\phi,\psi)$ and approximating the supremum in Equation~\ref{eq:supipm-penalized-objective} with $(\phi,\psi)$ fixed. 
-To approximate this supremum, we use compass search over $s$ \citep{kolda2003optimization} and projected gradient ascent over $(\theta,\mu)$.
+We alternate between two steps.
+With $(\phi,\psi)$ fixed, we approximate the supremum over $(s,\theta,\mu)$ in $\mathcal{L}(\phi,\psi)$ by compass search over $s$ \citep{kolda2003optimization} and projected gradient ascent over $(\theta,\mu)$.
+With $(s,\theta,\mu)$ fixed, we update $(\phi,\psi)$ by gradient descent on $\mathcal{L}(\phi,\psi;s,\theta,\mu)$ in Equation~(\ref{eq:supipm-penalized-objective}).
 This optimization scheme extends the computation of ReLU-IPM in \citet{park2026relu} by additionally maximizing over $s$.
-Because both procedures can converge to a local maximum, we use $T$ initial values of $s$ and $M$ discriminator initializations.  
+Because the compass search and the gradient ascent can converge to a local maximum, we use $T$ initial values of $s$ and $M$ discriminator initializations.  
 We refer to this training method as supIPM-FRL, which can be implemented efficiently using mini-batches (Appendix~\ref{app:mini-batch}).  Further details and the algorithms are provided in  Appendices~\ref{app:ascent} and ~\ref{app:algorithm-steps}, respectively.
 
-Section~\ref{sec:theory} shows that a small empirical supIPM yields a high-probability $\operatorname{GDP}_{\infty}$ bound for every downstream head of bounded Hölder norm.
+Section~\ref{sec:theory} shows that, with high probability, a small empirical supIPM yields a small $\operatorname{GDP}_{\infty}$ on an interior region of $\mathcal{S}$ for every downstream head of bounded H\"older norm.
 
 \section{Theoretical Analysis}
 \label{sec:theory}
@@ -459,22 +450,22 @@ Section~\ref{sec:theory} shows that a small empirical supIPM yields a high-proba
 % supIPM-FRL of Section~\ref{sec:supipm-objective} learns the encoder by penalizing the empirical supIPM, whereas the fairness of the learned representation is measured by the population supIPM.  
 Theorem~\ref{thm:uniform} establishes uniform convergence of the empirical
 supIPM to its population counterpart over a class of encoders.
-Corollary~\ref{cor:certificate} then establishes the bound of the $\operatorname{GDP}_{\infty}$ on H\"older prediction heads stated at the end of Section~\ref{sec:supipm-objective}.
+Corollary~\ref{cor:certificate} then bounds the $\operatorname{GDP}_{\infty}$ of prediction heads of bounded H\"older norm in terms of the empirical supIPM, as stated at the end of Section~\ref{sec:supipm-objective}.
 
-Let the sensitive domain be $\mathcal{S}=[\underline{s},\overline{s}]$ and state both results on its interior region $\mathcal{S}_n:=[\underline{s}+\epsilon_n,\,\overline{s}-\epsilon_n]$, where $0<\epsilon_n<\tfrac{1}{2}(\overline{s}-\underline{s})$ and $\epsilon_n\to0$.  Restricting the supremum over $s$ in Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) to $\mathcal{S}_n$ gives
+Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate} are stated on the interior region $\mathcal{S}_n:=[\epsilon_n,1-\epsilon_n]$ of $\mathcal{S}=[0,1]$, where $0<\epsilon_n<\tfrac{1}{2}$ and $\epsilon_n\to0$.  Restricting the supremum over $s$ in Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) to $\mathcal{S}_n$, with bandwidth $\gamma=\gamma_n$ in Equation~(\ref{eq:empirical-supipm}), gives
 \begin{equation}
 \begin{aligned}
   \operatorname{GDP}_{\infty,n}(g)
   &:=\sup_{s\in\mathcal{S}_n}
      \left|\mathbb{E}[g(\mathbf{X})\mid S=s]-\mathbb{E}[g(\mathbf{X})]\right|,
   \\
-  D_n(h)
+  \operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)
   &:=\sup_{s\in\mathcal{S}_n}
      \operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}
      \bigl(\mathbb{P}_{h(\mathbf{X})\mid S=s},
            \mathbb{P}_{h(\mathbf{X})}\bigr),
   \\
-  \widehat{D}_n(h)
+  \widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)
   &:=\sup_{s\in\mathcal{S}_n}
      \operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}
      \bigl(\widehat{\mathbb{P}}^{\gamma_n}_{h(\mathbf{X})\mid S=s},
@@ -482,9 +473,8 @@ Let the sensitive domain be $\mathcal{S}=[\underline{s},\overline{s}]$ and state
 \end{aligned}
   \label{eq:interior}
 \end{equation}
-Conditional expectations given $S=s$ are those of Equation~(\ref{eq:pointwise-conditional}), with $p(\mathbf{x},s)$ and $\nu$ as in Section~\ref{sec:supipm-criterion}.  The bandwidth $\gamma_n$ is that of Equation~(\ref{eq:supipm-estimators}), and $\widehat{w}_{\gamma_n}(i;s)$ is set to zero when its denominator vanishes.
-
-We assume three further conditions, stated in Appendix~\ref{app:assumptions}.  Assumption~\ref{as:smooth-density} requires an i.i.d. sample and a joint density of $(\mathbf{X},S)$ that is twice continuously differentiable in $s$, with integrable envelopes $M_1$ and $M_2$ for the two derivatives.  Assumption~\ref{as:kernel} requires a bounded, symmetric and Lipschitz kernel $K$ in $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$, together with a bandwidth $\gamma_n\to0$.
+Since Theorem~\ref{thm:uniform} is uniform over a class of encoders, we write the encoder explicitly and abbreviate $D_n(h):=\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ and $\widehat{D}_n(h):=\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$.
+To bound the difference between $\widehat{D}_n(h)$ and $D_n(h)$ uniformly over a class $\mathcal{E}_n$ of encoders, we assume four conditions, stated in Appendix~\ref{app:assumptions}.  Assumption~\ref{as:positive-density} requires $\mathbb{P}_S$ to have a density $p_S$ with $0<c_S\le p_S\le C_S<\infty$ on $\mathcal{S}$, and Appendix~\ref{app:assumptions} then fixes a joint density $p(\mathbf{x},s)$ of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$, for a $\sigma$-finite measure $\nu$ on $\mathcal{X}$, and a version of the conditional expectation given $S=s$ at every $s\in\mathcal{S}$.  Assumption~\ref{as:smooth-density} requires an i.i.d. sample and a joint density of $(\mathbf{X},S)$ that is twice continuously differentiable in $s$, with integrable envelopes $M_1$ and $M_2$ for the two derivatives.  Assumption~\ref{as:kernel} requires a bounded, symmetric and Lipschitz kernel $K$ in $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$, together with a bandwidth $\gamma_n\to0$.
 % that is at most $\min\{\epsilon_n,1/2\}$ and for which the kernel centered at any $s\in\mathcal{S}_n$ places mass at most $\gamma_n^2$ outside $\mathcal{S}$.  
 Assumption~\ref{as:encoder} requires the encoders in $\mathcal{E}_n$ to take values in $\mathbb{B}^d$ and to have covering number at most $(A_n/\eta)^{\mathfrak{v}_n}$ in the supremum norm at every radius $\eta\in(0,1]$, so that $A_n$ and $\mathfrak{v}_n$ measure its size.  For $0<\delta<1$, let
 \begin{equation}
@@ -495,7 +485,6 @@ Assumption~\ref{as:encoder} requires the encoders in $\mathcal{E}_n$ to take val
   :=\gamma_n^2+\sqrt{\frac{\Gamma_{n,\delta}}{n\gamma_n}} .
   \label{eq:rate}
 \end{equation}
-In terms of these quantities, the following theorem gives the rate at which the empirical supIPM converges to the population supIPM.
 
 \begin{theorem}[Uniform convergence of the empirical supIPM]
 \label{thm:uniform}
@@ -529,7 +518,7 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold, let $d\ge3$, a
   \label{eq:certificate}
 \end{equation}
 \end{corollary}
-Thus, the $\widehat{D}_n(h)$ provides  a bound of  the $\operatorname{GDP}_{\infty}$ that holds uniformly over all heads in $\mathcal{H}^{\beta}_d(B)$.
+Thus $\widehat{D}_n(h)$ bounds $\operatorname{GDP}_{\infty,n}(f\circ h)$, and hence $\left|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]\right|$ at every $s\in\mathcal{S}_n$, uniformly over all heads $f\in\mathcal{H}^{\beta}_d(B)$.
 % The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$, so the single quantity $\widehat{D}_n(h)$ controls the $\operatorname{GDP}_{\infty}$ of every H\"older prediction head over $\mathcal{S}_n$.  
 The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and equals one when $\beta>(d+3)/2$.
 
@@ -543,7 +532,7 @@ Experimental details are given in Appendices~\ref{app:synth-experiments} and~\re
 
 \paragraph{Measures.}  Prediction performance is the test accuracy for classification and the test $1-\mathrm{MAE}$ for regression.  Fairness is measured through the disparity of a prediction head $f$ at each sensitive value, $\Delta_{f}(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$.
 % whose supremum over $s$ is $\operatorname{GDP}_{\infty}(f\circ h)$ of Equation~(\ref{eq:linfty-gdp}).  
-The prediction-level disparity is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ for the head trained jointly with the encoder.  Since a representation may later serve other heads \citep{coston2021characterizing,jovanovic2023fare,luo2026fair}, we also measure the largest disparity that a downstream head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the logistic heads with weight norm at most $c$, and define the worst-case disparity
+The prediction-level disparity is $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi})$ for the head trained jointly with the encoder.  Since a representation may later serve other heads \citep{coston2021characterizing,jovanovic2023fare,luo2026fair}, we also measure the largest disparity that a downstream head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the logistic heads with weight norm at most $c$, where $\sigma(t):=(1+e^{-t})^{-1}$, and define the worst-case disparity
 \begin{equation}
   \operatorname{GDP}_{\infty}(h;\mathcal{F}_c):=\sup_{f\in\mathcal{F}_c}\operatorname{GDP}_{\infty}(f\circ h).
   \label{eq:worst-case-gdp}
@@ -561,7 +550,7 @@ $\widehat{\Delta}_{f}(s)$ and $\widehat{\operatorname{GDP}}_{\infty}$ denote the
   \widehat{\operatorname{GDP}}_{\infty}(f_{\mathbf{w},b}\circ h)
   \label{eq:worst-case-estimate}
 \end{equation}
-over $\lVert\mathbf{w}\rVert_2\le c$  and $\lambda_h=10^{3}$, so that the disparity term dominates.  The minimizer $\hat{f}_c$ approximates the head attaining the supremum in Equation~(\ref{eq:worst-case-gdp}), and the worst-case disparity is estimated on the test data by $\widehat{\operatorname{GDP}}_{\infty}(h;\mathcal{F}_c):=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$.
+over $\lVert\mathbf{w}\rVert_2\le c$ and $b\in\mathbb{R}$, with $\lambda_h=10^{3}$ so that the disparity term dominates.  The minimizer $\hat{f}_c$ approximates the head attaining the supremum in Equation~(\ref{eq:worst-case-gdp}), and the worst-case disparity is estimated on the test data by $\widehat{\operatorname{GDP}}_{\infty}(h;\mathcal{F}_c):=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$.
 
 \subsection{Simulation study}
 \label{sec:exp-simulation}
@@ -578,7 +567,7 @@ Let $S\sim\mathrm{Uniform}(0,1)$ and $\mathbf{X}=(\mathbf{X}_{\mathrm{task}},X_{
   \qquad
   Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+0.3\,\varepsilon_2\right),
 \end{equation*}
-with $s_0=0.5$, $\tau=0.043$, standard normal $\varepsilon_1,\varepsilon_2$, a fixed $\mathbf{u}$ and the logistic function $\sigma$.  
+with $s_0=0.5$, $\tau=0.043$, standard normal $\varepsilon_1,\varepsilon_2$ and a fixed $\mathbf{u}$.  
 % Thus $\mathbf{X}$ depends on $S$ only through $X_{\mathrm{loc}}$, which is shifted only for $S$ near $s_0$, and $Y$ does not depend on $S$. 
 A representation that depends on $X_{\mathrm{loc}}$ therefore differs from its marginal distribution mainly for $S$ near $s_0$.
 The remaining settings are given in Appendix~\ref{app:synth-experiments}.
@@ -597,7 +586,7 @@ We compare supIPM-FRL with FREM over a grid of penalty parameters, using the wor
 The circled points are the configurations with the smallest disparity that retain the prediction performance of the model trained without a penalty.  At these points FREM still exhibits a peak in $\widehat{\Delta}_{\hat{f}_1}(s)$ at $s_0$, whereas the $\widehat{\Delta}_{\hat{f}_1}(s)$ of supIPM-FRL at $s_0$ is markedly smaller. 
 This is the situation of Figure~\ref{fig:motivation}. 
 The region near $s_0$ has low probability and therefore contributes little to the average in Equation~(\ref{eq:eipm}).
-Consequently, representation obtained by FREM may retain dependence localized near $s_0$.
+Consequently, the representation obtained by FREM may retain dependence localized near $s_0$.
 In contrast,  the supremum in Equation~(\ref{eq:supipm}) is attained near $s_0$, so supIPM-FRL controls this dependence directly. 
 
 
@@ -647,7 +636,7 @@ At the prediction level, supIPM-FRL is comparable to the other methods.  Under t
   \vspace{-4pt}
 \end{figure}
 
-The two measures differ because the prediction-level disparity concerns the trained head only, whereas the worst-case disparity concerns every head in $\mathcal{F}_1$.  
+The prediction-level disparity concerns the trained head only, whereas the worst-case disparity concerns every head in $\mathcal{F}_1$.  
 % The other methods constrain the dependence on $S$ only on average over $S$, only within groups of a discretized $S$, or only through a single head or adversary, so a downstream head can use the dependence they leave.
 The baselines do not directly control the dependence between the representation and $S$ at every sensitive value. 
 They may therefore achieve low disparity for the trained head while the representation still depends on $S$. 
@@ -663,8 +652,8 @@ Another downstream head can exploit that dependence, which raises the worst-case
   \vspace{-10pt}
 \end{wrapfigure}
 
-In contrast, supIPM-FRL controls the largest ReLU-IPM between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ over the sensitive domain. Corollary~\ref{cor:certificate} shows that the empirical supIPM uniformly controls a downstream disparity over all sensitive values.
-Figure~\ref{fig:profile-adult} shows this property on Adult. We consider settings with test accuracy within $0.004$ of the baseline accuracy at $\lambda=0$. For each method, we take the setting with the lowest worst-case disparity among them. At comparable test accuracy, supIPM-FRL keeps disparity low across the sensitive domain even for the worst-case head, whereas FREM exhibits substantially larger disparities.
+In contrast, supIPM-FRL controls the largest ReLU-IPM between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ over the sensitive domain, and Corollary~\ref{cor:certificate} bounds $\Delta_f(s)$ at every $s$ in the interior region $\mathcal{S}_n$ for every head $f$ of bounded H\"older norm in terms of the empirical supIPM.
+Figure~\ref{fig:profile-adult} shows $\widehat{\Delta}_{\hat{f}_1}(s)$ of supIPM-FRL and FREM on Adult. We consider settings with test accuracy within $0.004$ of the baseline accuracy at $\lambda=0$. For each method, we take the setting with the smallest worst-case disparity among these settings. At comparable test accuracy, $\widehat{\Delta}_{\hat{f}_1}(s)$ of supIPM-FRL is small across the sensitive domain, whereas that of FREM is substantially larger.
   
   % on Adult for the configurations with the smallest worst-case disparity among those whose test accuracy is within $0.004$ of the model trained without a penalty. the worst-case head of FREM attains a disparity many times larger than that of supIPM-FRL, whose disparity is small at every $s$.  Accordingly, the empirical supIPM on the test data in Appendix~\ref{app:real-measures} is smallest for supIPM-FRL on Adult and Crime at a matched level of prediction performance, although FREM attains a smaller value on ACSIncome.
 
@@ -683,12 +672,10 @@ Appendix~\ref{app:real-measures} compares the methods under five further fairnes
 % Two directions remain: extending supIPM to a multivariate or mixed sensitive attribute, for which the supremum ranges over a multidimensional domain, and finding a discriminator class that controls H\"older heads with an exponent closer to one than $\alpha_{d,\beta}$ in Equation~(\ref{eq:relu-holder}) while remaining computable.
 
 
-We proposed supIPM to measure worst-case fairness violations of representations for continuous sensitive attributes.
-Using supIPM as a fairness penalty, we developed supIPM-FRL to learn representations with worst-case fairness guarantees.
-Our theoretical analysis established a uniform convergence rate for the empirical supIPM.
-We then used the empirical supIPM to bound population $\operatorname{GDP}_{\infty}$ uniformly over heads of bounded H\"older norm.
-The supIPM-FRL also enables efficient mini-batch learning.
-Experiments further show lower worst-case disparity than existing methods at comparable prediction performance.
+We proposed supIPM, which measures the worst-case fairness violation of a representation for a continuous sensitive attribute by the supremum over the sensitive domain of the IPM between the conditional and the marginal distributions, and supIPM-FRL, which uses the empirical supIPM as a fairness penalty.
+We established a uniform convergence rate of the empirical supIPM over a class of encoders and showed that it bounds the $\operatorname{GDP}_{\infty}$ of every prediction head of bounded H\"older norm over the interior region $\mathcal{S}_n$.
+With the ReLU discriminator class, supIPM-FRL admits a mini-batch formulation with unbiased gradients for fixed inner variables.
+On simulated and real data, supIPM-FRL attains a markedly smaller worst-case downstream disparity than existing methods at comparable prediction performance.
 
 % Future work includes extending supIPM-FRL to multivariate sensitive attributes.
 % We also aim to support training when sensitive attributes are observed for only some samples.
@@ -713,7 +700,21 @@ This appendix states the assumptions of Section~\ref{sec:theory}, proves four au
 \subsection{Assumptions}
 \label{app:assumptions}
 
-Assumption~\ref{as:positive-density} of Section~\ref{sec:supipm-criterion} is maintained throughout, with $p(\mathbf{x},s)$ and $\nu$ as fixed there, and $\mathcal{S}=[\underline{s},\overline{s}]$, $\mathcal{S}_n$, $\epsilon_n$ and $\gamma_n$ as in Section~\ref{sec:theory}.  We now state the three conditions imposed there.
+We state the four conditions imposed in Section~\ref{sec:theory}, with $\mathcal{S}=[0,1]$ as in Section~\ref{sec:frem} and $\mathcal{S}_n$, $\epsilon_n$ and $\gamma_n$ as in Section~\ref{sec:theory}.
+
+\begin{assumption}[Positive density]
+\label{as:positive-density}
+$\mathbb{P}_S$ has a density $p_S$ with respect to the Lebesgue measure $\mathrm{Leb}$ on $\mathcal{S}=[0,1]$, and $0<c_S\le p_S(s)\le C_S<\infty$ for every $s\in\mathcal{S}$.
+\end{assumption}
+
+Let $\nu$ be a $\sigma$-finite measure on $\mathcal{X}$ and $p(\mathbf{x},s)$ a joint density of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$ with $\int_{\mathcal{X}}p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x})=p_S(s)$ for every $s\in\mathcal{S}$.  For a bounded measurable $g:\mathcal{X}\to\mathbb{R}$, this joint density fixes the version of the conditional expectation given $S=s$ used throughout the paper,
+\begin{equation}
+  \mathbb{E}[g(\mathbf{X})\mid S=s]
+  :=\frac{1}{p_S(s)}\int_{\mathcal{X}} g(\mathbf{x})\,p(\mathbf{x},s)\,\mathrm{d}\nu(\mathbf{x}),
+  \qquad s\in\mathcal{S},
+  \label{eq:pointwise-conditional}
+\end{equation}
+which Equations~(\ref{eq:supipm}) and (\ref{eq:linfty-gdp}) require at every $s\in\mathcal{S}$, not only for $\mathbb{P}_S$-almost every $s$.
 
 \begin{assumption}[Smooth joint density]
 \label{as:smooth-density}
@@ -747,10 +748,10 @@ and let $N(\eta,\mathcal{F},\lVert\cdot\rVert_\infty)$ be the smallest number of
 
 Assumption~\ref{as:encoder} holds on a bounded $\mathcal{X}$ for ReLU networks with bounded parameters followed by the normalization of Appendix~\ref{app:ascent}, which is $1$-Lipschitz because its Jacobian is symmetric with eigenvalues in $(0,1]$, and therefore does not increase covering numbers.  For such networks, $\mathfrak{v}_n$ is bounded by a multiple of the number of parameters and $\log A_n$ by a multiple of the depth times the logarithm of the width \citep{schmidt2020nonparametric}.
 
-\subsection{Notation}
+\subsection{Notation and auxiliary inequalities}
 \label{app:notation}
 
-Throughout the appendix $\mathbb{E}$ denotes expectation under the joint distribution of $(\mathbf{X},S)$ and $\mathbb{E}_n$ the empirical average, $\mathbb{E}_n\varphi:=n^{-1}\sum_{i=1}^n\varphi(\mathbf{X}_i,S_i)$.  We abbreviate $\gamma:=\gamma_n$ and $\epsilon:=\epsilon_n$.  We write $C$ for a finite positive constant depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, whose value may change from one occurrence to the next.  Since $p_S$ integrates to one and is bounded below by $c_S$, the length $\overline{s}-\underline{s}$ is at most $1/c_S$. 
+Throughout the appendix $\mathbb{E}$ denotes expectation under the joint distribution of $(\mathbf{X},S)$ and $\mathbb{E}_n$ the empirical average, $\mathbb{E}_n\varphi:=n^{-1}\sum_{i=1}^n\varphi(\mathbf{X}_i,S_i)$.  We abbreviate $\gamma:=\gamma_n$ and $\epsilon:=\epsilon_n$.  We write $C$ for a finite positive constant depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, whose value may change from one occurrence to the next. 
 
 The encoder class $\mathcal{E}_n$ and the ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ induce the class
 \begin{equation}
@@ -776,18 +777,16 @@ Every $g\in\mathcal{G}_n$ satisfies $0\le g\le2$, because $h$ takes values in $\
 \end{aligned}
   \label{eq:app-notation}
 \end{equation}
-
 where $m_g$ is the version of the conditional expectation fixed in Equation~(\ref{eq:pointwise-conditional}).  
 The quantity $\widehat{m}_{g,\gamma}$ is the Nadaraya--Watson estimator of $m_g$, and $m_{g,\gamma}$ is its population counterpart.
-Since $\widehat{w}_{\gamma}(i;s)=K_{\gamma}(S_i,s)/\sum_{j=1}^nK_{\gamma}(S_j,s)$, we have $\widehat{m}_{g,\gamma}(s)=\sum_{i=1}^n\widehat{w}_{\gamma}(i;s)g(\mathbf{X}_i)$ whenever the denominator is positive.  Hence, for every $h\in\mathcal{E}_n$,
-
+By the definition of $\widehat{w}_{\gamma}(i;s)$ in Section~\ref{sec:supipm-estimation}, $\widehat{m}_{g,\gamma}(s)=\sum_{i=1}^n\widehat{w}_{\gamma}(i;s)g(\mathbf{X}_i)$ whenever $\mathbb{E}_nK_{\gamma}(S,s)>0$.  Hence, for every $h\in\mathcal{E}_n$ and whenever $\inf_{s\in\mathcal{S}_n}\mathbb{E}_nK_{\gamma}(S,s)>0$,
 \begin{equation}
   D_n(h)=\sup_{g,s}\left|m_g(s)-\mathbb{E}g\right|,
   \qquad
   \widehat{D}_n(h)=\sup_{g,s}\left|\widehat{m}_{g,\gamma}(s)-\mathbb{E}_ng\right| ,
   \label{eq:D-in-scores}
 \end{equation}
-where the suprema are taken over $g=v\circ h$ with $v\in\mathcal{V}_{\mathrm{R}}$ and over $s\in\mathcal{S}_n$.  Because $g$, $m_g$, $m_{g,\gamma}$ and $\widehat{m}_{g,\gamma}$ all take values in $[0,2]$, both quantities in Equation~(\ref{eq:D-in-scores}) lie in $[0,2]$.
+where the suprema are taken over $g=v\circ h$ with $v\in\mathcal{V}_{\mathrm{R}}$ and over $s\in\mathcal{S}_n$.  Because $g$, $m_g$, $m_{g,\gamma}$ and $\widehat{m}_{g,\gamma}$ all take values in $[0,2]$, $D_n(h)$ and $\widehat{D}_n(h)$ lie in $[0,2]$.
 
 We use Bernstein's inequality in the following form \citep[Chapter~2]{boucheron2013concentration}.  If $W_1,\ldots,W_n$ are independent copies of a random variable $W$ with $0\le W\le U$ and $\operatorname{Var}(W)\le\sigma^2$, then
 \begin{equation}
@@ -970,7 +969,7 @@ Adding Equation~(\ref{eq:tail-term}), and using $T_K(\epsilon/\gamma)\le\gamma^2
 \end{aligned}
   \label{eq:numerator-explicit}
 \end{equation}
-which is the first bound in Equation~(\ref{eq:numerator-bias}).  The same argument with $g\equiv1$, for which $a_g=p_S\le C_S$ and $\lVert p_S''\rVert_\infty\le\lVert M_2\rVert_{L_1(\nu)}$ by Lemma~\ref{lem:regularity}, so that the tail term, the term $p_S(s)T_K(\epsilon/\gamma)$ and the Taylor remainder are at most $C_S\gamma^2$, $C_S\gamma^2$ and $\tfrac12\gamma^2\lVert M_2\rVert_{L_1(\nu)}\kappa_K$, gives
+which is the first bound in Equation~(\ref{eq:numerator-bias}).  For $g\equiv1$, $a_g=p_S\le C_S$ and $\lVert p_S''\rVert_\infty\le\lVert M_2\rVert_{L_1(\nu)}$ by Lemma~\ref{lem:regularity}, so the tail term, the term $p_S(s)T_K(\epsilon/\gamma)$ and the Taylor remainder are at most $C_S\gamma^2$, $C_S\gamma^2$ and $\tfrac12\gamma^2\lVert M_2\rVert_{L_1(\nu)}\kappa_K$.  The same argument then gives
 \begin{equation}
   \left|q_{\gamma}(s)-p_S(s)\right|
   \le\left(2C_S+\tfrac12\lVert M_2\rVert_{L_1(\nu)}\kappa_K\right)\gamma^2 ,
@@ -1021,7 +1020,7 @@ holds.
 \end{lemma}
 
 \begin{proof}
-The constants are determined in the following order.  Step~1 fixes a constant $C_0\ge1$ depending only on $c_S$ and $K$, Step~2 fixes $C_\ast\ge1$ depending only on $c_S$, $C_S$ and $K$, and $c$ is then defined by
+The constants are determined in the following order.  Step~1 fixes a constant $C_0\ge1$ depending only on $K$, Step~2 fixes $C_\ast\ge1$ depending only on $c_S$, $C_S$ and $K$, and $c$ is then defined by
 \begin{equation}
   c:=\min\left\{\frac{1}{C_\ast^{2}},\ \frac{c_S^2}{16C_\ast^{2}}\right\},
   \qquad\text{so that}\qquad
@@ -1132,12 +1131,12 @@ It remains to bound $\Xi$.  By Lemma~\ref{lem:entropy}(ii) with $\eta=\zeta_{\ma
   \le(\mathfrak{v}_n+d+1)\log\frac{9A_n}{\zeta_{\mathcal{G}}}
   \le(\mathfrak{v}_n+d+1)\log\frac{9(8\lVert K\rVert_\infty+1)A_n}{\gamma u} .
 \]
-The interval $\mathcal{S}_n$ admits a $\zeta_{\mathcal{S}}$-net with at most $1+(\overline{s}-\underline{s})/(2\zeta_{\mathcal{S}})$ points, so
+The interval $\mathcal{S}_n\subseteq[0,1]$ admits a $\zeta_{\mathcal{S}}$-net with at most $1+1/(2\zeta_{\mathcal{S}})$ points, so
 \[
-  \log N_2\le\log\left(1+\frac{\overline{s}-\underline{s}}{2\zeta_{\mathcal{S}}}\right)
-  =\log\left(1+\frac{8L_K(\overline{s}-\underline{s})}{\gamma^2u}\right).
+  \log N_2\le\log\left(1+\frac{1}{2\zeta_{\mathcal{S}}}\right)
+  =\log\left(1+\frac{8L_K}{\gamma^2u}\right).
 \]
-We now use $u\ge n^{-1}$ from Equation~(\ref{eq:u-range}), which gives $\log(1/u)\le\log n$.  Since $A_n\ge e$ and $\gamma\le1$, $\log(A_nn/\gamma)=\log A_n+\log n+\log(1/\gamma)\ge1$, and since $\overline{s}-\underline{s}\le1/c_S$ and $\gamma^2u\le1$, $1+8L_K(\overline{s}-\underline{s})/(\gamma^2u)\le(1+8L_K/c_S)/(\gamma^2u)$.  Hence
+We now use $u\ge n^{-1}$ from Equation~(\ref{eq:u-range}), which gives $\log(1/u)\le\log n$.  Since $A_n\ge e$ and $\gamma\le1$, $\log(A_nn/\gamma)=\log A_n+\log n+\log(1/\gamma)\ge1$, and since $\gamma^2u\le1$, $1+8L_K/(\gamma^2u)\le(1+8L_K)/(\gamma^2u)$.  Hence
 \[
 \begin{aligned}
   \log\frac{9(8\lVert K\rVert_\infty+1)A_n}{\gamma u}
@@ -1145,10 +1144,10 @@ We now use $u\ge n^{-1}$ from Equation~(\ref{eq:u-range}), which gives $\log(1/u
   \\
   &\le\left[1+\log\{9(8\lVert K\rVert_\infty+1)\}\right]\log\frac{A_nn}{\gamma},
   \\
-  \log\left(1+\frac{8L_K(\overline{s}-\underline{s})}{\gamma^2u}\right)
-  &\le\log\left(1+\frac{8L_K}{c_S}\right)+2\log\frac{1}{\gamma}+\log n
+  \log\left(1+\frac{8L_K}{\gamma^2u}\right)
+  &\le\log\left(1+8L_K\right)+2\log\frac{1}{\gamma}+\log n
   \\
-  &\le\left[2+\log\left(1+\frac{8L_K}{c_S}\right)\right]\log\frac{A_nn}{\gamma} .
+  &\le\left[2+\log\left(1+8L_K\right)\right]\log\frac{A_nn}{\gamma} .
 \end{aligned}
 \]
 Since $\mathfrak{v}_n+d+1\le2(\mathfrak{v}_n+d)$ and $\mathfrak{v}_n+d\ge1$, we conclude that $\Xi=\log6+\log N_1+\log N_2+\log(1/\delta)$ satisfies
@@ -1158,11 +1157,11 @@ Since $\mathfrak{v}_n+d+1\le2(\mathfrak{v}_n+d)$ and $\mathfrak{v}_n+d\ge1$, we 
   &\le C_0\left\{(\mathfrak{v}_n+d)\log\frac{A_nn}{\gamma}+\log\frac{1}{\delta}\right\}
   =C_0\,\Gamma_{n,\delta},
   \\
-  C_0&:=4+2\log\{36(8\lVert K\rVert_\infty+1)\}+\log\left(1+\frac{8L_K}{c_S}\right)+\log6 ,
+  C_0&:=4+2\log\{36(8\lVert K\rVert_\infty+1)\}+\log\left(1+8L_K\right)+\log6 ,
 \end{aligned}
   \label{eq:entropy-bound}
 \end{equation}
-where $C_0\ge1$ depends only on $c_S$ and $K$, and where the factor $36$ in place of $9$ is chosen so that the same $C_0$ serves in Step~2.  Finally, by Equation~(\ref{eq:entropy-bound}) and $\Lambda_n^2=\Gamma_{n,\delta}/(n\gamma)$, together with $\Lambda_n\le\sqrt{c}\le1$ from Equations~(\ref{eq:lambda-range}) and (\ref{eq:c-choice}),
+where $C_0\ge1$ depends only on $K$, and where the factor $36$ in place of $9$ is chosen so that the same $C_0$ serves in Step~2.  Finally, by Equation~(\ref{eq:entropy-bound}) and $\Lambda_n^2=\Gamma_{n,\delta}/(n\gamma)$, together with $\Lambda_n\le\sqrt{c}\le1$ from Equations~(\ref{eq:lambda-range}) and (\ref{eq:c-choice}),
 \[
   8\sqrt{\frac{\lVert K\rVert_\infty C_S\Xi}{n\gamma}}
   \le8\sqrt{\lVert K\rVert_\infty C_SC_0}\,\Lambda_n ,
@@ -1249,7 +1248,7 @@ On $\Omega_n$ fix $g\in\mathcal{G}_n$ and $s\in\mathcal{S}_n$, and write $\wideh
   \qquad
   \widehat{q}_{\gamma}(s)-q_{\gamma}(s)=(\mathbb{E}_n-\mathbb{E})K_{\gamma}(S,s) .
 \]
-By Equation~(\ref{eq:denominator-lower}), $\widehat{q}_{\gamma}(s)\ge c_S/2$, so $\widehat{m}_{g,\gamma}(s)$ is well defined and the zero-denominator convention for $\widehat{w}_{\gamma}(i;s)$ in Section~\ref{sec:theory} is not needed on $\Omega_n$.  Using $\widehat{m}_{g,\gamma}=\widehat{b}_{g,\gamma}/\widehat{q}_{\gamma}$ and $m_{g,\gamma}=b_{g,\gamma}/q_{\gamma}$, we obtain
+By Equation~(\ref{eq:denominator-lower}), $\widehat{q}_{\gamma}(s)\ge c_S/2$, so $\widehat{m}_{g,\gamma}(s)$ is well defined.  Using $\widehat{m}_{g,\gamma}=\widehat{b}_{g,\gamma}/\widehat{q}_{\gamma}$ and $m_{g,\gamma}=b_{g,\gamma}/q_{\gamma}$, we obtain
 \begin{equation}
 \begin{aligned}
   \widehat{m}_{g,\gamma}(s)-m_{g,\gamma}(s)
@@ -1338,7 +1337,7 @@ Let $\Omega_n$ be the event of Lemma~\ref{lem:stochastic}, on which Equation~(\r
   \qquad h\in\mathcal{E}_n .
   \label{eq:population-from-empirical}
 \end{equation}
-Fix $h\in\mathcal{E}_n$, $B>0$, $\beta>0$ with $\beta\ne(d+3)/2$, and $s\in\mathcal{S}_n$.  Write $\mathbb{P}_s:=\mathbb{P}_{h(\mathbf{X})\mid S=s}$ and $\mathbb{P}_0:=\mathbb{P}_{h(\mathbf{X})}$, which are probability measures on $\mathbb{B}^d$ because $h$ takes values in $\mathbb{B}^d$ by Assumption~\ref{as:encoder}.  Let $f\in\mathcal{H}^{\beta}_d(B)$.  Then $B^{-1}f\in\mathcal{H}^{\beta}_d$, and the absolute difference between the conditional and the marginal means of $f(h(\mathbf{X}))$ equals $B$ times the corresponding difference for $B^{-1}f$, which by the definition of the IPM is at most $\operatorname{IPM}_{\mathcal{H}^{\beta}_d}(\mathbb{P}_s,\mathbb{P}_0)$.  Since $d\ge3$ and $\beta\ne(d+3)/2$, Theorem~2 of \citet{park2026relu}, restated in Equation~(\ref{eq:relu-holder}), then gives
+Fix $h\in\mathcal{E}_n$, $B>0$, $\beta>0$ with $\beta\ne(d+3)/2$, and $s\in\mathcal{S}_n$.  Write $\mathbb{P}_s:=\mathbb{P}_{h(\mathbf{X})\mid S=s}$ and $\mathbb{P}_0:=\mathbb{P}_{h(\mathbf{X})}$, which are probability measures on $\mathbb{B}^d$ because $h$ takes values in $\mathbb{B}^d$ by Assumption~\ref{as:encoder}.  Let $f\in\mathcal{H}^{\beta}_d(B)$.  Then $B^{-1}f\in\mathcal{H}^{\beta}_d$, so Equation~(\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{H}^{\beta}_d$ gives $\left|\mathbb{E}[f(h(\mathbf{X}))\mid S=s]-\mathbb{E}[f(h(\mathbf{X}))]\right|=B\left|\int B^{-1}f\,\mathrm{d}\mathbb{P}_s-\int B^{-1}f\,\mathrm{d}\mathbb{P}_0\right|\le B\operatorname{IPM}_{\mathcal{H}^{\beta}_d}(\mathbb{P}_s,\mathbb{P}_0)$.  Since $d\ge3$ and $\beta\ne(d+3)/2$, Theorem~2 of \citet{park2026relu}, restated in Equation~(\ref{eq:relu-holder}), then gives
 \begin{equation}
   \left|\mathbb{E}\!\left[f(h(\mathbf{X}))\mid S=s\right]
         -\mathbb{E}\!\left[f(h(\mathbf{X}))\right]\right|
@@ -1347,7 +1346,7 @@ Fix $h\in\mathcal{E}_n$, $B>0$, $\beta>0$ with $\beta\ne(d+3)/2$, and $s\in\math
      (\mathbb{P}_s,\mathbb{P}_0)^{\alpha_{d,\beta}} .
   \label{eq:pointwise-transfer}
 \end{equation}
-The map $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$, and $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le D_n(h)$ by the definition of $D_n(h)$ in Equation~(\ref{eq:interior}).  The right-hand side of Equation~(\ref{eq:pointwise-transfer}) is therefore at most $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, which depends on neither $s$ nor $f$.  Take the supremum over $s\in\mathcal{S}_n$ and then over $f\in\mathcal{H}^{\beta}_d(B)$ on the left-hand side of Equation~(\ref{eq:pointwise-transfer}).  By Equation~(\ref{eq:interior}) the result is $\sup_{f}\operatorname{GDP}_{\infty,n}(f\circ h)$, and applying Equation~(\ref{eq:population-from-empirical}) together with the monotonicity of $t\mapsto t^{\alpha_{d,\beta}}$ gives
+The map $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$, and $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le D_n(h)$ by the definition of $D_n(h)$ in Section~\ref{sec:theory}.  The right-hand side of Equation~(\ref{eq:pointwise-transfer}) is therefore at most $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, which depends on neither $s$ nor $f$.  Take the supremum over $s\in\mathcal{S}_n$ and then over $f\in\mathcal{H}^{\beta}_d(B)$ on the left-hand side of Equation~(\ref{eq:pointwise-transfer}).  By the definition of $\operatorname{GDP}_{\infty,n}$ in Equation~(\ref{eq:interior}) the result is $\sup_{f}\operatorname{GDP}_{\infty,n}(f\circ h)$, and applying Equation~(\ref{eq:population-from-empirical}) together with the monotonicity of $t\mapsto t^{\alpha_{d,\beta}}$ gives
 \[
   \sup_{f\in\mathcal{H}^{\beta}_d(B)}
   \operatorname{GDP}_{\infty,n}(f\circ h)
@@ -1361,15 +1360,15 @@ which is Equation~(\ref{eq:certificate}).  The event $\Omega_n$ depends on neith
 \section{Details of Training supIPM-FRL}
 \label{app:algorithm}
 
-This appendix supplies the details of the learning procedure in Section~\ref{sec:supipm-objective}.  Appendix~\ref{app:ascent} describes the updates of  the sensitive values and the discriminators parameters together with the descent step for the encoder and the prediction head. 
-Appendix~\ref{app:mini-batch} derives an equivalent formulation of Equation~(\ref{eq:supipm-penalized-objective}) for mini-batch training.
+This appendix supplies the details of the learning procedure in Section~\ref{sec:supipm-objective}.  Appendix~\ref{app:ascent} describes the updates of the candidate sensitive values and the discriminator parameters together with the descent step for the encoder and the prediction head.
+Appendix~\ref{app:mini-batch} derives an equivalent formulation of the objective $\mathcal{L}(\phi,\psi)$ of Section~\ref{sec:supipm-objective} for mini-batch training.
 The mini-batch gradients are unbiased when the inner maximization variables are held fixed.
 Appendix~\ref{app:algorithm-steps} presents the batch and mini-batch procedures in Algorithms~\ref{alg:supipm-frl} and~\ref{alg:supipm-frl-mb}, respectively.
 
 \subsection{Optimization Procedure}
 \label{app:ascent}
 
-In practice the encoder $h_{\phi}$ is a neural network followed by the normalization $\mathbf{z}\mapsto\mathbf{z}/\sqrt{\lVert\mathbf{z}\rVert_2^2+1}\in\mathbb{B}^d$, so that $\mathbf{Z}=h_{\phi}(\mathbf{X})$ takes values in $\mathbb{B}^d$ as required in Section~\ref{sec:supipm-criterion}.  We minimize the objective in Equation~(\ref{eq:supipm-penalized-objective}) by alternating gradient descent in $(\phi,\psi)$ with compass search in $s$ \citep{kolda2003optimization} and projected gradient ascent in $(\theta,\mu)$.  To describe the search and the ascent steps, for $s\in\mathcal{S}$ and $(\theta,\mu)\in\mathbb{S}^{d-1}\times[-1,1]$ let $\Delta(s;\theta,\mu)$ denote the discrepancy detected at $s$ by the discriminator $v_{\theta,\mu}$:
+In practice the encoder $h_{\phi}$ is a neural network followed by the normalization $\mathbf{z}\mapsto\mathbf{z}/\sqrt{\lVert\mathbf{z}\rVert_2^2+1}\in\mathbb{B}^d$, so that $\mathbf{Z}=h_{\phi}(\mathbf{X})$ takes values in $\mathbb{B}^d$, on which the ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ of Equation~(\ref{eq:relu-class}) is defined.  Minimizing $\mathcal{L}(\phi,\psi)$ of Section~\ref{sec:supipm-objective} is a min--max problem, which we solve by alternating gradient descent in $(\phi,\psi)$ with compass search in $s$ \citep{kolda2003optimization} and projected gradient ascent in $(\theta,\mu)$.  To describe the search and the ascent steps, write $\mathbf{Z}_i:=h_{\phi}(\mathbf{X}_i)$ and, for $s\in\mathcal{S}$ and $(\theta,\mu)\in\mathbb{S}^{d-1}\times[-1,1]$, let
 \begin{equation}
   \Delta(s;\theta,\mu)
   :=\left|
@@ -1379,14 +1378,37 @@ In practice the encoder $h_{\phi}$ is a neural network followed by the normaliza
   \right|.
   \label{eq:discriminator-discrepancy}
 \end{equation}
-Then $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)=\sup_{s\in\mathcal{S}}\sup_{\theta\in\mathbb{S}^{d-1},\,\mu\in[-1,1]}\Delta(s;\theta,\mu)$.  Because both procedures can converge to a local maximum, we follow \citet{park2026relu} and run them from several initial values in parallel, with $T$ candidate sensitive values $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ and $M$ discriminators $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$, where $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$.  Let $s^{\star}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ be the candidate at which the largest discrepancy is detected.  The candidates are updated by compass search on $g$ and the discriminators by gradient ascent on $H$, where
+Then Equations~(\ref{eq:supipm-penalized-objective}) and (\ref{eq:empirical-supipm}) read
+\[
+\begin{aligned}
+  \mathcal{L}(\phi,\psi;s,\theta,\mu)
+  &=\frac{1}{n}\sum_{i=1}^n\ell\!\left(f_{\psi}(\mathbf{Z}_i),Y_i\right)+\lambda\Delta(s;\theta,\mu),
+  \\
+  \widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)
+  &=\sup_{s\in\mathcal{S}}\ \sup_{\theta\in\mathbb{S}^{d-1},\,\mu\in[-1,1]}\Delta(s;\theta,\mu).
+\end{aligned}
+\]
+
+Because the compass search and the gradient ascent can converge to a local maximum, we follow \citet{park2026relu} and run them from several initial values in parallel.
+
+Let $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ be $T$ candidate sensitive values and $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$ be $M$ discriminators, where $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$, and let $s^{\star}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$.  The candidates are updated by compass search on $g$ and the discriminators by gradient ascent on $H$, where
 \begin{equation}
   g(s):=\max_{m\in[M]}\Delta(s;\theta_m,\mu_m),
   \qquad
   H(\mathbf{v}):=\sum_{m=1}^{M}\Delta(s^{\star};\theta_m,\mu_m),
   \label{eq:stacked-objectives}
 \end{equation}
-and $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $g$ and in $H$, respectively.  We write $\Pi_{A}$ for the projection onto a set $A$.  One compass search step with step size $\delta$ evaluates $g$ at the candidate $s^{(t)}$ and at the two points $\Pi_{\mathcal{S}}(s^{(t)}\pm\delta)$, moves the candidate to the point with the largest value, and halves $\delta$; the $T$ candidates are moved in parallel.  The search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$.  Since the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, one ascent step on $H$ updates all $M$ discriminator parameters, and after each step $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ projects each $\theta_m$ onto the unit sphere and each $\mu_m$ to $[-1,1]$.  The encoder and the prediction head are then updated by gradient descent on $\mathcal{L}(\phi,\psi)$ with the empirical supIPM replaced by $\max_{m\in[M]}\Delta(s^{\star};\theta_m,\mu_m)$, that is, with the outer supremum taken over the $T$ candidates and the inner supremum over the $M$ discriminators.
+and $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $g$ and in $H$, respectively.
+
+We write $\Pi_{A}$ for the projection onto a set $A$.  One compass search step with step size $\delta$ evaluates $g$ at the candidate $s^{(t)}$ and at the two points $\Pi_{\mathcal{S}}(s^{(t)}\pm\delta)$, moves the candidate to the point with the largest value, and halves $\delta$.  The $T$ candidates are moved in parallel.  The search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$.
+
+Since the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, one ascent step on $H$ updates all $M$ discriminator parameters, and after each step $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ projects each $\theta_m$ onto the unit sphere and each $\mu_m$ to $[-1,1]$.
+
+The encoder and the prediction head are then updated by gradient descent on
+\[
+  \max_{m\in[M]}\mathcal{L}(\phi,\psi;s^{\star},\theta_m,\mu_m),
+\]
+that is, on $\mathcal{L}(\phi,\psi)$ with the supremum over $s$ restricted to the $T$ candidates and the supremum over $(\theta,\mu)$ to the $M$ discriminators.
 
 \subsection{mini-batch Learning}
 \label{app:mini-batch}
@@ -1394,9 +1416,9 @@ and $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $g$ a
 The updates of Appendix~\ref{app:ascent} use all $n$ observations.  For mini-batch training, the absolute value and the supremum in Equation~(\ref{eq:empirical-supipm}) prevent the usual argument that an average over a random mini-batch is unbiased for the average over the sample.
 We therefore express the absolute value using the identity $|x|=\max_{\chi\in\{-1,1\}}\chi x$.
 We then estimate the resulting objective using a mini-batch, with the inner variables held fixed.
-These steps yield an equivalent stochastic min--max formulation of Equation~(\ref{eq:supipm-penalized-objective}).
+These steps yield an equivalent stochastic min--max formulation of $\min_{\phi,\psi}\mathcal{L}(\phi,\psi)$.
 
-Throughout this subsection, we condition on the sample $\mathcal{D}$, and the bandwidth $\gamma$ is fixed.  Write $[n]:=\{1,\ldots,n\}$, let the mini-batch $\mathcal{B}$ be drawn uniformly from the subsets of $[n]$ of a fixed size $|\mathcal{B}|$, and let $\mathbb{E}_{\mathcal{B}}$ denote the expectation over this draw.  As in the proof of Theorem~\ref{thm:uniform}, write $\widehat{q}_{\gamma}(s):=n^{-1}\sum_{j=1}^{n}K_{\gamma}(S_j,s)$, so that $\widehat{w}_{\gamma}(i;s)=K_{\gamma}(S_i,s)/\{n\widehat{q}_{\gamma}(s)\}$ when $\widehat{q}_{\gamma}(s)>0$, with the zero-denominator convention of Section~\ref{sec:theory} otherwise.  The normalization $\widehat{q}_{\gamma}(s)$ uses all $n$ sensitive values and does not depend on the encoder, so at a given $s$ it costs $O(n)$ scalar kernel evaluations and no forward pass through $h_{\phi}$.
+Throughout this subsection, we condition on the sample $\mathcal{D}$, and the bandwidth $\gamma$ is fixed.  Write $[n]:=\{1,\ldots,n\}$, let the mini-batch $\mathcal{B}$ be drawn uniformly from the subsets of $[n]$ of a fixed size $|\mathcal{B}|$, and let $\mathbb{E}_{\mathcal{B}}$ denote the expectation over this draw.  As in the proof of Theorem~\ref{thm:uniform}, write $\widehat{q}_{\gamma}(s):=n^{-1}\sum_{j=1}^{n}K_{\gamma}(S_j,s)$, so that $\widehat{w}_{\gamma}(i;s)=K_{\gamma}(S_i,s)/\{n\widehat{q}_{\gamma}(s)\}$ when $\widehat{q}_{\gamma}(s)>0$, and we set $\widehat{w}_{\gamma}(i;s):=0$ when $\widehat{q}_{\gamma}(s)=0$.  The normalization $\widehat{q}_{\gamma}(s)$ uses all $n$ sensitive values and does not depend on the encoder, so at a given $s$ it costs $O(n)$ scalar kernel evaluations and no forward pass through $h_{\phi}$.
 
 \paragraph{An equivalent objective.}  Let $\chi\in\{-1,1\}$ be a sign, and collect the inner variables in $\boldsymbol{\vartheta}:=(s,\theta,\mu,\chi)\in\Theta:=\mathcal{S}\times\mathbb{S}^{d-1}\times[-1,1]\times\{-1,1\}$.  For a mini-batch $\mathcal{B}\subseteq[n]$, with $\mathbf{Z}_i=h_{\phi}(\mathbf{X}_i)$ and the discriminator $v_{\theta,\mu}$ of Equation~(\ref{eq:relu-class}), define
 \begin{equation}
@@ -1413,7 +1435,6 @@ Throughout this subsection, we condition on the sample $\mathcal{D}$, and the ba
   \label{eq:mb-objective}
 \end{equation}
 and write $\mathcal{J}:=\mathcal{J}_{[n]}$ for the batch objective.  
-We compute the averages over the mini-batch.
 The factor $n$ denotes the full sample size, and the weights $\widehat{w}_{\gamma}(i;s)$ are computed using all $n$ sensitive values.
 Since $\Delta_{[n]}(s;\theta,\mu)$ is the signed sum inside the absolute value in Equation~(\ref{eq:discriminator-discrepancy}), we have $\Delta(s;\theta,\mu)=|\Delta_{[n]}(s;\theta,\mu)|$, and the identity $|x|=\max_{\chi\in\{-1,1\}}\chi x$ together with $\lambda\ge0$ gives
 \begin{equation}
@@ -1422,7 +1443,7 @@ Since $\Delta_{[n]}(s;\theta,\mu)$ is the signed sum inside the absolute value i
   \label{eq:mb-equivalent}
 \end{equation}
 With $h_{\phi}$ fixed, the representation of an input must not depend on the mini-batch.
-Therefore, the normalization of encoder's output cannot use mini-batch statistics.
+Therefore, the normalization of the encoder's output cannot use mini-batch statistics.
 The pointwise normalization of Appendix~\ref{app:ascent} satisfies this requirement.
 
 \begin{proposition}[Unbiased mini-batch objective and gradients]
@@ -1444,7 +1465,7 @@ If $\ell(f_{\psi}(\mathbf{Z}_i),Y_i)$ and $v_{\theta,\mu}(\mathbf{Z}_i)$ are dif
   \label{eq:mb-unbiased-gradient}
 \end{equation}
 Suppose that $\mathcal{B}$ is drawn uniformly and independently of the random parameters $(\phi,\psi,\boldsymbol{\vartheta})$.
-Then both statements hold conditional on $(\phi,\psi,\boldsymbol{\vartheta})$.Finally, suppose that $\boldsymbol{\vartheta}^{\star}$ maximizes $\mathcal{J}(\phi,\psi;\cdot)$ over $\Theta$ and is fixed before $\mathcal{B}$ is drawn, that $\mathcal{L}$ is differentiable at $(\phi,\psi)$, and that the condition above holds for $\phi$ and $\psi$ at $\boldsymbol{\vartheta}^{\star}$.  Then
+Then both statements hold conditional on $(\phi,\psi,\boldsymbol{\vartheta})$.  Finally, suppose that $\boldsymbol{\vartheta}^{\star}$ maximizes $\mathcal{J}(\phi,\psi;\cdot)$ over $\Theta$ and is fixed before $\mathcal{B}$ is drawn, that $\mathcal{L}$ is differentiable at $(\phi,\psi)$, and that the condition above holds for $\phi$ and $\psi$ at $\boldsymbol{\vartheta}^{\star}$.  Then
 \begin{equation}
   \mathbb{E}_{\mathcal{B}}\bigl[\nabla_{(\phi,\psi)}\mathcal{J}_{\mathcal{B}}(\phi,\psi;\boldsymbol{\vartheta}^{\star})\bigr]
   =\nabla_{(\phi,\psi)}\mathcal{L}(\phi,\psi).
@@ -1463,19 +1484,14 @@ Fix $(\phi,\psi,\boldsymbol{\vartheta})$.  By Equation~(\ref{eq:mb-objective}), 
 The second identity in Equation~(\ref{eq:mb-unbiased-value}) then follows from Equation~(\ref{eq:mb-equivalent}).  The expectation $\mathbb{E}_{\mathcal{B}}$ is a finite average over the subsets of $[n]$ of size $|\mathcal{B}|$, so it commutes with differentiation, and the same calculation with $\nabla\mathcal{J}_{\{i\}}$ in place of $\mathcal{J}_{\{i\}}$ gives Equation~(\ref{eq:mb-unbiased-gradient}).  If $\mathcal{B}$ is independent of a random $(\phi,\psi,\boldsymbol{\vartheta})$, conditioning on it leaves $\mathbb{P}(i\in\mathcal{B})=|\mathcal{B}|/n$, which gives the conditional statements.  For the last assertion, the map $(\phi',\psi')\mapsto\mathcal{L}(\phi',\psi')-\mathcal{J}(\phi',\psi';\boldsymbol{\vartheta}^{\star})$ is nonnegative by Equation~(\ref{eq:mb-equivalent}) and vanishes at $(\phi,\psi)$, where it therefore attains its minimum.  Its gradients with respect to $\phi$ and to $\psi$ at $(\phi,\psi)$ therefore vanish, so $\nabla_{(\phi,\psi)}\mathcal{L}(\phi,\psi)=\nabla_{(\phi,\psi)}\mathcal{J}(\phi,\psi;\boldsymbol{\vartheta}^{\star})$, and Equation~(\ref{eq:mb-unbiased-gradient}) completes the proof.
 \end{proof}
 
-We fix the sensitive value, discriminator, and sign before drawing the mini-batch.
-By Proposition~\ref{prop:mini-batch}, the resulting mini-batch gradient is unbiased for the gradient of $\mathcal{J}$.
-Algorithm~\ref{alg:supipm-frl-mb} follows this order.
-Evaluating MMD penalty on mini-batches generally introduces bias.
-In contrast, ReLU-IPM admits unbiased mini-batch gradients.
-It also avoids pairwise kernel evaluations on representations.
-These computational advantages motivate our use of ReLU-IPM.
+We fix the sensitive value, the discriminator and the sign before drawing the mini-batch, so that the mini-batch gradient is unbiased for the gradient of $\mathcal{J}$ by Proposition~\ref{prop:mini-batch}, and Algorithm~\ref{alg:supipm-frl-mb} follows this order.
+The MMD penalty of FREM admits no such formulation, because its value on a mini-batch is biased for its value on the batch \citep{lee2026fair}, and it also requires a kernel evaluation for every pair of representations.
 
 
 \subsection{Algorithm}
 \label{app:algorithm-steps}
 
-Algorithm~\ref{alg:supipm-frl} repeats the three updates of Appendix~\ref{app:ascent} into $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by a compass search from newly initialized candidates, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The compass search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$, and the discriminator updates and the descent step use the step sizes $\alpha_v$ and $\alpha$.
+Algorithm~\ref{alg:supipm-frl} repeats the three updates of Appendix~\ref{app:ascent} for $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by a compass search from newly initialized candidates, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The compass search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$, and the discriminator updates and the descent step use the step sizes $\alpha_v$ and $\alpha$.
 
 Algorithm~\ref{alg:supipm-frl-mb} is the mini-batch version of Algorithm~\ref{alg:supipm-frl} and follows the order of sampling required by Proposition~\ref{prop:mini-batch}.  The compass search, the candidate $s^{\star}$ and the signs $\chi_m:=\operatorname{sign}\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m)$, with $\operatorname{sign}(0):=1$, are computed on one mini-batch with $\Delta$ replaced by $|\Delta_{\mathcal{B}}|$, and each gradient step uses a new mini-batch drawn independently of the preceding ones.  The ascent step uses
 \begin{equation}
@@ -1483,10 +1499,11 @@ Algorithm~\ref{alg:supipm-frl-mb} is the mini-batch version of Algorithm~\ref{al
   :=\sum_{m=1}^{M}\chi_m\,\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m),
   \label{eq:mb-stacked-ascent}
 \end{equation}
-whose gradient is, by the argument of Proposition~\ref{prop:mini-batch}, unbiased for that of the same sum with $\mathcal{B}$ replaced by $[n]$. 
-Choose each $\chi_m$ to match the sign of $\Delta_{[n]}(s^{\star};\theta_m,\mu_m)$.
-The batch sum then equals $H(\mathbf{v})$ in Equation~(\ref{eq:stacked-objectives}).
-If all these discrepancies are nonzero, the gradient of the batch sum also equals $\nabla_{\mathbf{v}}H(\mathbf{v})$.
+whose gradient is unbiased, by the argument of Proposition~\ref{prop:mini-batch}, for the gradient of
+\[
+  \sum_{m=1}^{M}\chi_m\Delta_{[n]}(s^{\star};\theta_m,\mu_m).
+\]
+When each $\chi_m$ equals the sign of $\Delta_{[n]}(s^{\star};\theta_m,\mu_m)$, this sum equals $H(\mathbf{v})$ in Equation~(\ref{eq:stacked-objectives}), and if these $M$ discrepancies are all nonzero, its gradient equals $\nabla_{\mathbf{v}}H(\mathbf{v})$.
 The descent step uses $\mathcal{J}_{\mathcal{B}}$ of Equation~(\ref{eq:mb-objective}) at $(s^{\star},\theta_{m^{\star}},\mu_{m^{\star}},\chi_{m^{\star}})$, where $m^{\star}$ indexes the discriminator with the largest $|\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m)|$ on the preceding mini-batch.
 
 
@@ -1495,7 +1512,7 @@ The descent step uses $\mathcal{J}_{\mathcal{B}}$ of Equation~(\ref{eq:mb-object
 \label{alg:supipm-frl}
 \begin{algorithmic}[1]
 \REQUIRE sample $\mathcal{D}$, supervised loss $\ell$, kernel $K_{\gamma}$ with bandwidth $\gamma$, penalty parameter $\lambda$, number of candidates $T$, number of discriminators $M$, number of iterations $R$, number of inner updates $J_v$, initial step size $\delta_0$ of the compass search, step sizes $\alpha_v$ and $\alpha$
-% \ENSURE encoder $h_{\phi}$ and prediction head $f_{\psi}$
+\ENSURE encoder $h_{\phi}$ and prediction head $f_{\psi}$
 \STATE Initialize $\phi$, $\psi$, and $\mathbf{v}$ with $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]$
 \FOR{$r=1,\ldots,R$}
   \FOR{$j=1,\ldots,J_v$}
@@ -1511,7 +1528,6 @@ The descent step uses $\mathcal{J}_{\mathcal{B}}$ of Equation~(\ref{eq:mb-object
   \label{alg:encoder-step}
 \ENDFOR
 \RETURN $h_{\phi}$, $f_{\psi}$
-\ENSURE encoder $h_{\phi}$ and prediction head $f_{\psi}$  
 \end{algorithmic}
 \end{algorithm}
 
@@ -1521,6 +1537,7 @@ The descent step uses $\mathcal{J}_{\mathcal{B}}$ of Equation~(\ref{eq:mb-object
 \label{alg:supipm-frl-mb}
 \begin{algorithmic}[1]
 \REQUIRE the inputs of Algorithm~\ref{alg:supipm-frl} and a mini-batch size $|\mathcal{B}|$
+\ENSURE encoder $h_{\phi}$ and prediction head $f_{\psi}$
 \STATE Initialize $\phi$, $\psi$, and $\mathbf{v}$ with $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]$
 \FOR{$r=1,\ldots,R$}
   \FOR{$j=1,\ldots,J_v$}
@@ -1539,21 +1556,23 @@ The descent step uses $\mathcal{J}_{\mathcal{B}}$ of Equation~(\ref{eq:mb-object
 \section{Experiments on Synthetic Data}
 \label{app:synth-experiments}
 
+This appendix gives the data-generating process, the training settings and the detailed result of the simulation in Section~\ref{sec:exp-simulation}.
+
 \subsection{Data-generating process}
 \label{app:synth-generative}
 
-This appendix describes the data-generating mechanism and simulation settings for Section~\ref{sec:exp-simulation}.  The data are generated as
+The data are generated as
 \begin{equation}
 \begin{aligned}
-  S &\sim \mathrm{Uniform}(0,1), &\qquad \tilde{S} &:= 2\sqrt{3}\,\bigl(S-\tfrac{1}{2}\bigr), \\
+  S &\sim \mathrm{Uniform}(0,1), \\
   \mathbf{X}_{\mathrm{task}} &\sim N(\mathbf{0},\mathbf{I}_4), &\qquad \mathbf{X}_{\mathrm{noise}} &\sim N(\mathbf{0},\mathbf{I}_3), \\
   \omega(S) &:= \exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}, &\qquad s_0 &= 0.5, \quad \tau = 0.043, \\
   X_{\mathrm{loc}} &:= 3\,\omega(S) + 0.5\,\varepsilon_1,
 \end{aligned}
 \label{eq:synth-common}
 \end{equation}
-where $\varepsilon_1,\varepsilon_2\sim N(0,1)$. And $S$, $\mathbf{X}_{\mathrm{task}}$, $\mathbf{X}_{\mathrm{noise}}$, $\varepsilon_1$, and $\varepsilon_2$ are mutually independent.
- Here $S$ is on the $[0,1]$ scale of the real datasets and $\tilde{S}$ is its standardized value, with mean $0$ and standard deviation $1$. The function $\omega$ is a Gaussian kernel centered at $s_0=0.5$.  Since $S$ is uniform on $[0,1]$, the interval $[s_0-\tau,\,s_0+\tau]$ has probability $2\tau\approx0.087$, so the dependence on $S$ introduced through $\omega$ is concentrated in a small part of the sensitive domain.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function.  The outcome and the input are
+where $\varepsilon_1,\varepsilon_2\sim N(0,1)$, and $S$, $\mathbf{X}_{\mathrm{task}}$, $\mathbf{X}_{\mathrm{noise}}$, $\varepsilon_1$ and $\varepsilon_2$ are mutually independent.
+The function $\omega$ is a Gaussian kernel centered at $s_0=0.5$.  Since $S$ is uniform on $[0,1]$, the interval $[s_0-\tau,\,s_0+\tau]$ has probability $2\tau\approx0.087$, so the dependence on $S$ introduced through $\omega$ is concentrated in a small part of the sensitive domain.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function of Section~\ref{sec:experiments}.  The outcome and the input are
 \begin{equation}
 \begin{aligned}
   Y &:= \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}} + 0.3\,\varepsilon_2\right), \\
@@ -1563,7 +1582,7 @@ where $\varepsilon_1,\varepsilon_2\sim N(0,1)$. And $S$, $\mathbf{X}_{\mathrm{ta
 \end{equation}
 
 
-The sensitive attribute affects the input only through $X_{\mathrm{loc}}$ alone and does not enter the outcome generating equation, so $Y$ is conditionally independent of $S$ given $\mathbf{X}_{\mathrm{task}}$ and a representation that discards the dependence near $s_0$ incurs no loss of prediction performance.  The disparity that remains under each measure therefore reflects the dependence that the measure fails to remove, not a trade-off against prediction performance.  Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.
+The sensitive attribute affects the input only through $X_{\mathrm{loc}}$ and does not enter the outcome equation, so $Y$ is conditionally independent of $S$ given $\mathbf{X}_{\mathrm{task}}$ and a representation that discards the dependence near $s_0$ incurs no loss of prediction performance.  The disparity that remains under each measure therefore reflects the dependence that the measure fails to remove, not a trade-off against prediction performance.  Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.
 
 \subsection{Settings}
 \label{app:synth-settings}
@@ -1592,12 +1611,12 @@ batch & epochs & learning rate & weight decay & $M$ & $J_v$ & $\alpha_v$ & $T$ &
 \label{app:synth-result}
 
 In the left panel of Figure~\ref{fig:simulation}, each curve connects the evaluated configurations in increasing order of the penalty parameter.
-The circled points are the configurations at which each method attains its smallest worst-case disparity among those that retain the test $1-\mathrm{MAE}$ of the model trained without a fairness penalty, $0.952$.  Since the dependence near $s_0$ carries no information about $Y$, its removal entails no loss of prediction performance, and the disparity at these points is the dependence that each penalty fails to remove.  The right panel shows $\widehat{\Delta}(s)$ of the head $\hat{f}_1$ of Equation~(\ref{eq:worst-case-estimate}) at these two configurations, averaged over the five seeds. The fluctuations away from $s_0$ are not reproduced across seeds, whereas the peak at $s_0$ is.
+The circled points are the configurations at which each method attains its smallest worst-case disparity among those that retain the test $1-\mathrm{MAE}$ of the model trained without a fairness penalty, $0.952$.  Since the dependence near $s_0$ carries no information about $Y$, its removal entails no loss of prediction performance, and the disparity at these points is the dependence that each penalty fails to remove.  The right panel shows $\widehat{\Delta}_{\hat{f}_1}(s)$ for the head $\hat{f}_1$ of Equation~(\ref{eq:worst-case-estimate}) at these two configurations, averaged over the five seeds. The fluctuations away from $s_0$ are not reproduced across seeds, whereas the peak at $s_0$ is.
 
 \section{Experiments on Real Datasets}
 \label{app:real-experiments}
 
-This appendix describes the datasets, the training settings, the baselines and the evaluation measures of Section~\ref{sec:exp-real} in Appendices~\ref{app:real-datasets}--\ref{app:worst-case}, gives the results omitted from the main text in Appendix~\ref{app:real-additional}, and compares the computational cost of supIPM-FRL with that of FREM in Appendix~\ref{app:real-cost}.
+This appendix describes the datasets, the training settings, the baselines and the evaluation measures of Section~\ref{sec:exp-real} in Appendices~\ref{app:real-datasets}--\ref{app:worst-case}, gives the results omitted from the main text in Appendix~\ref{app:real-additional}, and compares the computational cost of supIPM-FRL and FREM in Appendix~\ref{app:real-cost}.
 
 \subsection{Datasets}
 \label{app:real-datasets}
@@ -1672,13 +1691,13 @@ The baselines share the encoder, the prediction head and the optimization settin
   \widehat{\operatorname{GDP}}_{\infty}(f\circ h):=\max_{s\in\mathcal{Q}}\widehat{\Delta}_{f}(s),
   \label{eq:gdp-estimate}
 \end{equation}
-where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight of Equation~(\ref{eq:supipm-estimators}) with a Gaussian kernel whose bandwidth $\tilde{\gamma}$ follows the rule of Appendix~\ref{app:synth-settings}, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ of $S$.
+where $\widehat{w}_{\tilde{\gamma}}(i;s)$ is the kernel weight $\widehat{w}_{\gamma}(i;s)$ of Section~\ref{sec:supipm-estimation} with a Gaussian kernel and the bandwidth $\tilde{\gamma}$ of Appendix~\ref{app:synth-settings}, so that the first sum is the Nadaraya--Watson estimate of $\mathbb{E}[f(\mathbf{Z})\mid S=s]$, and $\mathcal{Q}$ is a grid of spacing $10^{-3}$ of $S$.
 % $\tilde{\gamma}=(3n/4)^{-1/5}$ \citep{silverman2018density}
 
 
 \paragraph{Worst-case downstream disparity.}  The head $\hat{f}_c$ of Equation~(\ref{eq:worst-case-estimate}) is computed with $\widehat{\operatorname{GDP}}_{\infty}$ of Equation~(\ref{eq:gdp-estimate}) formed from the training sample, by projected gradient descent over $(\mathbf{w},b)$ from eight initial heads, with $\mathbf{w}$ projected onto the ball of radius $c$ after every step.  The reported value $\widehat{\operatorname{GDP}}_{\infty}(h;\mathcal{F}_c)=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h)$ of Section~\ref{sec:experiments} is computed on the test sample.
 
-\paragraph{Additional fairness measures.}  Appendix~\ref{app:real-measures} evaluates the methods under five further measures.  The kernel GDP and the binned GDP are two estimates of the GDP of Equation~(\ref{eq:gdp}). The former averages $\widehat{\Delta}(s)$ against a kernel density estimate of $S$, as in \citet{kong2025fair}, and the latter averages, over the distinct observed values of $S$, the absolute difference between the mean prediction at that value and the overall mean.  The empirical supIPM of Equation~(\ref{eq:empirical-supipm}) is computed on the test representation. The last two measure the dependence between the prediction $\hat{Y}:=f_{\psi}(h_{\phi}(\mathbf{X}))$ and $S$: the HGR maximal correlation \citep{mary2019fairness} and the mutual information,
+\paragraph{Additional fairness measures.}  Appendix~\ref{app:real-measures} evaluates the methods under five further measures.  The kernel GDP and the binned GDP are two estimates of the GDP of Equation~(\ref{eq:gdp}). The kernel GDP averages $\widehat{\Delta}_{f_{\psi}}(s)$ against a kernel density estimate of $S$, as in \citet{kong2025fair}, and the binned GDP averages, over the distinct observed values of $S$, the absolute difference between the mean prediction at that value and the overall mean.  The empirical supIPM of Equation~(\ref{eq:empirical-supipm}) is computed on the test representation. The last two measure the dependence between the prediction $\hat{Y}:=f_{\psi}(h_{\phi}(\mathbf{X}))$ and $S$: the HGR maximal correlation \citep{mary2019fairness} and the mutual information,
 \begin{equation}
 \begin{aligned}
   \operatorname{HGR}(\hat{Y},S)
@@ -1696,15 +1715,13 @@ The point is the mean over the seeds, and the bars give one standard deviation o
 \subsection{Additional Results}
 \label{app:real-additional}
 
-This subsection presents additional results omitted from Section~\ref{sec:exp-real}. 
-We report prediction-level curves on Crime and ACSIncome and worst-case curves at larger norm bounds.
-We also provide comparisons under alternative fairness measures, results on graph datasets, and comparisons at matched levels of prediction performance.
+This subsection collects the results omitted from Section~\ref{sec:exp-real}.  Appendix~\ref{app:real-tabular} gives the prediction-level and the worst-case curves on the three tabular datasets, also at larger norm bounds, Appendix~\ref{app:real-measures} compares the methods under alternative fairness measures, Appendix~\ref{app:real-graph} reports the results on the graph datasets, and Appendix~\ref{app:real-matched} compares the methods at matched levels of prediction performance.
 
 
 \subsubsection{Tabular Results}
 \label{app:real-tabular}
 
-Figure~\ref{fig:app-prediction-level} repeats the prediction-level comparison of Figure~\ref{fig:adult} on the three datasets with a third panel in which $S$ is discretized at its mean, as does every figure in this appendix.  On both datasets supIPM-FRL, FREM and Reg-GDP have nearly the same prediction-level curve, and the binary-$S$ methods are close to them.  As on Adult, the methods are separated mainly by the worst-case disparity: a penalty on the fitted head, or an average over $S$, leaves a dependence on $S$ that a different head can exploit, whereas the supremum over $s$ and over the discriminators reduces it markedly.
+Figure~\ref{fig:app-prediction-level} repeats the prediction-level comparison of Figure~\ref{fig:adult} on the three datasets and adds a third panel in which $S$ is discretized at its mean, as does every figure in this appendix.  On Crime and ACSIncome, supIPM-FRL, FREM and Reg-GDP have nearly the same prediction-level curve, and the binary-$S$ methods are close to them.  As on Adult, the methods are separated mainly by the worst-case disparity.  A penalty on the fitted head, or an average over $S$, leaves a dependence on $S$ that a different head can exploit, whereas the supremum over $s$ and over the discriminators reduces it markedly.
 
 \begin{figure}[!htb]
   \centering
@@ -1726,7 +1743,7 @@ Figure~\ref{fig:app-c1} repeats the worst-case comparison of Figure~\ref{fig:wor
   \label{fig:app-c1}
 \end{figure}
 
-\paragraph{Other norm bounds.}  Figures~\ref{fig:app-c4} and~\ref{fig:app-c8} repeat the worst-case comparison of Section~\ref{sec:exp-real} with $c=4$ and $c=8$.  The ordering is unchanged: supIPM-FRL attains the lowest worst-case disparity at a matched level of prediction performance on all three tabular datasets, with Reg-HGR closest to it on Crime at $c=8$, so its advantage persists across the evaluated norm bounds.
+\paragraph{Other norm bounds.}  Figures~\ref{fig:app-c4} and~\ref{fig:app-c8} repeat the worst-case comparison of Section~\ref{sec:exp-real} with $c=4$ and $c=8$.  The ordering is unchanged, and supIPM-FRL attains the lowest worst-case disparity at a matched level of prediction performance on all three tabular datasets, with Reg-HGR closest to it on Crime at $c=8$, so its advantage persists across the evaluated norm bounds.
 
 \begin{figure}[!htb]
   \centering
@@ -1804,7 +1821,7 @@ Under the empirical supIPM on the test split, supIPM-FRL is markedly lower than 
 \label{app:real-graph}
 
 For the graph experiments,  we compare supIPM-FRL with FREM, Reg-GDP, Reg-HGR, ADV, and MMD. LAFTR and sIPM-LFR are evaluated only on the tabular datasets.  
-On Pokec-z and Pokec-n (Figure~\ref{fig:app-graph}), supIPM-FRL, FREM and Reg-GDP have similar prediction-level curves.  Under the worst-case disparity, supIPM-FRL and FREM coincide, MMD is close to them, and Reg-GDP and Reg-HGR attain larger disparities: on these graphs the supremum and the average penalty control the downstream heads equally well, whereas a penalty on the fitted head does not.
+On Pokec-z and Pokec-n (Figure~\ref{fig:app-graph}), supIPM-FRL, FREM and Reg-GDP have similar prediction-level curves.  Under the worst-case disparity, supIPM-FRL and FREM coincide, MMD is close to them, and Reg-GDP and Reg-HGR attain larger disparities.  On these graphs the supremum and the average penalty control the downstream heads equally well, whereas a penalty on the fitted head does not.
 
 \begin{figure}[!htb]
   \centering
@@ -1869,7 +1886,7 @@ worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- 
 \subsection{Computational Cost}
 \label{app:real-cost}
 
-Appendix~\ref{app:mini-batch} shows that supIPM-FRL admits mini-batch learning.  The MMD penalty of FREM carries no such guarantee \citep{lee2026fair}, so it should be trained on the batch, that is, on the whole training sample.  Table~\ref{tab:cost} reports one gradient step on Adult under these two regimes.  It also covers sup-MMD, the variant of Appendix~\ref{app:ablation-ipm-class} with the MMD in place of the ReLU discriminators.
+Appendix~\ref{app:mini-batch} shows that supIPM-FRL admits mini-batch learning with unbiased gradients.  No such formulation is available for the MMD penalty of FREM \citep{lee2026fair}, so FREM is trained on the batch, that is, on the whole training sample.  Table~\ref{tab:cost} reports one gradient step on Adult for mini-batch and for batch learning, and includes sup-MMD, the variant of Appendix~\ref{app:ablation-ipm-class} with the MMD in place of the ReLU discriminators.
 
 \begin{table}[H]
 \centering
@@ -1887,7 +1904,7 @@ sup-MMD    & batch ($32{,}000$) & \multicolumn{2}{c}{out of memory} \\
 \end{tabular}
 \end{table}
 
-The MMD evaluates the kernel at every pair of representations, so its cost grows quadratically with the number of observations.  On the whole batch, this cost exceeds the $24$ GB of the GPU.  In practice, they are therefore trained with mini-batches, without the unbiasedness such as Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} gives the computational cost as the mini-batch grows.  FREM already needs $8.5$ GB at $1{,}024$ observations.  The memory of supIPM-FRL grows linearly and the whole training sample takes $129$ MB, while its time per step is almost same with the mini-batch.
+The MMD evaluates the kernel at every pair of representations, so its cost grows quadratically with the number of observations.  On the whole batch, this cost exceeds the $24$ GB of the GPU.  In practice, FREM and sup-MMD are therefore trained with mini-batches, whose gradients are biased for the batch objective.  Figure~\ref{fig:cost} gives the computational cost as the mini-batch grows.  FREM already needs $8.5$ GB at $1{,}024$ observations.  The memory of supIPM-FRL grows linearly and the whole training sample takes $129$ MB, while its time per step is almost the same as with the mini-batch.
 
 \begin{figure}[H]
   \centering
@@ -1896,7 +1913,7 @@ The MMD evaluates the kernel at every pair of representations, so its cost grows
   \label{fig:cost}
 \end{figure}
 
-This computational advantage, together with the guarantee of Appendix~\ref{app:mini-batch}, is the main reason for the ReLU discriminators of Section~\ref{sec:discriminator-choice}.
+The linear cost of supIPM-FRL, together with the unbiased mini-batch gradients of Appendix~\ref{app:mini-batch}, is the main reason for the ReLU discriminators of Section~\ref{sec:discriminator-choice}.
 
 \section{Ablation Studies}
 \label{app:ablation-studies}
@@ -1936,7 +1953,7 @@ The shape of $K_{\gamma}$ determines how the sensitive values neighboring $s$ ar
 The last three vanish beyond a fixed distance from $s$, and the four are scaled to the same second moment, so that the comparison isolates the shape from the spread.
 
 In Figure~\ref{fig:app-ablation-kernel} no kernel is uniformly best at a matched level of prediction performance: the lowest worst-case disparity is attained by the Gaussian on Crime, by the box kernel on ACSIncome and by the compactly supported kernels on Adult, each within a factor of $1.4$ of the Gaussian.  The kernels differ instead in the penalty values they admit.  
-With a compactly supported kernel the representation collapses to a constant predictor at a smaller $\lambda$, so those curves stop at a disparity the Gaussian still reaches with a model that predicts.
+With a compactly supported kernel the representation collapses to a constant predictor at a smaller $\lambda$, so the curves of the compactly supported kernels stop at a disparity that the Gaussian kernel still reaches with a nonconstant predictor.
 
 \begin{figure}[!htb]
   \centering
@@ -1952,9 +1969,7 @@ With a compactly supported kernel the representation collapses to a constant pre
 The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in Equation~(\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  We replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of Equation~(\ref{eq:relu-class}), within the same supremum over $s$, by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ of sIPM-LFR \citep{kim2022learning} and by the unit ball of the Gaussian RKHS of FREM \citep{kong2025fair}.  The grid of penalty values is chosen separately for each class, since the three IPMs are not on a common scale.
 
 In Figure~\ref{fig:app-ablation-ipm-class}, the three discriminator classes yield similar prediction-level curves.
-ReLU-IPM and sigmoid-IPM achieve comparable worst-case disparity.
-Their relative performance varies with the dataset and penalty strength.
-Both achieve lower worst-case disparity than MMD at comparable prediction performance.
+The ReLU and the sigmoid discriminators attain comparable worst-case disparity, with an ordering that varies with the dataset and the penalty value, and both attain a lower worst-case disparity than the MMD at comparable prediction performance.
 
 \begin{figure}[!htb]
   \centering
