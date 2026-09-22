@@ -91,10 +91,14 @@ Address \\
 \maketitle
 
 \begin{abstract}
-Fair representation learning (FRL) seeks a representation that is informative for downstream prediction yet independent of a sensitive attribute. For a continuous sensitive attribute, existing methods measure the discrepancy between conditional and marginal distributions at each sensitive value and \emph{average} it over the distribution of the sensitive attribute. Such an average can be small even when a large discrepancy is confined to a low-probability range of sensitive values, and thus provides no uniform guarantee over the sensitive domain. We therefore propose $L_\infty$-generalized demographic parity, which replaces the average by a supremum, and its representation-level counterpart, the supremum integral probability metric (supIPM). We then propose supIPM-FRL, which can control worst-case fairness violations across sensitive values and downstream heads.
+Fair representation learning (FRL) seeks a representation that is informative for downstream prediction yet independent of a sensitive attribute. For a continuous sensitive attribute, existing methods measure the discrepancy between conditional and marginal distributions at each sensitive value and \emph{average} it over the distribution of the sensitive attribute. Such an average can be small even when a fairness violation is confined to a low-probability range of sensitive values, and thus provides no uniform guarantee over the sensitive domain. 
+We therefore propose the supremum integral probability metric (supIPM) to measure the worst-case discrepancy between the conditional and marginal distributions of the representation over sensitive values.
+supIPM controls the worst-case disparity of predictions, which we call $L_\infty$-generalized demographic parity.
+We then propose supIPM-FRL, an algorithm for learning representations that control worst-case fairness violations in downstream predictions.
 % Such a discriminator is determined by a direction and a bias alone, so each discrepancy is maximized over the discriminator class by gradient ascent. 
 % We prove that the empirical supIPM is a uniformly consistent estimator, and bounds downstream disparity for heads of bounded Hölder norm.
-We establish a uniform convergence rate of the empirical supIPM over a class of encoders and show that it yields a bound on downstream disparity for heads of bounded Hölder norm.
+% We establish a uniform convergence rate of the empirical supIPM over a class of encoders and show that it yields a bound on downstream disparity for heads of bounded Hölder norm.
+We establish a uniform convergence rate of the empirical supIPM and show that it yields a bound on downstream disparity for prediction heads of bounded Hölder norm.
 %so the fairness level attained on the sample transfers to the population. 
 % The transfer is uniform over the sensitive domain and over prediction heads of bounded H\"older norm. 
 Experiments on tabular and graph benchmarks show that supIPM-FRL attains prediction performance comparable to existing methods while substantially reducing the worst-case fairness violation.
@@ -128,13 +132,14 @@ have been proposed by \citet{mary2019fairness,grari2019fairness,grari2021learnin
 an extension of these methods to FRL has been proposed by \citet{kong2025fair}. The shared idea of such methods
 is to control the average fairness violation of a given model or representation with respect to 
 a continuous sensitive attribute. 
-A critical limitation, however, in controlling the average fairness violation is that under-represented sensitive groups could be highly discriminated.
+% A critical limitation, however, in controlling the average fairness violation is that under-represented sensitive groups could be highly discriminated.
+A critical limitation, however, in controlling the average fairness violation is that  under-represented sensitive groups could be highly discriminated.
 % Criteria that report a worst value over the sensitive domain have appeared for the fitted predictor, through a probable segmentation of $S$ \citep{kim202} and through the maximal local disparity of a classifier \citep{jin2024maximal}.
 
 The aim of this paper is to develop an FRL algorithm for continuous sensitive attributes which
 can control the worst-case fairness violation and thus avoid discrimination against under-represented sensitive values.
 For this purpose, we propose a measure for the worst-case fairness violation of a given representation and
-develop an algorithm to learn a representation while maintaining  
+develop an algorithm to learn a representation while controlling  
 the worst-case fairness violation. Our proposed measure is the supremum of the IPM$_s$ with respect to $s,$
 where IPM$_S$ is the IPM between the distribution of a representation when the sensitive attribute $S$ is equal to $s$
 and the marginal distribution, which we call {\bf supIPM}.
@@ -142,9 +147,8 @@ For the choice of IPM,
 we consider ReLU-IPM of \citet{park2026relu} since  
 computation of supIPM can be done without much hamper and the worst-case fairness violations for a large class
 of prediction heads are well controlled.
-Theoretically, we show that a consistent estimator of supIPM can be obtained by combining ReLU-IPM and kernel density estimation, and
- the worst-case fairness violation of any prediction model constricted on the fair representation
- is  also asymptotically controlled as long as the prediction head is H\"{o}lder continuous.
+Theoretically, we show that a consistent estimator of supIPM can be obtained by combining ReLU-IPM and kernel density estimation.
+The worst-case fairness violation of any prediction model constructed on the fair representation is also asymptotically controlled as long as its prediction head is H\"{o}lder continuous.
 
 \paragraph{Contributions.}
 \begin{itemize}
@@ -168,13 +172,13 @@ across all of the domain of continuous sensitive attributes.
 We observe an input $\mathbf{X}\in\mathcal{X}$, an outcome $Y\in\mathcal{Y}$, and a continuous sensitive attribute $S$ taking values in  $\mathcal{S}\subset \mathbb{R}^r.$ For notational simplicity,  we only consider the case of $r=1$ and let $\mathcal{S}=[0,1].$
 The proposed algorithm, however, can be easily modified for high-dimensional continuous sensitive attributes. {\bf See Remark xx for discussions.}
 
-An encoder $h:\mathcal{X}\to\mathcal{Z}$ maps $\mathbf{X}$ to a representation $\mathbf{Z}=h(\mathbf{X})$ in the representation space $\mathcal{Z}\subset \mathbb{R}^d.$ A prediction head $f:\mathcal{Z}\to\mathbb{R}$ maps the representation to a real-valued prediction, and $f\circ h$ denotes the composed prediction model
+An encoder $h:\mathcal{X}\to\mathcal{Z}$ maps $\mathbf{X}$ to a representation $\mathbf{Z}$ in the representation space $\mathcal{Z}\subset \mathbb{R}^d.$ A prediction head $f:\mathcal{Z}\to\mathbb{R}$ maps the representation to a real-valued prediction, and $f\circ h$ denotes the composed prediction model
 which maps an input to a prediction value. 
 % The parameterized encoder $h_{\phi}$ and prediction head $f_{\psi}$ are introduced in Section~\ref{sec:supipm-objective}.
 We write $\mathbb{P}_S$ for the distribution of $S$, $\mathbb{P}_{\mathbf{Z}}$ for the distribution of $\mathbf{Z}$, and $\mathbb{P}_{\mathbf{Z}\mid S=s}$ for the conditional distribution of $\mathbf{Z}$ given $S=s$.  
 % Equality $\mathbb{P}_{\mathbf{Z}\mid S=s}=\mathbb{P}_{\mathbf{Z}}$ for $\mathbb{P}_S$-almost every $s$ is equivalent to independence of $\mathbf{Z}$ and $S$, and this independence is inherited by every measurable function of $\mathbf{Z}$.
 
-The discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ is measured using the IPM
+The discrepancy between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ is measured using the integral probability metric (IPM)
 with a discriminator class $\mathcal{V}$, a class of real-valued discriminator functions on $\mathcal{Z}$. 
 The IPM associated with $\mathcal{V}$ between two probability measures $\mathbb{P}$ and $\mathbb{Q}$ \citep{muller1997integral,sriperumbudur2012empirical} is defined as
 \begin{equation}
@@ -219,8 +223,8 @@ With a general discriminator class, this estimator requires a separate maximizat
 FREM avoids this problem by taking $\mathcal{V}$ to be the unit ball of a reproducing kernel Hilbert space (RKHS), for which each IPM is the MMD and has a closed-form kernel expression \citep{gretton2012kernel,kong2025fair}.  
 For a supervised loss $\ell$ and a penalty parameter $\lambda\ge 0$, FREM then trains the encoder $h$ and the prediction head $f$ by minimizing
 \begin{equation}
-  \frac{1}{n}\sum_{i=1}^n \ell\!\left(f(\mathbf{Z}_i),Y_i\right)
-  +\lambda\,\widehat{\operatorname{EIPM}}^{\gamma}_{\mathcal{V}}(\mathbf{Z};S).
+  \frac{1}{n}\sum_{i=1}^n \ell\!\left(f(h(\mathbf{X}_i)),Y_i\right)
+  +\lambda\,\widehat{\operatorname{EIPM}}^{\gamma}_{\mathcal{V}}(h(\mathbf{X});S).
   \label{eq:frem-objective}
 \end{equation}
 
@@ -331,7 +335,7 @@ For a bounded measurable function $g:\mathcal{X}\rightarrow \mathbb{R},$ \citet{
   \right].
   \label{eq:gdp}
 \end{equation}
-For $g=f\circ h$, $\operatorname{GDP}(g)$ averages $\left|\mathbb{E}[f(\mathbf{Z})\mid S]-\mathbb{E}[f(\mathbf{Z})]\right|$ over $S$.  Replacing the average by the supremum, as in Equation~(\ref{eq:supipm}), we define $L_{\infty}$-generalized demographic parity ($\operatorname{GDP}_{\infty}$) as
+For $g=f\circ h$, $\operatorname{GDP}(g)$ averages $\left|\mathbb{E}[f(\mathbf{Z})\mid S]-\mathbb{E}[f(\mathbf{Z})]\right|$ over $S$.  Replacing the average by the supremum, as in (\ref{eq:supipm}), we define $L_{\infty}$-generalized demographic parity ($\operatorname{GDP}_{\infty}$) as
 \begin{equation}
   \operatorname{GDP}_{\infty}(g)
   :=\sup_{s\in\mathcal{S}}
@@ -354,8 +358,8 @@ It remains to choose the discriminator class $\mathcal{V}$.
 Note that $\operatorname{GDP}_{\infty}(f\circ h)$ for heads $f$ with a bounded H\"older norm is bounded by
 $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S).$
 However, computation of $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$
-is not easy because $\mathcal{H}^{\beta}_d$ is not easily parameterizable.
-To resolve this problem, we use ReLU-IPM, that is, we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$ in Equation~(\ref{eq:supipm}) and control $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$. Since the discriminator class of ReLU-IPM has finite parameters,
+is not easy because function in $\mathcal{H}^{\beta}_d$ is not easily parameterizable.
+To resolve this problem, we use ReLU-IPM, that is, we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$ in (\ref{eq:supipm}) and control $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$. Since the discriminator class of ReLU-IPM has finite parameters,
 computation of $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ can be done without much hamper.
 Moreover, the inequality (\ref{eq:relu-holder}) implies
 that $\operatorname{GDP}_{\infty}(f\circ h)$ is bounded by $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$
@@ -363,10 +367,10 @@ under regularity conditions.
 
  % The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in (\ref{eq:supipm}) is the ReLU-IPM.  
 The ReLU-IPM is better than MMD from computational point of view.  
-Computing EIPM with MMD requires $O(n^3)$ evaluations at each update.
+Computing EIPM with MMD requires $O(n^3)$ computation at each update.
 In contrast, $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ only needs $O(n)$ computation at each update.
 Moreover, a mini-batch learning is not possible for EIPM with MMD \citep{lee2026fair}, and thus  
-$O(n^2)$ memories are required. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM-FRL with the ReLU-IPM admits a mini-batch learning.
+$O(n^2)$ memory is required. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM-FRL with the ReLU-IPM admits a mini-batch learning.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
@@ -414,17 +418,17 @@ with a properly chosen kernel and bandwidth.
 %s^* 찾는 알고리즘 수정 처음엔 0.3 0.5 0.7 중에 큰거 0.7이 뽑혔으면 이제 0.6 0.7 0.8 중에 큰거. 0.6이 뽑혔으면 0.55 0.6 0.65 중 큰거... 이런식으로 찾는 알고리즘으로 수정.
 % The empirical supIPM of Section~\ref{sec:supipm-estimation} measures the fairness of any encoder on the sample.  
 To learn fair representations, we use the empirical supIPM of Section~\ref{sec:supipm-estimation} as a fairness penalty.
-Let $h_{\phi}$ and $f_{\psi}$ be the encoder and the prediction head with parameters $\phi$ and $\psi$, respectively, and write $\mathbf{Z}_i(\phi):=h_{\phi}(\mathbf{X}_i)$.
+Let $h_{\phi}$ and $f_{\psi}$ be the encoder and the prediction head with parameters $\phi$ and $\psi$, respectively.
 For $s\in\mathcal{S}$, $\theta\in\mathbb{S}^{d-1}$ and $\mu\in[-1,1]$, let
 % To learn a fair representation with the supIPM, we add this estimate as a penalty to the supervised risk and train the encoder $h_{\phi}$ and the prediction head $f_{\psi}$ jointly by minimizing
 \begin{equation}
   \mathcal{L}(\phi,\psi;s,\theta,\mu)
   :=\frac{1}{n}\sum_{i=1}^n
-  \ell\!\left(f_{\psi}(\mathbf{Z}_i(\phi)),Y_i\right)
+  \ell\!\left(f_{\psi}(h_{\phi}(\mathbf{Z}_i),Y_i\right)
   +\lambda\left|
     \sum_{i=1}^n
     \left(\widehat{w}_{\gamma}(i;s)-\frac{1}{n}\right)
-    (\theta^\top\mathbf{Z}_i(\phi)+\mu)_+
+    (\theta^\top h_{\phi}(\mathbf{Z}_i)+\mu)_+
   \right|,
   \label{eq:supipm-penalized-objective}
 \end{equation}
@@ -435,10 +439,10 @@ Since $\lambda\ge0$, this problem is a penalized formulation of empirical superv
 
 % , so the minimization of Equation~(\ref{eq:supipm-penalized-objective}) is a min--max problem.  
 % We solve it by alternating gradient descent in $(\phi,\psi)$ with compass search \citep{kolda2003optimization} in $s$ and projected gradient ascent in $(\theta,\mu)$, which extends the computation of ReLU-IPM in \citet{park2026relu} to the additional supremum over $s$. 
-We alternate between two steps.
+To optimize this objective function, we alternate between two steps.
 With $(\phi,\psi)$ fixed, we approximate the supremum over $(s,\theta,\mu)$ in $\mathcal{L}(\phi,\psi)$ by compass search over $s$ \citep{kolda2003optimization} and projected gradient ascent over $(\theta,\mu)$.
 With $(s,\theta,\mu)$ fixed, we update $(\phi,\psi)$ by gradient descent on $\mathcal{L}(\phi,\psi;s,\theta,\mu)$ in Equation~(\ref{eq:supipm-penalized-objective}).
-This optimization scheme extends the computation of ReLU-IPM in \citet{park2026relu} by additionally maximizing over $s$.
+% This optimization scheme extends the computation of ReLU-IPM in \citet{park2026relu} by additionally maximizing over $s$.
 Because the compass search and the gradient ascent can converge to a local maximum, we use $T$ initial values of $s$ and $M$ discriminator initializations.  
 We refer to this training method as supIPM-FRL, which can be implemented efficiently using mini-batches (Appendix~\ref{app:mini-batch}).  Further details and the algorithms are provided in  Appendices~\ref{app:ascent} and ~\ref{app:algorithm-steps}, respectively.
 
@@ -452,7 +456,7 @@ Theorem~\ref{thm:uniform} establishes uniform convergence of the empirical
 supIPM to its population counterpart over a class of encoders.
 Corollary~\ref{cor:certificate} then bounds the $\operatorname{GDP}_{\infty}$ of prediction heads of bounded H\"older norm in terms of the empirical supIPM, as stated at the end of Section~\ref{sec:supipm-objective}.
 
-Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate} are stated on the interior region $\mathcal{S}_n:=[\epsilon_n,1-\epsilon_n]$ of $\mathcal{S}=[0,1]$, where $0<\epsilon_n<\tfrac{1}{2}$ and $\epsilon_n\to0$.  Restricting the supremum over $s$ in Equations~(\ref{eq:linfty-gdp}), (\ref{eq:supipm}) and (\ref{eq:empirical-supipm}) to $\mathcal{S}_n$, with bandwidth $\gamma=\gamma_n$ in Equation~(\ref{eq:empirical-supipm}), gives
+Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate} are stated on the interior region $\mathcal{S}_n:=[\epsilon_n,1-\epsilon_n]$ of $\mathcal{S}=[0,1]$, where $0<\epsilon_n<\tfrac{1}{2}$ and $\epsilon_n\to0$.  We restrict the suprema over $s$ in Equations~(\ref{eq:supipm}),~(\ref{eq:linfty-gdp}), and~(\ref{eq:empirical-supipm}) to $\mathcal{S}_n$ and set $\gamma=\gamma_n$ for the empirical supIPM in (\ref{eq:empirical-supipm}). This gives
 \begin{equation}
 \begin{aligned}
   \operatorname{GDP}_{\infty,n}(g)
