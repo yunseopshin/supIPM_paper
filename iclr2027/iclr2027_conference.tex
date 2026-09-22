@@ -650,7 +650,7 @@ All methods share the architecture of Appendix~\ref{app:real-settings} and are t
 % Each point is the mean over five seeds with bars of $\pm1$ standard deviation, each curve traces the configurations of one method with the smallest disparity at each level of prediction performance, and the upper left is favorable. 
 Figure~\ref{fig:adult} shows the prediction-level disparity and Figure~\ref{fig:worst-case} the worst-case downstream disparity over $\mathcal{F}_1$ on the three datasets.
 % the results with $S$ discretized at its mean and the worst-case curves over $\mathcal{F}_4$ and $\mathcal{F}_8$ are given in Appendix~\ref{app:real-tabular}.  
-At the prediction level, supIPM-FRL is comparable to the other methods.  Under the worst-case downstream disparity, supIPM-FRL attains a markedly smaller disparity than every other method at the same prediction performance on all three datasets.
+At the prediction level, supIPM-FRL is comparable to the other methods.  Under the worst-case downstream disparity, supIPM-FRL attains a markedly smaller disparity than every other method at the same prediction performance on all three datasets.  Table~\ref{tab:matched-adult} reads the methods on Adult at a common test accuracy, chosen as described in Appendix~\ref{app:real-additional}, where the worst-case disparity of supIPM-FRL is smaller than that of every baseline by at least a factor of six.
 % , where the methods that use $S$ directly coincide with it.
 
 \begin{figure}[!htb]
@@ -661,6 +661,22 @@ At the prediction level, supIPM-FRL is comparable to the other methods.  Under t
   \label{fig:worst-case}
   \vspace{-4pt}
 \end{figure}
+
+\begin{table}[!htb]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\caption{The two disparities on Adult at test accuracy $0.842$.}
+\label{tab:matched-adult}
+\begin{tabular}{lrrrrrrrr}
+\toprule
+ & supIPM-FRL & FREM & Reg-GDP & Reg-HGR & ADV & LAFTR & MMD & sIPM-LFR \\
+\midrule
+prediction-level & $\mathbf{0.0350}$ & 0.0529 & 0.0639 & 0.0706 & 0.0855 & 0.0822 & 0.0541 & 0.0601 \\
+worst-case ($c=1$) & $\mathbf{0.0014}$ & 0.0086 & 0.0339 & 0.0192 & 0.0388 & 0.0403 & 0.0186 & 0.0197 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 The prediction-level disparity concerns the trained head only, whereas the worst-case disparity concerns every head in $\mathcal{F}_1$.  
 % The other methods constrain the dependence on $S$ only on average over $S$, only within groups of a discretized $S$, or only through a single head or adversary, so a downstream head can use the dependence they leave.
