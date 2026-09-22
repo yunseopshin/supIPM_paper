@@ -424,11 +424,11 @@ For $s\in\mathcal{S}$, $\theta\in\mathbb{S}^{d-1}$ and $\mu\in[-1,1]$, let
 \begin{equation}
   \mathcal{L}(\phi,\psi;s,\theta,\mu)
   :=\frac{1}{n}\sum_{i=1}^n
-  \ell\!\left(f_{\psi}(h_{\phi}(\mathbf{Z}_i),Y_i\right)
+  \ell\!\left(f_{\psi}(h_{\phi}(\mathbf{X}_i)),Y_i\right)
   +\lambda\left|
     \sum_{i=1}^n
     \left(\widehat{w}_{\gamma}(i;s)-\frac{1}{n}\right)
-    (\theta^\top h_{\phi}(\mathbf{Z}_i)+\mu)_+
+    (\theta^\top h_{\phi}(\mathbf{X}_i)+\mu)_+
   \right|,
   \label{eq:supipm-penalized-objective}
 \end{equation}
@@ -477,8 +477,7 @@ Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate} are stated on the 
 \end{aligned}
   \label{eq:interior}
 \end{equation}
-Since Theorem~\ref{thm:uniform} is uniform over a class of encoders, we write the encoder explicitly and abbreviate $D_n(h):=\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ and $\widehat{D}_n(h):=\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$.
-To bound the difference between $\widehat{D}_n(h)$ and $D_n(h)$ uniformly over a class $\mathcal{E}_n$ of encoders, we assume four conditions, stated in Appendix~\ref{app:assumptions}.  Assumption~\ref{as:positive-density} requires $\mathbb{P}_S$ to have a density $p_S$ with $0<c_S\le p_S\le C_S<\infty$ on $\mathcal{S}$, and Appendix~\ref{app:assumptions} then fixes a joint density $p(\mathbf{x},s)$ of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$, for a $\sigma$-finite measure $\nu$ on $\mathcal{X}$, and a version of the conditional expectation given $S=s$ at every $s\in\mathcal{S}$.  Assumption~\ref{as:smooth-density} requires an i.i.d. sample and a joint density of $(\mathbf{X},S)$ that is twice continuously differentiable in $s$, with integrable envelopes $M_1$ and $M_2$ for the two derivatives.  Assumption~\ref{as:kernel} requires a bounded, symmetric and Lipschitz kernel $K$ in $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$, together with a bandwidth $\gamma_n\to0$.
+To bound $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)-\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ uniformly over a class $\mathcal{E}_n$ of encoders, we assume four conditions, stated in Appendix~\ref{app:assumptions}.  Assumption~\ref{as:positive-density} requires $\mathbb{P}_S$ to have a density $p_S$ with $0<c_S\le p_S\le C_S<\infty$ on $\mathcal{S}$, and Appendix~\ref{app:assumptions} then fixes a joint density $p(\mathbf{x},s)$ of $(\mathbf{X},S)$ with respect to $\nu\otimes\mathrm{Leb}$, for a $\sigma$-finite measure $\nu$ on $\mathcal{X}$, and a version of the conditional expectation given $S=s$ at every $s\in\mathcal{S}$.  Assumption~\ref{as:smooth-density} requires an i.i.d. sample and a joint density of $(\mathbf{X},S)$ that is twice continuously differentiable in $s$, with integrable envelopes $M_1$ and $M_2$ for the two derivatives.  Assumption~\ref{as:kernel} requires a bounded, symmetric and Lipschitz kernel $K$ in $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$, together with a bandwidth $\gamma_n\to0$.
 % that is at most $\min\{\epsilon_n,1/2\}$ and for which the kernel centered at any $s\in\mathcal{S}_n$ places mass at most $\gamma_n^2$ outside $\mathcal{S}$.  
 Assumption~\ref{as:encoder} requires the encoders in $\mathcal{E}_n$ to take values in $\mathbb{B}^d$ and to have covering number at most $(A_n/\eta)^{\mathfrak{v}_n}$ in the supremum norm at every radius $\eta\in(0,1]$, so that $A_n$ and $\mathfrak{v}_n$ measure its size.  For $0<\delta<1$, let
 \begin{equation}
@@ -495,14 +494,14 @@ Assumption~\ref{as:encoder} requires the encoders in $\mathcal{E}_n$ to take val
 Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold.  There exist constants $C,c>0$, depending only on $c_S$, $C_S$, $K$, $\lVert M_1\rVert_{L_1(\nu)}$ and $\lVert M_2\rVert_{L_1(\nu)}$, such that for every $\delta\in(0,1)$ and every $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$,
 \begin{equation}
   \sup_{h\in\mathcal{E}_n}
-  \left|\widehat{D}_n(h)-D_n(h)\right|
+  \left|\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)-\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)\right|
   \ \le\ C\,r_{n,\delta} .
   \label{eq:uniform}
 \end{equation}
 If in addition $A_n$ and $\mathfrak{v}_n$ are bounded, $\delta:=\delta_n=n^{-c_1}$ for some $c_1>0$, $\gamma_n\asymp(\log n/n)^{1/5}$ and $\epsilon_n\asymp1/\log n$, then $r_{n,\delta_n}=O\{(\log n/n)^{2/5}\}$.
 \end{theorem}
 
-Theorem~\ref{thm:uniform} shows that the fairness level attained on the sample over $\mathcal{S}_n$ transfers to the population over $\mathcal{S}_n$.  If $\widehat{D}_n(h)\le\rho$ for an encoder $h\in\mathcal{E}_n$, then $D_n(h)\le\rho+Cr_{n,\delta}$ with probability at least $1-\delta$.  The bound is uniform over $\mathcal{E}_n$, so it applies to the encoder that supIPM-FRL selects from the same sample.  
+Theorem~\ref{thm:uniform} shows that the fairness level attained on the sample over $\mathcal{S}_n$ transfers to the population over $\mathcal{S}_n$.  If $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)\le\rho$ for an encoder $h\in\mathcal{E}_n$, then $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)\le\rho+Cr_{n,\delta}$ with probability at least $1-\delta$.  The bound is uniform over $\mathcal{E}_n$, so it applies to the encoder that supIPM-FRL selects from the same sample.  
 % Because $D_n(h)$ is a supremum over $\mathcal{S}_n$, the transfer holds at every sensitive value in $\mathcal{S}_n$ rather than on average.  
 % One may expect the supremum over the sensitive domain and the representation dimension $d$ to slow the convergence.  The supremum enters $r_{n,\delta}$ only through the logarithmic factor in $\Gamma_{n,\delta}$, and $d$ enters $\Gamma_{n,\delta}$ linearly because $\mathcal{V}_{\mathrm{R}}$ is indexed by $d+1$ parameters, so the order of $r_{n,\delta}$ in $n$ is unchanged.  For an encoder class of bounded size, the bandwidth $\gamma_n\asymp(\log n/n)^{1/5}$ gives the rate $(\log n/n)^{2/5}$ of Theorem~\ref{thm:uniform}.
 For bounded $A_n$ and $\mathfrak{v}_n$, the bandwidth $\gamma_n\asymp(\log n/n)^{1/5}$ gives the rate $(\log n/n)^{2/5}$.  
@@ -518,11 +517,11 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold, let $d\ge3$, a
   \sup_{f\in\mathcal{H}^{\beta}_d(B)}
   \operatorname{GDP}_{\infty,n}(f\circ h)
   \ \le\ C_{d,\beta}\,B
-  \left\{\widehat{D}_n(h)+Cr_{n,\delta}\right\}^{\alpha_{d,\beta}} .
+  \left\{\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)+Cr_{n,\delta}\right\}^{\alpha_{d,\beta}} .
   \label{eq:certificate}
 \end{equation}
 \end{corollary}
-Thus $\widehat{D}_n(h)$ bounds $\operatorname{GDP}_{\infty,n}(f\circ h)$, and hence $\left|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]\right|$ at every $s\in\mathcal{S}_n$, uniformly over all heads $f\in\mathcal{H}^{\beta}_d(B)$.
+Thus $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ bounds $\operatorname{GDP}_{\infty,n}(f\circ h)$, and hence $\left|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]\right|$ at every $s\in\mathcal{S}_n$, uniformly over all heads $f\in\mathcal{H}^{\beta}_d(B)$.
 % The right-hand side of Equation~(\ref{eq:certificate}) depends on neither the sensitive value nor the prediction head, and the bound holds simultaneously over $\mathcal{E}_n$, so the single quantity $\widehat{D}_n(h)$ controls the $\operatorname{GDP}_{\infty}$ of every H\"older prediction head over $\mathcal{S}_n$.  
 The exponent $\alpha_{d,\beta}$ is the cost of measuring the discrepancy through the parametric class $\mathcal{V}_{\mathrm{R}}$ rather than through the H\"older ball itself, and equals one when $\beta>(d+3)/2$.
 
@@ -755,7 +754,7 @@ Assumption~\ref{as:encoder} holds on a bounded $\mathcal{X}$ for ReLU networks w
 \subsection{Notation and auxiliary inequalities}
 \label{app:notation}
 
-Throughout the appendix $\mathbb{E}$ denotes expectation under the joint distribution of $(\mathbf{X},S)$ and $\mathbb{E}_n$ the empirical average, $\mathbb{E}_n\varphi:=n^{-1}\sum_{i=1}^n\varphi(\mathbf{X}_i,S_i)$.  We abbreviate $\gamma:=\gamma_n$ and $\epsilon:=\epsilon_n$.  We write $C$ for a finite positive constant depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, whose value may change from one occurrence to the next. 
+Throughout the appendix $\mathbb{E}$ denotes expectation under the joint distribution of $(\mathbf{X},S)$ and $\mathbb{E}_n$ the empirical average, $\mathbb{E}_n\varphi:=n^{-1}\sum_{i=1}^n\varphi(\mathbf{X}_i,S_i)$.  We abbreviate $\gamma:=\gamma_n$ and $\epsilon:=\epsilon_n$, and for notational convenience we write $D_n(h):=\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ and $\widehat{D}_n(h):=\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ for the quantities in Equation~(\ref{eq:interior}).  We write $C$ for a finite positive constant depending only on $c_S$, $C_S$, $\lVert M_1\rVert_{L_1(\nu)}$, $\lVert M_2\rVert_{L_1(\nu)}$ and $K$, whose value may change from one occurrence to the next. 
 
 The encoder class $\mathcal{E}_n$ and the ReLU discriminator class $\mathcal{V}_{\mathrm{R}}$ induce the class
 \begin{equation}
@@ -1350,7 +1349,7 @@ Fix $h\in\mathcal{E}_n$, $B>0$, $\beta>0$ with $\beta\ne(d+3)/2$, and $s\in\math
      (\mathbb{P}_s,\mathbb{P}_0)^{\alpha_{d,\beta}} .
   \label{eq:pointwise-transfer}
 \end{equation}
-The map $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$, and $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le D_n(h)$ by the definition of $D_n(h)$ in Section~\ref{sec:theory}.  The right-hand side of Equation~(\ref{eq:pointwise-transfer}) is therefore at most $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, which depends on neither $s$ nor $f$.  Take the supremum over $s\in\mathcal{S}_n$ and then over $f\in\mathcal{H}^{\beta}_d(B)$ on the left-hand side of Equation~(\ref{eq:pointwise-transfer}).  By the definition of $\operatorname{GDP}_{\infty,n}$ in Equation~(\ref{eq:interior}) the result is $\sup_{f}\operatorname{GDP}_{\infty,n}(f\circ h)$, and applying Equation~(\ref{eq:population-from-empirical}) together with the monotonicity of $t\mapsto t^{\alpha_{d,\beta}}$ gives
+The map $t\mapsto t^{\alpha_{d,\beta}}$ is nondecreasing on $[0,\infty)$, and $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P}_s,\mathbb{P}_0)\le D_n(h)$ by the definition of $D_n(h)$.  The right-hand side of Equation~(\ref{eq:pointwise-transfer}) is therefore at most $C_{d,\beta}BD_n(h)^{\alpha_{d,\beta}}$, which depends on neither $s$ nor $f$.  Take the supremum over $s\in\mathcal{S}_n$ and then over $f\in\mathcal{H}^{\beta}_d(B)$ on the left-hand side of Equation~(\ref{eq:pointwise-transfer}).  By the definition of $\operatorname{GDP}_{\infty,n}$ in Equation~(\ref{eq:interior}) the result is $\sup_{f}\operatorname{GDP}_{\infty,n}(f\circ h)$, and applying Equation~(\ref{eq:population-from-empirical}) together with the monotonicity of $t\mapsto t^{\alpha_{d,\beta}}$ gives
 \[
   \sup_{f\in\mathcal{H}^{\beta}_d(B)}
   \operatorname{GDP}_{\infty,n}(f\circ h)
