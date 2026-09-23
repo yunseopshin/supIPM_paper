@@ -368,9 +368,9 @@ under regularity conditions.
 
  % The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in (\ref{eq:supipm}) is the ReLU-IPM.  
 The ReLU-IPM is better than MMD from computational point of view.  
-Computing EIPM with MMD requires $O(n^3)$ computation at each update.
+Computing supIPM with MMD requires $O(n^2)$ computation at each update.
 In contrast, $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ only needs $O(n)$ computation at each update.
-Moreover, a mini-batch learning is not possible for EIPM with MMD \citep{lee2026fair}, and thus  
+Moreover, a mini-batch learning is not possible for supIPM with MMD \citep{lee2026fair}, and thus  
 $O(n^2)$ memory is required. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM-FRL with the ReLU-IPM admits a mini-batch learning.
 
 \subsection{Estimation of supIPM}
