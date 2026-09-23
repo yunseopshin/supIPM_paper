@@ -1856,7 +1856,7 @@ Figure~\ref{fig:app-c1} compares the methods by the worst-case downstream dispar
 
 \paragraph{Matched prediction performance.}
 \label{app:real-matched}
-Table~\ref{tab:matched} compares the methods at a fixed level of prediction performance on each tabular dataset.  For each method and each disparity, the entry is the smallest disparity among the models of that method whose prediction performance lies within $0.004$ of the level.  A dash indicates that no model of that method meets this criterion, and the smallest value in each row is in bold.  supIPM-FRL attains the smallest value in every row except the prediction-level disparity on Crime.  Under the worst-case disparity, its value is at least three times smaller than that of every baseline on the three datasets.
+Table~\ref{tab:matched} compares the methods at a fixed level of prediction performance on each tabular dataset.  For each method and each disparity, the entry is the smallest disparity among the models of that method whose prediction performance lies within $0.004$ of the level.  A dash indicates that no model of that method meets this criterion, and the smallest value in each row is in bold.  supIPM-FRL attains the smallest value in every row.  Under the worst-case disparity, its value is at least three times smaller than that of every baseline on the three datasets.
 
 \begin{table}[H]
 \centering
@@ -1873,7 +1873,7 @@ prediction-level & $\mathbf{0.0350}$ & 0.0529 & 0.0639 & 0.0706 & 0.0855 & 0.082
 worst-case ($c=1$) & $\mathbf{0.0014}$ & 0.0086 & 0.0339 & 0.0192 & 0.0388 & 0.0403 & 0.0186 & 0.0197 \\
 \midrule
 \multicolumn{9}{l}{\emph{Crime, $1-\mathrm{MAE}$ $0.855$}} \\
-prediction-level & 0.0469 & 0.0468 & 0.0550 & $\mathbf{0.0458}$ & -- & -- & 0.0529 & 0.0465 \\
+prediction-level & $\mathbf{0.0369}$ & 0.0468 & 0.0550 & 0.0458 & -- & -- & 0.0529 & 0.0465 \\
 worst-case ($c=1$) & $\mathbf{0.0100}$ & 0.0338 & 0.0504 & 0.0315 & -- & -- & 0.0380 & 0.0314 \\
 \midrule
 \multicolumn{9}{l}{\emph{ACSIncome, accuracy $0.780$}} \\
