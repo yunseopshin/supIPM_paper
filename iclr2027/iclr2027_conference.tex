@@ -744,7 +744,7 @@ worst-case & $\mathbf{0.0014}$ & 0.0086 & 0.0339 & 0.0192 & 0.0388 & 0.0403 & 0.
 % The baselines do not directly control the dependence between the representation and $S$ at every sensitive value, so a downstream head can exploit the dependence that remains, which raises the worst-case disparity.
 The baselines do not directly control disparity at every sensitive value, so worst-case fairness violations may arise with other downstream heads.
 In contrast, supIPM-FRL controls the largest ReLU-IPM between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ over the sensitive domain, and Corollary~\ref{cor:certificate} bounds $\Delta_f(s)$ on $\mathcal{S}_n$ for every head $f$ of bounded H\"older norm in terms of the empirical supIPM.
-Figure~\ref{fig:profile-adult} plots $\widehat{\Delta}_{\hat{f}_1}(s)$ on Adult for supIPM-FRL and FREM at a test accuracy within $0.004$ of the model trained without a fairness penalty.
+Figure~\ref{fig:profile-adult} shows $\widehat{\Delta}_{\hat{f}_1}(s)$ on Adult for supIPM-FRL and FREM at a test accuracy within $0.004$ of the model trained without a fairness penalty.
 % For each method, we take the setting with the smallest worst-case disparity among these settings.
 It is small over the whole sensitive domain for supIPM-FRL, whereas for FREM, it is substantially larger over most of it.
 
