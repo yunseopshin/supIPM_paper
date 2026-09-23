@@ -134,7 +134,7 @@ an extension of these methods to FRL has been proposed by \citet{kong2025fair}. 
 is to control the average fairness violation of a given model or representation with respect to 
 a continuous sensitive attribute. 
 % A critical limitation, however, in controlling the average fairness violation is that under-represented sensitive groups could be highly discriminated.
-A critical limitation, however, in controlling the average fairness violation is that  under-represented sensitive groups could be highly discriminated.
+A critical limitation, however, in controlling the average fairness violation is that  under-represented sensitive groups could be highly discriminated against.
 % Criteria that report a worst value over the sensitive domain have appeared for the fitted predictor, through a probable segmentation of $S$ \citep{kim202} and through the maximal local disparity of a classifier \citep{jin2024maximal}.
 
 The aim of this paper is to develop an FRL algorithm for continuous sensitive attributes which
@@ -155,7 +155,7 @@ The worst-case fairness violation of any prediction model constructed on the fai
 \begin{itemize}
   \item We propose supIPM as a measure of the worst-case fairness violation of a given representation
   for continuous sensitive attributes.
-  \item We construct an estimator of supIPM by applying kernel density estimate techniques
+  \item We construct an estimator of supIPM by applying kernel density estimation techniques
   to ReLU-IPM, and prove that this estimator is consistent. 
   \item We develop an algorithm to learn a fair representation while controlling the worst-case fairness violation, called
   supIPM-FRL, and prove that the worst-case fairness violations of a large class of prediction models constructed on the fair representation learned by supIPM-FRL are asymptotically controlled.
@@ -171,7 +171,7 @@ across all of the domain of continuous sensitive attributes.
 \label{sec:frem}
 
 We observe an input $\mathbf{X}\in\mathcal{X}$, an outcome $Y\in\mathcal{Y}$, and a continuous sensitive attribute $S$ taking values in  $\mathcal{S}\subset \mathbb{R}^r.$ For notational simplicity,  we only consider the case of $r=1$ and let $\mathcal{S}=[0,1].$
-The proposed algorithm, however, can be easily modified for high-dimensional continuous sensitive attributes. See Remark \ref{rem:multivariate-sensitive} for discussions.
+The proposed algorithm, however, can be easily modified for high-dimensional continuous sensitive attributes. See Remark~\ref{rem:multivariate-sensitive} for discussions.
 
 An encoder $h:\mathcal{X}\to\mathcal{Z}$ maps $\mathbf{X}$ to a representation $\mathbf{Z}$ in the representation space $\mathcal{Z}\subset \mathbb{R}^d.$ A prediction head $f:\mathcal{Z}\to\mathbb{R}$ maps the representation to a real-valued prediction, and $f\circ h$ denotes the composed prediction model
 which maps an input to a prediction value. 
@@ -375,7 +375,7 @@ Moreover, mini-batch learning is not possible for supIPM with MMD \citep{lee2026
 $O(n^2)$ memory is required. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM with the ReLU-IPM admits mini-batch learning.
 
 Theoretically, the class of discriminators for ReLU-IPM is much larger than that of MMD. Thus, controlling supIPM with $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}$
-can guarantee the level of fairness violation for a large class of prediction heads. Empirical studies in Section \ref{sec:experiments} confirm this advantage.
+can guarantee the level of fairness violation for a large class of prediction heads. Empirical studies in Section~\ref{sec:experiments} confirm this advantage.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
@@ -449,7 +449,7 @@ With $(\phi,\psi)$ fixed, we approximate the supremum over $(s,\theta,\mu)$ in $
 With $(s,\theta,\mu)$ fixed, we update $(\phi,\psi)$ by gradient descent.
 % This optimization scheme extends the computation of ReLU-IPM in \citet{park2026relu} by additionally maximizing over $s$.
 Because the compass search and the gradient ascent can converge to a local maximum, we use $T$ initial values of $s$ and $M$ initial vectors of $(\theta, \mu)$, respectively.  
-We refer to this learning algorithm as supIPM-FRL, which can be implemented efficiently using mini-batches (Appendix~\ref{app:mini-batch}).  Further details and the algorithms are provided in  Appendices~\ref{app:ascent} and ~\ref{app:algorithm-steps}, respectively.
+We refer to this learning algorithm as supIPM-FRL, which can be implemented efficiently using mini-batches (Appendix~\ref{app:mini-batch}).  Further details and the algorithms are provided in  Appendices~\ref{app:ascent} and~\ref{app:algorithm-steps}, respectively.
 
 Section~\ref{sec:theory} shows that, with high probability, a small empirical supIPM yields a small $\operatorname{GDP}_{\infty}$ on an interior region of $\mathcal{S}$ for every downstream head of bounded H\"older norm.
 
@@ -462,7 +462,7 @@ For $S\in\mathcal{S}\subset\mathbb{R}^r$ with $r>1$, we use a multivariate kerne
 where $K(\cdot)$ is a univariate kernel in (\ref{eq:supipm-estimators}).
 We approximate the supremum in (\ref{eq:empirical-supipm}) by compass search over $\mathcal{S}$  along each coordinate, together with projected gradient ascent over $(\theta,\mu)$.
 With $T$ initial candidate vectors, each compass search iteration evaluates at most $T(2r+1)$ sensitive values \citep{kolda2003optimization}.
-Thus, for fixed $T$, the number of evaluations per iteration grows linearly with $r$, allowing to extend supIPM-FRL for
+Thus, for fixed $T$, the number of evaluations per iteration grows linearly with $r$, allowing supIPM-FRL to be extended to
 multivariate sensitive attributes without much increase of computation.
 \end{remark}
 
@@ -499,7 +499,7 @@ Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate} are stated on the 
 To bound the difference between $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ and $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ uniformly over a class $\mathcal{E}_n$ of encoders, we assume four conditions, stated in Appendix~\ref{app:assumptions}.  Assumption~\ref{as:positive-density} requires $\mathbb{P}_S$ to have a density $p_S$ with $0<c_S\le p_S\le C_S<\infty$ on $\mathcal{S}$.  Assumption~\ref{as:smooth-density} requires that
 the joint density of $(\mathbf{X},S)$ is twice continuously differentiable in $s$, with integrable envelopes $M_1$ and $M_2$.  Assumption~\ref{as:kernel} requires a bounded, symmetric and Lipschitz kernel $K$ in $K_{\gamma}(s',s)=\gamma^{-1}K((s'-s)/\gamma)$, together with a bandwidth $\gamma_n\to0$.
 % that is at most $\min\{\epsilon_n,1/2\}$ and for which the kernel centered at any $s\in\mathcal{S}_n$ places mass at most $\gamma_n^2$ outside $\mathcal{S}$.  
-Assumption~\ref{as:encoder} requires that the encoder class $\mathcal{E}_n$ has the covering number 
+Assumption~\ref{as:encoder} requires that the covering number of the encoder class $\mathcal{E}_n$
 with respect to the sup norm is at most $(A_n/\eta)^{\mathfrak{v}_n}$ for every radius $\eta\in(0,1]$.  
 To state the uniform convergence rate, let $0<\delta<1$ and define
 \begin{equation}
@@ -550,7 +550,7 @@ Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold. Let $d\ge3$, a
 % This corollary shows that by learning an encoder $h$ with a small $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$, supIPM-FRL controls the fairness violation $\operatorname{GDP}_{\infty,n}(f\circ h)$ uniformly over all prediction heads $f\in\mathcal{H}^{\beta}_d(B)$.
 This corollary implies that by using an encoder $h$ with a small empirical supIPM, 
 we can control the worst-case fairness violation over all prediction heads $f\in\mathcal{H}^{\beta}_d(B)$
-over $h$.
+constructed on $h$.
 
 
 % Thus $\widehat{\operatorname{supIPM}}^{\gamma_n}_{\mathcal{V}_{\mathrm{R}},n}(h(\mathbf{X});S)$ bounds $\operatorname{GDP}_{\infty,n}(f\circ h)$, and hence $\left|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]\right|$ at every $s\in\mathcal{S}_n$, uniformly over all heads $f\in\mathcal{H}^{\beta}_d(B)$.
@@ -617,7 +617,7 @@ Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}}+0.3\
 \end{equation*}
 where $s_0=0.5$, $\tau=0.043$ and $\mathbf{u}\in\mathbb{R}^4$ is given.
 Since $S$ affects $Y$ only near $s_0$, the worst-case fairness violation can occur near $s_0$, even though only a small proportion of observations fall in this narrow interval.
-We compare supIPM-FRL with FREM by varying $\lambda$ in (\ref{eq:frem-objective}) and (\ref{eq:supipm-penalized-objective}), respectively, and measure fairness violation by the worst-case downstream disparity over $\mathcal{F}_1$.
+We compare supIPM-FRL with FREM by varying $\lambda$ in (\ref{eq:supipm-penalized-objective}) and (\ref{eq:frem-objective}), respectively, and measure fairness violation by the worst-case downstream disparity over $\mathcal{F}_1$.
 Details are provided in Appendix~\ref{app:synth-experiments}.
 
 
@@ -751,7 +751,7 @@ It is small over the whole sensitive domain for supIPM-FRL, whereas for FREM, it
   % on Adult for the configurations with the smallest worst-case disparity among those whose test accuracy is within $0.004$ of the model trained without a penalty. the worst-case head of FREM attains a disparity many times larger than that of supIPM-FRL, whose disparity is small at every $s$.  Accordingly, the empirical supIPM on the test data in Appendix~\ref{app:real-measures} is smallest for supIPM-FRL on Adult and Crime at a matched level of prediction performance, although FREM attains a smaller value on ACSIncome.
 
 \subsection{Additional results and ablation studies}
-We compare the methods under five further fairness measures and on the graph datasets in Appendix \ref{app:real-additional}, and the computational cost of supIPM-FRL and FREM in Appendix \ref{app:real-cost}. Appendix \ref{app:ablation-studies} examines (i) the effects of the kernel $K$ in (\ref{eq:supipm-estimators}), (ii) the discriminator class $\mathcal{V}$ and (iii) the number $T$ of initial values of $s$.
+We compare the methods under five further fairness measures and on the graph datasets in Appendix~\ref{app:real-additional}, and the computational cost of supIPM-FRL and FREM in Appendix~\ref{app:real-cost}. Appendix~\ref{app:ablation-studies} examines (i) the effects of the kernel $K$ in (\ref{eq:supipm-estimators}), (ii) the discriminator class $\mathcal{V}$ and (iii) the number $T$ of initial values of $s$.
 
 \section{Conclusion}
 \label{sec:conclusion}
