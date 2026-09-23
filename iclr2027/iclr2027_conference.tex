@@ -600,12 +600,12 @@ over $\lVert\mathbf{w}\rVert_2\le c$ and $b\in\mathbb{R}$, with $\lambda_h=10^{3
 % \begin{equation*}
 %   X_{\mathrm{loc}}:=3\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}+0.5\,\varepsilon_1,
 %   \qquad
-%   Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}}+0.3\,\varepsilon_2\right),
+%   Y:=\sigma\!\left(\boldsymbol{\upsilon}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}}+0.3\,\varepsilon_2\right),
 % \end{equation*}
-% with $s_0=0.5$, $\tau=0.043$ and a fixed $\mathbf{u}\in\mathbb{R}^4$.  The input is $\mathbf{X}:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{loc}},\mathbf{X}_{\mathrm{noise}})$.
+% with $s_0=0.5$, $\tau=0.043$ and a fixed $\boldsymbol{\upsilon}\in\mathbb{R}^4$.  The input is $\mathbf{X}:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{loc}},\mathbf{X}_{\mathrm{noise}})$.
 % % Thus $\mathbf{X}$ depends on $S$ only through $X_{\mathrm{loc}}$, which is shifted only for $S$ near $s_0$, and $Y$ does not depend on $S$.
 % % A representation that depends on $X_{\mathrm{loc}}$ therefore differs from its marginal distribution mainly for $S$ near $s_0$.
-% The value of $\mathbf{u}$, the sample sizes and the training settings are given in Appendix~\ref{app:synth-experiments}.
+% The value of $\boldsymbol{\upsilon}$, the sample sizes and the training settings are given in Appendix~\ref{app:synth-experiments}.
 % We compare supIPM-FRL with FREM by varying the penalty parameter $\lambda$ of their training objectives, (\ref{eq:supipm-penalized-objective}) and (\ref{eq:frem-objective}) respectively, and measure fairness violation by the worst-case downstream disparity over $\mathcal{F}_1$.
 % Each curve joins the configurations in increasing order of the penalty parameter.
 We generate an input $\mathbf{X}:=(\mathbf{X}_{\mathrm{task}},\mathbf{X}_{\mathrm{noise}},S)$ and an outcome $Y$ as follows.
@@ -613,9 +613,9 @@ We independently draw $S\sim\mathrm{Uniform}(0,1)$, $\mathbf{X}_{\mathrm{task}}\
 \begin{equation*}
 X_{\mathrm{loc}}:=3\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}+0.5\,\varepsilon_1,
 \qquad
-Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}}+0.3\,\varepsilon_2\right),
+Y:=\sigma\!\left(\boldsymbol{\upsilon}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}}+0.3\,\varepsilon_2\right),
 \end{equation*}
-where $s_0=0.5$, $\tau=0.043$ and $\mathbf{u}\in\mathbb{R}^4$ is given.
+where $s_0=0.5$, $\tau=0.043$ and $\boldsymbol{\upsilon}\in\mathbb{R}^4$ is given.
 Since $S$ affects $Y$ only near $s_0$, the worst-case fairness violation can occur near $s_0$, even though only a small proportion of observations fall in this narrow interval.
 We compare supIPM-FRL with FREM by varying $\lambda$ in (\ref{eq:supipm-penalized-objective}) and (\ref{eq:frem-objective}), respectively, and measure fairness violation by the worst-case downstream disparity over $\mathcal{F}_1$.
 Details are provided in Appendix~\ref{app:synth-experiments}.
@@ -1483,16 +1483,16 @@ Then (\ref{eq:supipm-penalized-objective}) and (\ref{eq:empirical-supipm}) read
 
 Because the compass search and the gradient ascent can converge to a local maximum, we follow \citet{park2026relu} and run them from several initial values in parallel.
 
-Let $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ be $T$ candidate sensitive values and $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$ be $M$ discriminators, where $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$, and let $s^{\star}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$.  The candidates are updated by compass search on $g$ and the discriminators by gradient ascent on $H$, where
+Let $\mathbf{s}:=(s^{(1)},\ldots,s^{(T)})$ be $T$ candidate sensitive values and $\mathbf{v}:=((\theta_1,\mu_1),\ldots,(\theta_M,\mu_M))$ be $M$ discriminators, where $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]:=\{1,\ldots,M\}$, and let $s^{\star}:=\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$.  The candidates are updated by compass search on $Q$ and the discriminators by gradient ascent on $H$, where
 \begin{equation}
-  g(s):=\max_{m\in[M]}\Delta(s;\theta_m,\mu_m),
+  Q(s):=\max_{m\in[M]}\Delta(s;\theta_m,\mu_m),
   \qquad
   H(\mathbf{v}):=\sum_{m=1}^{M}\Delta(s^{\star};\theta_m,\mu_m),
   \label{eq:stacked-objectives}
 \end{equation}
-and $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $g$ and in $H$, respectively.
+and $\mathbf{v}$ and $s^{\star}$ are held fixed at their current values in $Q$ and in $H$, respectively.
 
-We write $\Pi_{A}$ for the projection onto a set $A$.  One compass search step with step size $\delta$ evaluates $g$ at the candidate $s^{(t)}$ and at the two points $\Pi_{\mathcal{S}}(s^{(t)}\pm\delta)$, moves the candidate to the point with the largest value, and halves $\delta$.  The $T$ candidates are moved in parallel.  The search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$.
+We write $\Pi_{A}$ for the projection onto a set $A$.  One compass search step with step size $\alpha_s$ evaluates $Q$ at the candidate $s^{(t)}$ and at the two points $\Pi_{\mathcal{S}}(s^{(t)}\pm\alpha_s)$, moves the candidate to the point with the largest value, and halves $\alpha_s$.  The $T$ candidates are moved in parallel.  The search starts from the step size $\alpha_{s,0}$ and stops once $\alpha_s<\gamma/8$.
 
 Since the $m$-th summand of $H$ depends on $\mathbf{v}$ only through $(\theta_m,\mu_m)$, one ascent step on $H$ updates all $M$ discriminator parameters, and after each step $\Pi_{\mathbb{S}^{d-1}\times[-1,1]}$ projects each $\theta_m$ onto the unit sphere and each $\mu_m$ to $[-1,1]$.
 
@@ -1583,7 +1583,7 @@ The MMD penalty of FREM admits no such formulation, because its value on a mini-
 \subsection{Algorithm}
 \label{app:algorithm-steps}
 
-Algorithm~\ref{alg:supipm-frl} repeats the three updates of Appendix~\ref{app:ascent} for $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by a compass search from newly initialized candidates, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The compass search starts from the step size $\delta_0$ and stops once $\delta<\gamma/8$, and the discriminator updates and the descent step use the step sizes $\alpha_v$ and $\alpha$.
+Algorithm~\ref{alg:supipm-frl} repeats the three updates of Appendix~\ref{app:ascent} for $R$ iterations.  Each iteration performs $J_v$ discriminator updates, each preceded by a compass search from newly initialized candidates, recomputes $s^{\star}$ with the updated discriminators, and concludes with one descent step.  The compass search starts from the step size $\alpha_{s,0}$ and stops once $\alpha_s<\gamma/8$, and the discriminator updates and the descent step use the step sizes $\alpha_v$ and $\alpha$.
 
 Algorithm~\ref{alg:supipm-frl-mb} is the mini-batch version of Algorithm~\ref{alg:supipm-frl} and follows the order of sampling required by Proposition~\ref{prop:mini-batch}.  The compass search, the candidate $s^{\star}$ and the signs $\chi_m:=\operatorname{sign}\Delta_{\mathcal{B}}(s^{\star};\theta_m,\mu_m)$, with $\operatorname{sign}(0):=1$, are computed on one mini-batch with $\Delta$ replaced by $|\Delta_{\mathcal{B}}|$, and each gradient step uses a new mini-batch drawn independently of the preceding ones.  The ascent step uses
 \begin{equation}
@@ -1603,14 +1603,14 @@ The descent step uses $\mathcal{J}_{\mathcal{B}}$ of (\ref{eq:mb-objective}) at 
 \caption{supIPM-FRL}
 \label{alg:supipm-frl}
 \begin{algorithmic}[1]
-\REQUIRE sample $\mathcal{D}$, supervised loss $\ell$, kernel $K_{\gamma}$ with bandwidth $\gamma$, penalty parameter $\lambda$, number of candidates $T$, number of discriminators $M$, number of iterations $R$, number of inner updates $J_v$, initial step size $\delta_0$ of the compass search, step sizes $\alpha_v$ and $\alpha$
+\REQUIRE sample $\mathcal{D}$, supervised loss $\ell$, kernel $K_{\gamma}$ with bandwidth $\gamma$, penalty parameter $\lambda$, number of candidates $T$, number of discriminators $M$, number of iterations $R$, number of inner updates $J_v$, initial step size $\alpha_{s,0}$ of the compass search, step sizes $\alpha_v$ and $\alpha$
 \ENSURE encoder $h_{\phi}$ and prediction head $f_{\psi}$
 \STATE Initialize $\phi$, $\psi$, and $\mathbf{v}$ with $(\theta_m,\mu_m)\in\mathbb{S}^{d-1}\times[-1,1]$ for $m\in[M]$
 \FOR{$r=1,\ldots,R$}
   \FOR{$j=1,\ldots,J_v$}
-    \STATE Initialize $\mathbf{s}$ at $T$ distinct points of $\mathcal{S}$ and set $\delta\leftarrow\delta_0$ \label{alg:s-init}
-    \WHILE{$\delta\ge\gamma/8$}
-      \STATE $s^{(t)}\leftarrow\argmax_{s\in\{s^{(t)},\;\Pi_{\mathcal{S}}(s^{(t)}-\delta),\;\Pi_{\mathcal{S}}(s^{(t)}+\delta)\}}\,g(s)$ for $t\in[T]$, and $\delta\leftarrow\delta/2$
+    \STATE Initialize $\mathbf{s}$ at $T$ distinct points of $\mathcal{S}$ and set $\alpha_s\leftarrow\alpha_{s,0}$ \label{alg:s-init}
+    \WHILE{$\alpha_s\ge\gamma/8$}
+      \STATE $s^{(t)}\leftarrow\argmax_{s\in\{s^{(t)},\;\Pi_{\mathcal{S}}(s^{(t)}-\alpha_s),\;\Pi_{\mathcal{S}}(s^{(t)}+\alpha_s)\}}\,Q(s)$ for $t\in[T]$, and $\alpha_s\leftarrow\alpha_s/2$
     \ENDWHILE
     \STATE $s^{\star}\leftarrow\argmax_{s\in\{s^{(1)},\ldots,s^{(T)}\}}\max_{m\in[M]}\Delta(s;\theta_m,\mu_m)$ \label{alg:s-star}
     \STATE $\mathbf{v}\leftarrow\Pi_{\mathbb{S}^{d-1}\times[-1,1]}\!\left(\mathbf{v}+\alpha_v\,\nabla_{\mathbf{v}}H(\mathbf{v})\right)$
@@ -1664,10 +1664,10 @@ The data are generated as
 \label{eq:synth-common}
 \end{equation}
 where $\varepsilon_1,\varepsilon_2\sim N(0,1)$, and $S$, $\mathbf{X}_{\mathrm{task}}$, $\mathbf{X}_{\mathrm{noise}}$, $\varepsilon_1$ and $\varepsilon_2$ are mutually independent.
-The function $\omega$ is a Gaussian kernel centered at $s_0=0.5$.  Since $S$ is uniform on $[0,1]$, the interval $[s_0-\tau,\,s_0+\tau]$ has probability $2\tau=0.086$, so the dependence of $X_{\mathrm{loc}}$ on $S$ introduced through $\omega$ is concentrated in a small part of the sensitive domain.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function of Section~\ref{sec:experiments}.  The outcome and the input are
+The function $\omega$ is a Gaussian kernel centered at $s_0=0.5$.  Since $S$ is uniform on $[0,1]$, the interval $[s_0-\tau,\,s_0+\tau]$ has probability $2\tau=0.086$, so the dependence of $X_{\mathrm{loc}}$ on $S$ introduced through $\omega$ is concentrated in a small part of the sensitive domain.  Let $\boldsymbol{\upsilon}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function of Section~\ref{sec:experiments}.  The outcome and the input are
 \begin{equation}
 \begin{aligned}
-  Y &:= \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}} + 0.3\,\varepsilon_2\right), \\
+  Y &:= \sigma\!\left(\boldsymbol{\upsilon}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}} + 0.3\,\varepsilon_2\right), \\
   \mathbf{X} &:= (\mathbf{X}_{\mathrm{task}},\, \, \mathbf{X}_{\mathrm{noise}}, S) \in \mathbb{R}^{8}.
 \end{aligned}
 \label{eq:synth-linear}
@@ -1693,7 +1693,7 @@ For each of five seeds, training and test samples of size $5{,}000$ and a valida
 \label{tab:synth-settings}
 \begin{tabular}{rrllrrlrr}
 \toprule
-batch & epochs & learning rate & weight decay & $M$ & $J_v$ & $\alpha_v$ & $T$ & $\delta_0$ \\
+batch & epochs & learning rate & weight decay & $M$ & $J_v$ & $\alpha_v$ & $T$ & $\alpha_{s,0}$ \\
 \midrule
 200 & 200 & $10^{-3}$ & 0 & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
 \bottomrule
@@ -1740,7 +1740,7 @@ The graph datasets Pokec-z and Pokec-n are the social-network graphs drawn from 
 \subsection{Training Settings}
 \label{app:real-settings}
 
-On the tabular datasets, for every method, the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer, followed by the normalization in Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear. On the graph datasets, the encoder is the GCN of Appendix~\ref{app:real-datasets}.  Table~\ref{tab:hyperparameters} gives the batch size, the number of epochs, the learning rate and the weight decay, which are common to all methods.  For supIPM-FRL, it gives the number $M$ of discriminators and the number $J_v$ of discriminator updates with step size $\alpha_v$.  The last two columns are the number $T$ of candidate sensitive values and the initial step size $\delta_0$ of the compass search over $s$, which stops once its step size falls below $\gamma/8$.
+On the tabular datasets, for every method, the encoder is a two-layer network with $50$ SELU units \citep{klambauer2017self} per layer, followed by the normalization in Appendix~\ref{app:ascent}, so that $d=50$, and the prediction head is linear. On the graph datasets, the encoder is the GCN of Appendix~\ref{app:real-datasets}.  Table~\ref{tab:hyperparameters} gives the batch size, the number of epochs, the learning rate and the weight decay, which are common to all methods.  For supIPM-FRL, it gives the number $M$ of discriminators and the number $J_v$ of discriminator updates with step size $\alpha_v$.  The last two columns are the number $T$ of candidate sensitive values and the initial step size $\alpha_{s,0}$ of the compass search over $s$, which stops once its step size falls below $\gamma/8$.
 The bandwidth $\gamma$ follows the rule of Appendix~\ref{app:synth-settings}.
 The penalty parameter $\lambda$ of (\ref{eq:supipm-penalized-objective}) takes values between $0.003$ and $3$ for supIPM-FRL.
 The running times and peak GPU memory usage in Appendix~\ref{app:real-cost} are measured on a single NVIDIA GeForce RTX 3090 GPU with 24 GB of memory under PyTorch 2.0.1 and CUDA 11.7.
@@ -1753,7 +1753,7 @@ The running times and peak GPU memory usage in Appendix~\ref{app:real-cost} are 
 \setlength{\tabcolsep}{4pt}
 \begin{tabular}{lrrllrllrr}
 \toprule
-Dataset & batch & epochs & learning rate & weight decay & $M$ & $J_v$ & $\alpha_v$ & $T$ & $\delta_0$ \\
+Dataset & batch & epochs & learning rate & weight decay & $M$ & $J_v$ & $\alpha_v$ & $T$ & $\alpha_{s,0}$ \\
 \midrule
 Adult                & 1024 & 200 & $10^{-3}$ & $10^{-2}$ & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
 Crime                & 200  & 200 & $10^{-3}$ & $10^{-2}$ & 100 & 20 & $10^{-2}$ & 17 & 0.108 \\
