@@ -371,8 +371,8 @@ ReLU-IPM has several advantages for supIPM compared to MMD.
 Computing supIPM with MMD requires $O(n^2)$ computation at each update.
 In contrast, $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ only requires $O(n)$ computation at each update
 even though adversarial training is needed.
-Moreover, mini-batch learning is not possible for supIPM with MMD \citep{lee2026fair}, and thus  
-$O(n^2)$ memory is required. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM with the ReLU-IPM admits mini-batch learning.
+Moreover, mini-batch learning is biased for supIPM with MMD \citep{lee2026fair}, and  
+$O(n^2)$ memory is required to store full kernel matrix. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM with the ReLU-IPM admits mini-batch learning.
 
 Theoretically, the class of discriminators for ReLU-IPM is much larger than that of MMD. Thus, controlling supIPM with $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}$
 can guarantee the level of fairness violation for a large class of prediction heads. Empirical studies in Section~\ref{sec:experiments} confirm this advantage.
@@ -624,7 +624,7 @@ Details are provided in Appendix~\ref{app:synth-experiments}.
 
 \begin{figure}[!h]
   \centering
-  \includegraphics[width=0.7\textwidth]{main/fig1_simulation.pdf}
+  \includegraphics[width=0.7\textwidth]{main/fig1_simulation.png}
   \caption{Left: prediction performance against $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$.  Right: $\widehat{\Delta}_{\hat{f}_1}(s)$ for the two models circled in the left panel.}
   \label{fig:simulation}
 \end{figure}
@@ -1577,7 +1577,7 @@ The second identity in (\ref{eq:mb-unbiased-value}) then follows from (\ref{eq:m
 \end{proof}
 
 We fix the sensitive value, the discriminator and the sign before drawing the mini-batch used for the gradient step, so that the mini-batch gradient is unbiased for the gradient of $\mathcal{J}$ by Proposition~\ref{prop:mini-batch}, and Algorithm~\ref{alg:supipm-frl-mb} follows this order.
-The MMD penalty of FREM admits no such formulation, because its value on a mini-batch is biased for its value on the batch \citep{lee2026fair}, and it also requires a kernel evaluation for every pair of representations.
+The MMD penalty of FREM biased on mini-batches, so convergence to a stationary point of the batch objective is not guaranteed \citep{lee2026fair}, and it also requires a kernel evaluation for every pair of representations.
 
 
 \subsection{Algorithm}
@@ -1989,7 +1989,7 @@ Figures~\ref{fig:app-graph-gdp-kernel} and~\ref{fig:app-graph-mi} compare the me
 \subsection{Computational Cost}
 \label{app:real-cost}
 
-Appendix~\ref{app:mini-batch} shows that, for fixed inner variables, the mini-batch objective of supIPM-FRL and its gradient are unbiased for their counterparts on the whole training sample.  The MMD penalty of FREM has no such mini-batch formulation \citep{lee2026fair}, so its penalty is defined on the whole training sample.  Table~\ref{tab:cost} compares the cost of one gradient step on Adult for supIPM-FRL with a mini-batch and for FREM and supMMD-FRL with a single batch of $32{,}561$ observations, where supMMD-FRL replaces the ReLU-IPM in supIPM-FRL by the MMD.
+Appendix~\ref{app:mini-batch} shows that, for fixed inner variables, the mini-batch objective of supIPM-FRL and its gradient are unbiased for their counterparts on the whole training sample.  The MMD penalty of FREM is biased on mini-batches, so it should, in principle, be computed on the whole training sample. Table~\ref{tab:cost} compares the cost of one gradient step on Adult for supIPM-FRL with a mini-batch and for FREM and supMMD-FRL with a single batch of $32{,}561$ observations, where supMMD-FRL replaces the ReLU-IPM in supIPM-FRL by the MMD.
 
 \begin{table}[H]
 \centering
