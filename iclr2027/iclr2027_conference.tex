@@ -142,7 +142,7 @@ can control the worst-case fairness violation and thus avoid discrimination agai
 For this purpose, we propose a measure for the worst-case fairness violation of a given representation and
 develop an algorithm to learn a representation while controlling  
 the worst-case fairness violation. Our proposed measure is the supremum of the IPM$_s$ with respect to $s,$
-where IPM$_S$ is the IPM between the distribution of a representation when the sensitive attribute $S$ is equal to $s$
+where IPM$_s$ is the IPM between the distribution of a representation when the sensitive attribute $S$ is equal to $s$
 and the marginal distribution, which we call {\bf supIPM}.
 For the choice of IPM,
 we consider ReLU-IPM of \citet{park2026relu} since  
@@ -249,9 +249,9 @@ Let $\mathbb{B}^d:=\{\mathbf{z}\in\mathbb{R}^d:\lVert \mathbf{z}\rVert_2\le 1\}$
 where $(a)_+:=\max\{a,0\}$.  
 % ReLU-IPM between probability distributions $\mathbb{P}$ and $\mathbb{Q}$ on $\mathbb{B}^d$ is $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbb{P},\mathbb{Q})$, (\ref{eq:prelim-ipm}) with $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$.  
 Despite its finite-dimensional parameterization of the discriminator class, ReLU-IPM separates probability distributions on $\mathbb{B}^d$, while keeping its computation tractable.
-\citet{park2026relu} compute ReLU-IPM between two distributions by applying a gradient ascent over $(\theta,\mu)$,  and projecting $\theta$ back onto the unit sphere in each update.
+\citet{park2026relu} compute ReLU-IPM between two distributions by applying gradient ascent over $(\theta,\mu)$,  and projecting $\theta$ back onto the unit sphere in each update.
 
-To specify class of the prediction heads that ReLU-IPM controls, fix a smoothness index $\beta>0$ and let $k$ be the largest integer strictly smaller than $\beta$.  Let $\partial^{\mathbf{a}}$ denote the partial derivative indexed by a multi-index $\mathbf{a}\in\mathbb{N}_0^d$ of order $|\mathbf{a}|=a_1+\cdots+a_d$.  Then the $\beta$-H\"older norm of a $k$ times continuously differentiable function $v:\mathbb{B}^d\to\mathbb{R}$ and the $\beta$-H\"older ball on $\mathbb{B}^d$ are defined as
+To specify the class of the prediction heads that ReLU-IPM controls, fix a smoothness index $\beta>0$ and let $k$ be the largest integer strictly smaller than $\beta$.  Let $\partial^{\mathbf{a}}$ denote the partial derivative indexed by a multi-index $\mathbf{a}\in\mathbb{N}_0^d$ of order $|\mathbf{a}|=a_1+\cdots+a_d$.  Then the $\beta$-H\"older norm of a $k$ times continuously differentiable function $v:\mathbb{B}^d\to\mathbb{R}$ and the $\beta$-H\"older ball on $\mathbb{B}^d$ are defined as
 \begin{equation}
   \lVert v\rVert_{\mathcal{H}^{\beta}}
   :=\max\left\{
@@ -359,7 +359,7 @@ It remains to choose the discriminator class $\mathcal{V}$.
 Note that $\operatorname{GDP}_{\infty}(f\circ h)$ for heads $f$ with a bounded H\"older norm is bounded by
 $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S).$
 However, computation of $\operatorname{supIPM}_{\mathcal{H}^{\beta}_d}(\mathbf{Z};S)$
-is not easy because function in $\mathcal{H}^{\beta}_d$ is not easily parameterizable.
+is not easy because a function in $\mathcal{H}^{\beta}_d$ is not easily parameterizable.
 To resolve this problem, we use ReLU-IPM, that is, we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$ in (\ref{eq:supipm}) and control $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$. Since the discriminator class of ReLU-IPM has finite parameters,
 computation of $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ can be done without much hamper.
 Moreover, the inequality (\ref{eq:relu-holder}) implies
@@ -371,11 +371,11 @@ ReLU-IPM has several advantages for supIPM compared to MMD.
 Computing supIPM with MMD requires $O(n^2)$ computation at each update.
 In contrast, $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ only requires $O(n)$ computation at each update
 even though adversarial training is needed.
-Moreover, a mini-batch learning is not possible for supIPM with MMD \citep{lee2026fair}, and thus  
-$O(n^2)$ memory is required. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM with the ReLU-IPM admits a mini-batch learning.
+Moreover, mini-batch learning is not possible for supIPM with MMD \citep{lee2026fair}, and thus  
+$O(n^2)$ memory is required. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM with the ReLU-IPM admits mini-batch learning.
 
-Theoretically, the class of discriminators for ReLU-IPM is much larger that that of MMD, Thus, controlling supIPM with $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}$
-can guarantee the level of fairness violation for large class of prediction heads. Empirical studies in Section \ref{sec:experiments} confirm this advantage.
+Theoretically, the class of discriminators for ReLU-IPM is much larger than that of MMD. Thus, controlling supIPM with $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}$
+can guarantee the level of fairness violation for a large class of prediction heads. Empirical studies in Section \ref{sec:experiments} confirm this advantage.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
@@ -535,7 +535,7 @@ Moreover, the bound is uniform over $\mathcal{E}_n$, so it applies to the encode
 In addition, since $\epsilon_n \to 0$, $\mathcal{S}_n$ converges to $[0,1]$, so every fixed sensitive value in the interior of $\mathcal{S}$ is eventually covered.
 
 
-Theorem~\ref{thm:uniform} and inequality in (\ref{eq:relu-holder}) yield the following corollary.  For $B>0$ let $\mathcal{H}^{\beta}_d(B)$ be the H\"older ball of (\ref{eq:holder-ball}) with radius $B$, and let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and exponent in (\ref{eq:relu-holder}), so that $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $\alpha_{d,\beta}=1$ for $\beta>(d+3)/2$.
+Theorem~\ref{thm:uniform} and the inequality in (\ref{eq:relu-holder}) yield the following corollary.  For $B>0$ let $\mathcal{H}^{\beta}_d(B)$ be the H\"older ball of (\ref{eq:holder-ball}) with radius $B$, and let $C_{d,\beta}$ and $\alpha_{d,\beta}$ be the constant and exponent in (\ref{eq:relu-holder}), so that $\alpha_{d,\beta}=2\beta/(d+3)$ for $\beta<(d+3)/2$ and $\alpha_{d,\beta}=1$ for $\beta>(d+3)/2$.
 \begin{corollary}
 \label{cor:certificate}
 Let Assumptions~\ref{as:positive-density}--\ref{as:encoder} hold. Let $d\ge3$, and let $C$ and $c$ be the constants of Theorem~\ref{thm:uniform}.  For every $\delta\in(0,1)$ and  $n$ with $\Gamma_{n,\delta}\le c\,n\gamma_n$, with probability at least $1-\delta$, simultaneously for all  $h\in\mathcal{E}_n$,  $B>0$ and  $\beta>0$ with $\beta\ne(d+3)/2$,
@@ -656,7 +656,7 @@ In contrast, supIPM-FRL penalizes the largest discrepancy over $s$ in (\ref{eq:s
 Table~\ref{tab:datasets} in Appendix~\ref{app:real-datasets} gives further details, and Appendix~\ref{app:real-additional} reports results on the graph datasets Pokec-z and Pokec-n \citep{takac2012data}.
 
 \paragraph{Baselines.}
-We compare supIPM-FRL with seven baselines for fair representation learning (FRL) algoritms or for learning fair prediction models.
+We compare supIPM-FRL with seven baselines for fair representation learning (FRL) algorithms or for learning fair prediction models.
 Table~\ref{tab:baselines} summarizes the compared algorithms, and Appendix~\ref{app:real-baselines} provides more details about baseline methods.
 % ADV is the adaptation by \citet{kong2025fair} of the adversarial method of \citet{zhang2018mitigating}, whose adversary predicts $S$ from the representation.
 To apply LAFTR, MMD and sIPM-LFR to the continuous sensitive attribute $S$, we binarize the sensitive values at their median in the training data.
@@ -1883,7 +1883,7 @@ worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- 
 \end{tabular}
 \end{table}
 
-\paragraph{Two-layer mlp heads.}  We also evaluate the two-layer heads
+\paragraph{Two-layer MLP heads.}  We also evaluate the two-layer heads
 \begin{equation*}
   \mathcal{F}'_c:=\bigl\{\sigma(\mathbf{w}_2^{\top}\operatorname{relu}(\mathbf{W}_1\mathbf{z}+\mathbf{b}_1)+b_2):\ \lVert\mathbf{W}_1\rVert_2\le1,\ \lVert\mathbf{w}_2\rVert_2\le c\bigr\},
 \end{equation*}
@@ -2021,7 +2021,7 @@ The linear cost of supIPM-FRL, together with the unbiased mini-batch gradients o
 \section{Ablation Studies}
 \label{app:ablation-studies}
 
-This appendix examines three choices in the supIPM-FRL on the tabular datasets: the kernel in estimator of distribution, the class of the discriminators and the number $T$ of candidate sensitive values. 
+This appendix examines three choices in supIPM-FRL on the tabular datasets: the kernel in the estimator of the distribution, the class of the discriminators and the number $T$ of candidate sensitive values. 
 % Section~\ref{sec:exp-real} uses the Gaussian kernel, the ReLU class $\mathcal{V}_{\mathrm{R}}$ and $T=17$. 
 Each ablation varies one choice and keeps the architecture and the training settings of Appendix~\ref{app:real-settings} and the measures of Appendix~\ref{app:worst-case} unchanged, except that the penalty values are chosen separately for each discriminator class in Appendix~\ref{app:ablation-ipm-class}.  In each figure the columns are Adult, Crime and ACSIncome from left to right, the top row reports the prediction-level disparity and the bottom row the worst-case downstream disparity over $\mathcal{F}_1$.
 
