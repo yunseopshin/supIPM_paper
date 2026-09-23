@@ -600,7 +600,7 @@ We draw $S\sim\mathrm{Uniform}(0,1)$, $\mathbf{X}_{\mathrm{task}}\sim N(\mathbf{
 \begin{equation*}
   X_{\mathrm{loc}}:=3\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}+0.5\,\varepsilon_1,
   \qquad
-  Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+0.3\,\varepsilon_2\right),
+  Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}}+0.3\,\varepsilon_2\right),
 \end{equation*}
 with $s_0=0.5$, $\tau=0.043$ and a fixed $\mathbf{u}\in\mathbb{R}^4$.  The input is $\mathbf{X}:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{loc}},\mathbf{X}_{\mathrm{noise}})$.
 % Thus $\mathbf{X}$ depends on $S$ only through $X_{\mathrm{loc}}$, which is shifted only for $S$ near $s_0$, and $Y$ does not depend on $S$.
@@ -647,7 +647,7 @@ All methods use the encoder and the prediction head of Appendix~\ref{app:real-se
 \footnotesize
 \setlength{\tabcolsep}{5pt}
 \renewcommand{\arraystretch}{0.92}
-\caption{Original formulation of the methods compared in Section~\ref{sec:exp-real}.}
+\caption{Overview of compared algorithms.}
 \label{tab:baselines}
 \begin{tabular}{lll}
 \toprule
@@ -1643,14 +1643,15 @@ where $\varepsilon_1,\varepsilon_2\sim N(0,1)$, and $S$, $\mathbf{X}_{\mathrm{ta
 The function $\omega$ is a Gaussian kernel centered at $s_0=0.5$.  Since $S$ is uniform on $[0,1]$, the interval $[s_0-\tau,\,s_0+\tau]$ has probability $2\tau=0.086$, so the dependence of $X_{\mathrm{loc}}$ on $S$ introduced through $\omega$ is concentrated in a small part of the sensitive domain.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function of Section~\ref{sec:experiments}.  The outcome and the input are
 \begin{equation}
 \begin{aligned}
-  Y &:= \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}} + 0.3\,\varepsilon_2\right), \\
+  Y &:= \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}}: + 0.3\,\varepsilon_2\right), \\
   \mathbf{X} &:= (\mathbf{X}_{\mathrm{task}},\, X_{\mathrm{loc}},\, \mathbf{X}_{\mathrm{noise}}) \in \mathbb{R}^{8}.
 \end{aligned}
 \label{eq:synth-linear}
 \end{equation}
 
 
-The sensitive attribute enters the input only through $X_{\mathrm{loc}}$ and does not enter the outcome equation, so $Y$ is conditionally independent of $S$ given $\mathbf{X}_{\mathrm{task}}$.  A representation may therefore discard $X_{\mathrm{loc}}$, and with it the dependence on $S$ near $s_0$, without losing the information needed to predict $Y$.  Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.
+The sensitive attribute enters the input only through $X_{\mathrm{loc}}$.
+ Since $Y\in(0,1)$, the task is regression with the squared-error loss, and prediction performance is measured by the test $1-\mathrm{MAE}$.
 
 \subsection{Settings}
 \label{app:synth-settings}
