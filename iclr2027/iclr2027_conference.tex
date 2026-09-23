@@ -1783,73 +1783,58 @@ In Section~\ref{sec:exp-real} and in this appendix, each point on a curve report
 \subsection{Additional Results}
 \label{app:real-additional}
 
-This subsection collects the results omitted from Section~\ref{sec:exp-real}.  In every figure on the tabular datasets, the left panels show the methods that use the continuous $S$, and the middle and the right panels show the methods that require a binary $S$, with $S$ split at its median as in Section~\ref{sec:exp-real} and at its mean, respectively.
+This subsection collects the results omitted from Section~\ref{sec:exp-real}.  In every figure on the tabular datasets, the rows are Adult, Crime and ACSIncome from top to bottom; the left panels show the methods that use the continuous $S$, and the middle and the right panels show the methods that require a binary $S$, with $S$ split at its median as in Section~\ref{sec:exp-real} and at its mean, respectively.
 
 \paragraph{Prediction-level disparity.}
 \label{app:real-tabular}
 Figure~\ref{fig:app-prediction-level} compares the methods by the prediction-level disparity on the three tabular datasets, with the binary-$S$ methods under both splits of $S$.  On Crime and ACSIncome, supIPM-FRL, FREM and Reg-GDP have nearly the same curve, and the binary-$S$ methods are close to them.
 
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
   \includegraphics[trim=0 23.2 0 3.5, clip, width=0.88\textwidth]{appendix/fig2_own_head_adult.pdf}\\[1pt]
   \includegraphics[trim=0 23.2 0 3.5, clip, width=0.88\textwidth]{appendix/fig2_own_head_crime.pdf}\\[1pt]
   \includegraphics[trim=0 3.5 0 3.5, clip, width=0.88\textwidth]{appendix/fig2_own_head_acs.pdf}
-  \caption{Prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \caption{Prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$.}
   \label{fig:app-prediction-level}
 \end{figure}
 
 \paragraph{Worst-case downstream disparity.}
 Figure~\ref{fig:app-c1} compares the methods by the worst-case downstream disparity over $\mathcal{F}_1$ on the same datasets.  At comparable prediction performance, supIPM-FRL attains the lowest worst-case disparity on the three datasets.  The supremum over $s$ and over the discriminators constrains the representation at every sensitive value, whereas an average over $S$, or a penalty on the trained head, leaves a dependence on $S$ that a downstream head can exploit.
 
-\begin{figure}[!htb]
+\paragraph{Larger norm bounds.}  Figures~\ref{fig:app-c4} and~\ref{fig:app-c8} evaluate the worst-case downstream disparity over $\mathcal{F}_4$ and $\mathcal{F}_8$, respectively; these larger norm bounds admit a broader class of downstream heads.  At comparable prediction performance, supIPM-FRL attains the lowest worst-case disparity on the three tabular datasets, and its margin over the baselines is larger than at $c=1$, so its advantage persists across the evaluated norm bounds.
+
+\begin{figure}[H]
   \centering
   \includegraphics[trim=0 21.3 0 3.5, clip, width=0.88\textwidth]{appendix/figA2_worst_head_budgets_adult_c1.pdf}\\[1pt]
   \includegraphics[trim=0 21.3 0 3.5, clip, width=0.88\textwidth]{appendix/figA2_worst_head_budgets_crime_c1.pdf}\\[1pt]
   \includegraphics[trim=0 3.5 0 3.5, clip, width=0.88\textwidth]{appendix/figA2_worst_head_budgets_acs_c1.pdf}
-  \caption{Prediction performance against the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_{1})$ on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \caption{Prediction performance against the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_{1})$.}
   \label{fig:app-c1}
 \end{figure}
 
-\paragraph{Larger norm bounds.}  Figures~\ref{fig:app-c4} and~\ref{fig:app-c8} evaluate the worst-case downstream disparity over $\mathcal{F}_4$ and $\mathcal{F}_8$, respectively; these larger norm bounds admit a broader class of downstream heads.  At comparable prediction performance, supIPM-FRL attains the lowest worst-case disparity on the three tabular datasets, and its margin over the baselines is larger than at $c=1$, so its advantage persists across the evaluated norm bounds.
-
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
   \includegraphics[trim=0 21.3 0 3.5, clip, width=0.88\textwidth]{appendix/figA2_worst_head_budgets_adult_c4.pdf}\\[1pt]
   \includegraphics[trim=0 21.3 0 3.5, clip, width=0.88\textwidth]{appendix/figA2_worst_head_budgets_crime_c4.pdf}\\[1pt]
   \includegraphics[trim=0 3.5 0 3.5, clip, width=0.88\textwidth]{appendix/figA2_worst_head_budgets_acs_c4.pdf}
-  \caption{Prediction performance against the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_{4})$ on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \caption{Prediction performance against the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_{4})$.}
   \label{fig:app-c4}
 \end{figure}
 
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
   \includegraphics[trim=0 21.3 0 3.5, clip, width=0.88\textwidth]{appendix/figA2_worst_head_budgets_adult_c8.pdf}\\[1pt]
   \includegraphics[trim=0 21.3 0 3.5, clip, width=0.88\textwidth]{appendix/figA2_worst_head_budgets_crime_c8.pdf}\\[1pt]
   \includegraphics[trim=0 3.5 0 3.5, clip, width=0.88\textwidth]{appendix/figA2_worst_head_budgets_acs_c8.pdf}
-  \caption{Prediction performance against the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_{8})$ on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \caption{Prediction performance against the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_{8})$.}
   \label{fig:app-c8}
-\end{figure}
-
-\paragraph{Two-layer mlp heads.}  We also evaluate the two-layer heads
-\begin{equation*}
-  \mathcal{F}'_c:=\bigl\{\sigma(\mathbf{w}_2^{\top}\operatorname{relu}(\mathbf{W}_1\mathbf{z}+\mathbf{b}_1)+b_2):\ \lVert\mathbf{W}_1\rVert_2\le1,\ \lVert\mathbf{w}_2\rVert_2\le c\bigr\},
-\end{equation*}
-which have the same Lipschitz bound as the heads of $\mathcal{F}_c$.  Figure~\ref{fig:app-mlp-head} reports the worst-case downstream disparity over $\mathcal{F}'_1$.  The heads have $16$ hidden units and are fitted as in Appendix~\ref{app:worst-case}, with $\mathbf{W}_1$ projected onto the spectral-norm ball and $\mathbf{w}_2$ onto the ball of radius $c$ after every step.  At comparable prediction performance, the values over $\mathcal{F}'_1$ are close to those over $\mathcal{F}_1$.
-
-\begin{figure}[!htb]
-  \centering
-  \includegraphics[trim=0 31.0 0 2.4, clip, width=0.88\textwidth]{appendix/figA_worst_head_mlp2_adult.pdf}\\[1pt]
-  \includegraphics[trim=0 31.0 0 2.7, clip, width=0.88\textwidth]{appendix/figA_worst_head_mlp2_crime.pdf}\\[1pt]
-  \includegraphics[trim=0 5.5 0 2.7, clip, width=0.88\textwidth]{appendix/figA_worst_head_mlp2_acs.pdf}
-  \caption{Prediction performance against the worst-case downstream disparity over the two-layer heads, $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}'_{1})$, on Adult (top), Crime (middle) and ACSIncome (bottom).}
-  \label{fig:app-mlp-head}
 \end{figure}
 
 \paragraph{Matched prediction performance.}
 \label{app:real-matched}
 Table~\ref{tab:matched} compares the methods at a fixed level of prediction performance on each tabular dataset.  For each method and each disparity, the entry is the smallest disparity among the models of that method whose prediction performance lies within $0.004$ of the level.  A dash indicates that no model of that method meets this criterion, and the smallest value in each row is in bold.  supIPM-FRL attains the smallest value in every row except the prediction-level disparity on Crime.  Under the worst-case disparity, its value is at least three times smaller than that of every baseline on the three datasets.
 
-\begin{table}[!htbp]
+\begin{table}[H]
 \centering
 \caption{Prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ and worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$ on the tabular datasets at matched prediction performance.}
 \label{tab:matched}
@@ -1874,91 +1859,105 @@ worst-case ($c=1$) & $\mathbf{0.0018}$ & 0.0088 & 0.0146 & 0.0165 & 0.0248 & -- 
 \end{tabular}
 \end{table}
 
+\paragraph{Two-layer mlp heads.}  We also evaluate the two-layer heads
+\begin{equation*}
+  \mathcal{F}'_c:=\bigl\{\sigma(\mathbf{w}_2^{\top}\operatorname{relu}(\mathbf{W}_1\mathbf{z}+\mathbf{b}_1)+b_2):\ \lVert\mathbf{W}_1\rVert_2\le1,\ \lVert\mathbf{w}_2\rVert_2\le c\bigr\},
+\end{equation*}
+which have the same Lipschitz bound as the heads of $\mathcal{F}_c$.  Figure~\ref{fig:app-mlp-head} reports the worst-case downstream disparity over $\mathcal{F}'_1$.  The heads have $16$ hidden units and are fitted as in Appendix~\ref{app:worst-case}, with $\mathbf{W}_1$ projected onto the spectral-norm ball and $\mathbf{w}_2$ onto the ball of radius $c$ after every step.  At comparable prediction performance, the values over $\mathcal{F}'_1$ are close to those over $\mathcal{F}_1$.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[trim=0 31.0 0 2.4, clip, width=0.88\textwidth]{appendix/figA_worst_head_mlp2_adult.pdf}\\[1pt]
+  \includegraphics[trim=0 31.0 0 2.7, clip, width=0.88\textwidth]{appendix/figA_worst_head_mlp2_crime.pdf}\\[1pt]
+  \includegraphics[trim=0 5.5 0 2.7, clip, width=0.88\textwidth]{appendix/figA_worst_head_mlp2_acs.pdf}
+  \caption{Prediction performance against the worst-case downstream disparity over the two-layer heads, $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}'_{1})$.}
+  \label{fig:app-mlp-head}
+\end{figure}
+
 \paragraph{Alternative disparity measures.}
 \label{app:real-measures}
 Figures~\ref{fig:app-gdp}--\ref{fig:app-supipm} compare the methods by the kernel estimate of GDP, the binned estimate of GDP and the empirical supIPM, respectively, all defined in Appendix~\ref{app:worst-case}.  The two estimates of GDP evaluate the trained prediction head and average the disparity over $S$, whereas the empirical supIPM evaluates the representation on the test split.  Under the two averages, supIPM-FRL and FREM attain similar values, and the remaining methods are two to four times larger.  Under the empirical supIPM, supIPM-FRL is markedly lower than every other method on Adult and Crime.  This measure is the quantity that supIPM-FRL penalizes, and Theorem~\ref{thm:uniform} shows that it converges uniformly to the population supIPM of the representation.
 
-\begin{figure}[!htb]
+\paragraph{Dependence of the fitted prediction on $S$.}
+Figures~\ref{fig:app-hgr} and~\ref{fig:app-mi-y} compare the methods by the HGR maximal correlation and by the mutual information between the prediction of the trained head and $S$.  No method attains the smallest value on all three datasets, and supIPM-FRL is comparable to FREM under both measures.  These two measures depend on the trained head alone, so a method that penalizes that head can attain a small value while the representation still depends on $S$.
+
+\begin{figure}[H]
   \centering
   \includegraphics[trim=0 18.2 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_adult_gdp_w_kernel.pdf}\\[1pt]
   \includegraphics[trim=0 18.2 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_crime_gdp_w_kernel.pdf}\\[1pt]
   \includegraphics[trim=0 3.5 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_acs_gdp_w_kernel.pdf}
-  \caption{Prediction performance against the kernel estimate of GDP of the fitted prediction model on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \caption{Prediction performance against the kernel estimate of GDP of the fitted prediction model.}
   \label{fig:app-gdp}
 \end{figure}
 
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
   \includegraphics[trim=0 18.2 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_adult_gdp_wo_kernel.pdf}\\[1pt]
   \includegraphics[trim=0 18.2 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_crime_gdp_wo_kernel.pdf}\\[1pt]
   \includegraphics[trim=0 3.5 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_acs_gdp_wo_kernel.pdf}
-  \caption{Prediction performance against the binned estimate of GDP of the fitted prediction model on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \caption{Prediction performance against the binned estimate of GDP of the fitted prediction model.}
   \label{fig:app-gdp-binned}
 \end{figure}
 
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
   \includegraphics[trim=0 17.7 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_adult_sup_ipm.pdf}\\[1pt]
   \includegraphics[trim=0 17.7 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_crime_sup_ipm.pdf}\\[1pt]
   \includegraphics[trim=0 3.5 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_acs_sup_ipm.pdf}
-  \caption{Prediction performance against the empirical supIPM of the representation on the test split on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \caption{Prediction performance against the empirical supIPM of the representation on the test split.}
   \label{fig:app-supipm}
 \end{figure}
 
-\paragraph{Dependence of the fitted prediction on $S$.}
-Figures~\ref{fig:app-hgr} and~\ref{fig:app-mi-y} compare the methods by the HGR maximal correlation and by the mutual information between the prediction of the trained head and $S$.  No method attains the smallest value on all three datasets, and supIPM-FRL is comparable to FREM under both measures.  These two measures depend on the trained head alone, so a method that penalizes that head can attain a small value while the representation still depends on $S$.
-
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
   \includegraphics[trim=0 19.0 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_adult_hgr.pdf}\\[1pt]
   \includegraphics[trim=0 19.0 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_crime_hgr.pdf}\\[1pt]
   \includegraphics[trim=0 3.5 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_acs_hgr.pdf}
-  \caption{Prediction performance against the HGR maximal correlation between the fitted prediction and $S$ on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \caption{Prediction performance against the HGR maximal correlation between the fitted prediction and $S$.}
   \label{fig:app-hgr}
 \end{figure}
 
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
   \includegraphics[trim=0 20.7 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_adult_mi_y_s.pdf}\\[1pt]
   \includegraphics[trim=0 20.7 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_crime_mi_y_s.pdf}\\[1pt]
   \includegraphics[trim=0 3.5 0 3.5, clip, width=0.88\textwidth]{appendix/figA6_other_measures_acs_mi_y_s.pdf}
-  \caption{Prediction performance against the mutual information $I(\hat{Y};S)$ between the fitted prediction and $S$ on Adult (top), Crime (middle) and ACSIncome (bottom).}
+  \caption{Prediction performance against the mutual information $I(\hat{Y};S)$ between the fitted prediction and $S$.}
   \label{fig:app-mi-y}
 \end{figure}
 
 \paragraph{Graph datasets.}
 \label{app:real-graph}
-On Pokec-z and Pokec-n we compare supIPM-FRL with FREM, Reg-GDP, Reg-HGR, ADV and MMD; LAFTR and sIPM-LFR are evaluated only on the tabular datasets.  In the top row of Figure~\ref{fig:app-graph}, supIPM-FRL attains a higher accuracy than FREM and Reg-GDP at a given prediction-level disparity on both graphs, and MMD and Reg-HGR reach a given disparity only at a lower accuracy.  In the bottom row, supIPM-FRL attains a smaller worst-case downstream disparity than every baseline at comparable accuracy on both graphs, FREM and MMD lie close to each other below it, and Reg-GDP and Reg-HGR attain a worst-case disparity several times larger.  On these two graphs, the supremum penalty therefore constrains the evaluated downstream heads more tightly than the average penalty of FREM, and the penalties of Reg-GDP and Reg-HGR on the trained prediction leave a much larger worst-case disparity.
+On Pokec-z and Pokec-n we compare supIPM-FRL with FREM, Reg-GDP, Reg-HGR, ADV and MMD; LAFTR and sIPM-LFR are evaluated only on the tabular datasets.  In Figures~\ref{fig:app-graph}--\ref{fig:app-graph-mi}, the left column is Pokec-z and the right column is Pokec-n.  In the top row of Figure~\ref{fig:app-graph}, supIPM-FRL attains a higher accuracy than FREM and Reg-GDP at a given prediction-level disparity on both graphs, and MMD and Reg-HGR reach a given disparity only at a lower accuracy.  In the bottom row, supIPM-FRL attains a smaller worst-case downstream disparity than every baseline at comparable accuracy on both graphs, FREM and MMD lie close to each other below it, and Reg-GDP and Reg-HGR attain a worst-case disparity several times larger.  On these two graphs, the supremum penalty therefore constrains the evaluated downstream heads more tightly than the average penalty of FREM, and the penalties of Reg-GDP and Reg-HGR on the trained prediction leave a much larger worst-case disparity.
 
-\begin{figure}[!htb]
+\paragraph{Graph datasets under the other measures.}
+Figures~\ref{fig:app-graph-gdp-kernel} and~\ref{fig:app-graph-mi} compare the methods on the two graphs by the remaining measures of Appendix~\ref{app:worst-case}, one measure per row.  Under the kernel and the binned estimates of GDP, supIPM-FRL attains the smallest values on both graphs.  Under the empirical supIPM, its curve overlaps with that of FREM, and both lie well below Reg-GDP and Reg-HGR.  Under the HGR maximal correlation and the mutual information, Reg-HGR attains the smallest values and supIPM-FRL is comparable to FREM.
+
+\begin{figure}[H]
   \centering
-  \includegraphics[trim=0 25.7 0 2.2, clip, width=0.78\textwidth]{appendix/figA7_graph_own_head.pdf}\\[1pt]
-  \includegraphics[trim=0 3.3 0 2.2, clip, width=0.78\textwidth]{appendix/figA7_graph_worst_head.pdf}
-  \caption{Pokec-z (left) and Pokec-n (right): prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ (top) and the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$ (bottom).}
+  \includegraphics[trim=0 25.7 0 2.2, clip, width=0.72\textwidth]{appendix/figA7_graph_own_head.pdf}\\[1pt]
+  \includegraphics[trim=0 3.3 0 2.2, clip, width=0.72\textwidth]{appendix/figA7_graph_worst_head.pdf}
+  \caption{Prediction performance against the prediction-level disparity $\widehat{\operatorname{GDP}}_{\infty}(f_{\psi}\circ h_{\phi})$ and the worst-case downstream disparity $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$ on Pokec-z and Pokec-n.}
   \label{fig:app-graph}
 \end{figure}
 
-\paragraph{Graph datasets under the other measures.}
-Figures~\ref{fig:app-graph-gdp-kernel} and~\ref{fig:app-graph-mi} compare the methods on the two graphs by the remaining measures of Appendix~\ref{app:worst-case}.  Under the kernel and the binned estimates of GDP, supIPM-FRL attains the smallest values on both graphs.  Under the empirical supIPM, its curve overlaps with that of FREM, and both lie well below Reg-GDP and Reg-HGR.  Under the HGR maximal correlation and the mutual information, Reg-HGR attains the smallest values and supIPM-FRL is comparable to FREM.
-
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
-  \includegraphics[trim=0 22.4 0 2.2, clip, width=0.78\textwidth]{appendix/figA7_graph_gdp_w_kernel.pdf}\\[1pt]
-  \includegraphics[trim=0 22.4 0 2.2, clip, width=0.78\textwidth]{appendix/figA7_graph_gdp_wo_kernel.pdf}\\[1pt]
-  \includegraphics[trim=0 3.3 0 2.2, clip, width=0.78\textwidth]{appendix/figA7_graph_sup_ipm.pdf}
-  \caption{Pokec-z (left) and Pokec-n (right): prediction performance against the kernel GDP (top), the binned GDP (middle) and the empirical supIPM (bottom).}
+  \includegraphics[trim=0 22.4 0 2.2, clip, width=0.72\textwidth]{appendix/figA7_graph_gdp_w_kernel.pdf}\\[1pt]
+  \includegraphics[trim=0 22.4 0 2.2, clip, width=0.72\textwidth]{appendix/figA7_graph_gdp_wo_kernel.pdf}\\[1pt]
+  \includegraphics[trim=0 3.3 0 2.2, clip, width=0.72\textwidth]{appendix/figA7_graph_sup_ipm.pdf}
+  \caption{Prediction performance against the kernel GDP, the binned GDP and the empirical supIPM on Pokec-z and Pokec-n.}
   \label{fig:app-graph-gdp-kernel}
 \end{figure}
 
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
-  \includegraphics[trim=0 23.2 0 2.2, clip, width=0.78\textwidth]{appendix/figA7_graph_hgr.pdf}\\[1pt]
-  \includegraphics[trim=0 3.3 0 2.2, clip, width=0.78\textwidth]{appendix/figA7_graph_mi_y_s.pdf}
-  \caption{Pokec-z (left) and Pokec-n (right): prediction performance against the HGR maximal correlation (top) and the mutual information $I(\hat{Y};S)$ (bottom).}
+  \includegraphics[trim=0 23.2 0 2.2, clip, width=0.62\textwidth]{appendix/figA7_graph_hgr.pdf}\\[1pt]
+  \includegraphics[trim=0 3.3 0 2.2, clip, width=0.62\textwidth]{appendix/figA7_graph_mi_y_s.pdf}
+  \caption{Prediction performance against the HGR maximal correlation and the mutual information $I(\hat{Y};S)$ on Pokec-z and Pokec-n.}
   \label{fig:app-graph-mi}
 \end{figure}
 
-\FloatBarrier
 
 \subsection{Computational Cost}
 \label{app:real-cost}
@@ -1981,7 +1980,7 @@ sup-MMD    & batch ($32{,}000$) & \multicolumn{2}{c}{out of memory} \\
 \end{tabular}
 \end{table}
 
-The MMD evaluates the kernel at every pair of representations, so its cost grows quadratically with the number of observations, and on the whole training sample it exceeds the $24$ GB of the GPU.  In the experiments of Section~\ref{sec:exp-real}, FREM and sup-MMD are therefore trained with mini-batches, whose penalty is biased for the penalty on the whole sample, as noted in Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} reports the time and the peak memory per step as the mini-batch grows, and the cross marks the first size that exceeds the memory of the GPU.  FREM already needs $8.5$ GB at $1{,}024$ observations.  The memory of supIPM-FRL grows linearly and the whole training sample takes $129$ MB, while its time per step is almost the same as with the mini-batch.
+The MMD evaluates the kernel at every pair of representations, so its cost grows quadratically with the number of observations, and on the whole training sample it exceeds the $24$ GB of the GPU.  FREM and sup-MMD are therefore trained with mini-batches, whose penalty is biased for the penalty on the whole sample, as noted in Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} reports the time and the peak memory per step as the mini-batch grows, and the cross marks the first size that exceeds the memory of the GPU.  FREM already needs $8.5$ GB at $1{,}024$ observations.  The memory of supIPM-FRL grows linearly and the whole training sample takes $129$ MB, while its time per step is almost the same as with the mini-batch.
 
 \begin{figure}[H]
   \centering
@@ -1997,7 +1996,7 @@ The linear cost of supIPM-FRL, together with the unbiased mini-batch gradients o
 
 This appendix examines three choices in the penalty of supIPM-FRL on the tabular datasets: the shape of the smoothing kernel, the class of the discriminators and the number $T$ of candidate sensitive values. 
 % Section~\ref{sec:exp-real} uses the Gaussian kernel, the ReLU class $\mathcal{V}_{\mathrm{R}}$ and $T=17$. 
-Each ablation varies one choice and keeps the architecture and the training settings of Appendix~\ref{app:real-settings} and the measures of Appendix~\ref{app:worst-case} unchanged, except that the penalty values are chosen separately for each discriminator class in Appendix~\ref{app:ablation-ipm-class}.  In each figure the columns are the datasets, the top row reports the prediction-level disparity and the bottom row the worst-case downstream disparity over $\mathcal{F}_1$.
+Each ablation varies one choice and keeps the architecture and the training settings of Appendix~\ref{app:real-settings} and the measures of Appendix~\ref{app:worst-case} unchanged, except that the penalty values are chosen separately for each discriminator class in Appendix~\ref{app:ablation-ipm-class}.  In each figure the columns are Adult, Crime and ACSIncome from left to right, the top row reports the prediction-level disparity and the bottom row the worst-case downstream disparity over $\mathcal{F}_1$.
 
 % The bandwidth ablation is commented out for now.
 % \subsection{Bandwidth}
@@ -2020,45 +2019,42 @@ Each ablation varies one choice and keeps the architecture and the training sett
 
 The shape of the kernel $K_{\gamma}$ of Equation~(\ref{eq:supipm-estimators}) determines how the sensitive values neighboring $s$ are weighted.  Writing $u$ for the distance between two sensitive values in units of the bandwidth, we compare the Gaussian shape $\exp(-u^{2}/2)$ with the Epanechnikov shape $(1-u^{2})_{+}$, the triangular shape $(1-|u|)_{+}$ and the box shape $\mathbf{1}\{|u|\le1\}$, the last three of which vanish beyond one bandwidth from $s$.  The four are used at the same bandwidth, and their weights are normalized to sum to one, so that only the shape of the weighting changes.
 
-\paragraph{Results.}  In Figure~\ref{fig:app-ablation-kernel}, over the range of prediction performance shared by the four kernels, their curves are close on the three datasets, and no kernel attains the lowest disparity on every dataset.  For the three compactly supported kernels, the prediction performance falls to that of a constant predictor at a smaller value of $\lambda$ than for the Gaussian kernel, so their curves end at a larger disparity, whereas the curve of the Gaussian kernel extends to a lower disparity.
-
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
-  \includegraphics[width=0.92\textwidth]{appendix/figAB_kernel.pdf}
-  \caption{Prediction performance against the prediction-level disparity (top) and the worst-case downstream disparity over $\mathcal{F}_1$ (bottom) for supIPM-FRL trained with each smoothing kernel, on Adult (left), Crime (middle) and ACSIncome (right).}
+  \includegraphics[width=0.78\textwidth]{appendix/figAB_kernel.pdf}
+  \caption{Prediction performance against the prediction-level disparity and the worst-case downstream disparity over $\mathcal{F}_1$ for supIPM-FRL trained with each smoothing kernel.}
   \label{fig:app-ablation-kernel}
 \end{figure}
-\FloatBarrier
+
+\paragraph{Results.}  In Figure~\ref{fig:app-ablation-kernel}, over the range of prediction performance shared by the four kernels, their curves are close on the three datasets, and no kernel attains the lowest disparity on every dataset.  For the three compactly supported kernels, the prediction performance falls to that of a constant predictor at a smaller value of $\lambda$ than for the Gaussian kernel, so their curves end at a larger disparity, whereas the curve of the Gaussian kernel extends to a lower disparity.
 
 \subsection{IPM Class}
 \label{app:ablation-ipm-class}
 
-The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in Equation~(\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  We replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of Equation~(\ref{eq:relu-class}), within the same supremum over $s$, by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ used by sIPM-LFR \citep{kim2022learning} and by the unit ball of the Gaussian RKHS, whose IPM is the MMD used by FREM \citep{kong2025fair}; Appendix~\ref{app:real-cost} refers to the latter variant as sup-MMD.  Both variants retain the supremum over $s$, which the baselines sIPM-LFR and FREM do not.  The grid of penalty values is chosen separately for each class, since the three IPMs are not on a common scale, and the classes are compared at comparable prediction performance.
+The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in Equation~(\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  We replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of Equation~(\ref{eq:relu-class}) by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ used by sIPM-LFR \citep{kim2022learning} and by the unit ball of the Gaussian RKHS, whose IPM is the MMD used by FREM \citep{kong2025fair}; Appendix~\ref{app:real-cost} refers to the latter variant as sup-MMD.  Both variants retain the supremum over $s$, which the baselines sIPM-LFR and FREM do not.  The grid of penalty values is chosen separately for each class, since the three IPMs are not on a common scale, and the classes are compared at comparable prediction performance.
 
-\paragraph{Results.}  In Figure~\ref{fig:app-ablation-ipm-class}, the three discriminator classes yield similar prediction-level curves.  The ReLU and the sigmoid discriminators attain comparable worst-case downstream disparities, and their ordering varies with the dataset and with $\lambda$.  Both attain a markedly lower worst-case disparity than the MMD at comparable prediction performance.
-
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
-  \includegraphics[width=0.92\textwidth]{appendix/figAB_disc.pdf}
-  \caption{Prediction performance against the prediction-level disparity (top) and the worst-case downstream disparity over $\mathcal{F}_1$ (bottom) for supIPM-FRL trained with each discriminator class, on Adult (left), Crime (middle) and ACSIncome (right).}
+  \includegraphics[width=0.78\textwidth]{appendix/figAB_disc.pdf}
+  \caption{Prediction performance against the prediction-level disparity and the worst-case downstream disparity over $\mathcal{F}_1$ for supIPM-FRL trained with each discriminator class.}
   \label{fig:app-ablation-ipm-class}
 \end{figure}
-\FloatBarrier
+
+\paragraph{Results.}  In Figure~\ref{fig:app-ablation-ipm-class}, the three discriminator classes yield similar prediction-level curves.  The ReLU and the sigmoid discriminators attain comparable worst-case downstream disparities, and their ordering varies with the dataset and with $\lambda$.  Both attain a markedly lower worst-case disparity than the MMD at comparable prediction performance.
 
 \subsection{Candidate Sensitive Values}
 \label{app:ablation-T}
 
 The compass search over $s$ of Appendix~\ref{app:ascent} starts from $T$ candidate sensitive values.  We train supIPM-FRL with $T\in\{5,10,15,20,25,30\}$ in addition to $T=17$ of Table~\ref{tab:hyperparameters}, using the same random seeds and the same penalty values for every $T$.
 
-\paragraph{Results.}  In Figure~\ref{fig:app-ablation-T}, the seven values of $T$ yield similar curves: on Crime the curves overlap, and on Adult and ACSIncome the differences between them lie within one standard deviation over the seeds and show no trend in $T$.  Within the evaluated range of $T$, the results are therefore insensitive to the number of starting points of the search.
-
-\begin{figure}[!htb]
+\begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{appendix/figAB_T.pdf}
-  \caption{Prediction performance against the prediction-level disparity (top) and the worst-case downstream disparity over $\mathcal{F}_1$ (bottom) for supIPM-FRL trained at $T\in\{5,10,15,17,20,25,30\}$, on Adult (left), Crime (middle) and ACSIncome (right).}
+  \includegraphics[width=0.78\textwidth]{appendix/figAB_T.pdf}
+  \caption{Prediction performance against the prediction-level disparity and the worst-case downstream disparity over $\mathcal{F}_1$ for supIPM-FRL trained at $T\in\{5,10,15,17,20,25,30\}$.}
   \label{fig:app-ablation-T}
 \end{figure}
-\FloatBarrier
+
+\paragraph{Results.}  In Figure~\ref{fig:app-ablation-T}, the seven values of $T$ yield similar curves: on Crime the curves overlap, and on Adult and ACSIncome the differences between them lie within one standard deviation over the seeds and show no trend in $T$.  Within the evaluated range of $T$, the results are therefore insensitive to the number of starting points of the search.
 
 \end{document}
 
