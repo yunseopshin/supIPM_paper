@@ -563,7 +563,7 @@ over $h$.
 
 % This section evaluates supIPM-FRL on simulated data, where the location $s_0$ of the dependence on $S$ is known, and on three tabular datasets, where we compare it with existing baselines.
 This section evaluates supIPM-FRL on simulated data and on three tabular datasets.
-Appendices~\ref{app:synth-experiments} and~\ref{app:real-experiments} give the experimental details and further results, and Appendix~\ref{app:ablation-studies} the ablation studies.
+Experimental details are given in Appendices~\ref{app:synth-experiments} and~\ref{app:real-experiments}.
 
 \paragraph{Measures.}  Prediction performance is measured by the test accuracy for classification and the test $1-\mathrm{MAE}$ for regression.  Fairness violation of a prediction head $f$ on the representation $\mathbf{Z}=h_{\phi}(\mathbf{X})$ is measured through the disparity $\Delta_{f}(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$ at each sensitive value $s$.
 % whose supremum over $s$ is $\operatorname{GDP}_{\infty}(f\circ h)$ of (\ref{eq:linfty-gdp}).
@@ -596,18 +596,31 @@ over $\lVert\mathbf{w}\rVert_2\le c$ and $b\in\mathbb{R}$, with $\lambda_h=10^{3
 % $S$ is uniform on an interval; the outcome $Y$ and one input variable depend on $S$ through a term concentrated near a value $s_0$, so that this dependence is confined to a set of small $\mathbb{P}_S$-probability, and $Y$ and a second input variable also depend on $S$ linearly; the generating equations are given in Appendix~\ref{app:synth-experiments}.
 % With $S$ uniformly distributed on an interval, the outcome $Y$ and one input variable depend on $S$ through a term localized near $s_0$ in a region of small $\mathbb{P}_S$-probability.
 % The outcome $Y$ and a second input variable also depend linearly on $S$, with the full data-generating process specified in Appendix~\ref{app:synth-experiments}.
-We draw $S\sim\mathrm{Uniform}(0,1)$, $\mathbf{X}_{\mathrm{task}}\sim N(\mathbf{0},\mathbf{I}_4)$, $\mathbf{X}_{\mathrm{noise}}\sim N(\mathbf{0},\mathbf{I}_3)$ and $\varepsilon_1,\varepsilon_2\sim N(0,1)$, all mutually independent, and set
-\begin{equation*}
-  X_{\mathrm{loc}}:=3\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}+0.5\,\varepsilon_1,
-  \qquad
-  Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}}+0.3\,\varepsilon_2\right),
-\end{equation*}
-with $s_0=0.5$, $\tau=0.043$ and a fixed $\mathbf{u}\in\mathbb{R}^4$.  The input is $\mathbf{X}:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{loc}},\mathbf{X}_{\mathrm{noise}})$.
-% Thus $\mathbf{X}$ depends on $S$ only through $X_{\mathrm{loc}}$, which is shifted only for $S$ near $s_0$, and $Y$ does not depend on $S$.
-% A representation that depends on $X_{\mathrm{loc}}$ therefore differs from its marginal distribution mainly for $S$ near $s_0$.
-The value of $\mathbf{u}$, the sample sizes and the training settings are given in Appendix~\ref{app:synth-experiments}.
-We compare supIPM-FRL with FREM by varying the penalty parameter $\lambda$ of their training objectives, (\ref{eq:supipm-penalized-objective}) and (\ref{eq:frem-objective}) respectively, and measure fairness violation by the worst-case downstream disparity over $\mathcal{F}_1$.
+% We draw $S\sim\mathrm{Uniform}(0,1)$, $\mathbf{X}_{\mathrm{task}}\sim N(\mathbf{0},\mathbf{I}_4)$, $\mathbf{X}_{\mathrm{noise}}\sim N(\mathbf{0},\mathbf{I}_3)$ and $\varepsilon_1,\varepsilon_2\sim N(0,1)$, all mutually independent, and set
+% \begin{equation*}
+%   X_{\mathrm{loc}}:=3\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}+0.5\,\varepsilon_1,
+%   \qquad
+%   Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}}+0.3\,\varepsilon_2\right),
+% \end{equation*}
+% with $s_0=0.5$, $\tau=0.043$ and a fixed $\mathbf{u}\in\mathbb{R}^4$.  The input is $\mathbf{X}:=(\mathbf{X}_{\mathrm{task}},X_{\mathrm{loc}},\mathbf{X}_{\mathrm{noise}})$.
+% % Thus $\mathbf{X}$ depends on $S$ only through $X_{\mathrm{loc}}$, which is shifted only for $S$ near $s_0$, and $Y$ does not depend on $S$.
+% % A representation that depends on $X_{\mathrm{loc}}$ therefore differs from its marginal distribution mainly for $S$ near $s_0$.
+% The value of $\mathbf{u}$, the sample sizes and the training settings are given in Appendix~\ref{app:synth-experiments}.
+% We compare supIPM-FRL with FREM by varying the penalty parameter $\lambda$ of their training objectives, (\ref{eq:supipm-penalized-objective}) and (\ref{eq:frem-objective}) respectively, and measure fairness violation by the worst-case downstream disparity over $\mathcal{F}_1$.
 % Each curve joins the configurations in increasing order of the penalty parameter.
+We generate an input $\mathbf{X}:=(\mathbf{X}_{\mathrm{task}},\mathbf{X}_{\mathrm{noise}},S)$ and an outcome $Y$ as follows.
+We independently draw $S\sim\mathrm{Uniform}(0,1)$, $\mathbf{X}_{\mathrm{task}}\sim N(\mathbf{0},\mathbf{I}_4)$, $\mathbf{X}_{\mathrm{noise}}\sim N(\mathbf{0},\mathbf{I}_3)$ and $\varepsilon_1,\varepsilon_2\sim N(0,1)$, and set
+\begin{equation*}
+X_{\mathrm{loc}}:=3\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}+0.5\,\varepsilon_1,
+\qquad
+Y:=\sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}}+0.3\,\varepsilon_2\right),
+\end{equation*}
+where $s_0=0.5$, $\tau=0.043$ and $\mathbf{u}\in\mathbb{R}^4$ is given.
+Since $S$ affects $Y$ only near $s_0$, the worst-case fairness violation can occur near $s_0$, even though only a small proportion of observations fall in this narrow interval.
+We compare supIPM-FRL with FREM by varying $\lambda$ in (\ref{eq:frem-objective}) and (\ref{eq:supipm-penalized-objective}), respectively, and measure fairness violation by the worst-case downstream disparity over $\mathcal{F}_1$.
+Details are provided in Appendix~\ref{app:synth-experiments}.
+
+
 
 \begin{figure}[!h]
   \centering
@@ -619,12 +632,16 @@ We compare supIPM-FRL with FREM by varying the penalty parameter $\lambda$ of th
 \paragraph{Results.}  In the left panel of Figure~\ref{fig:simulation}, supIPM-FRL attains a lower worst-case downstream disparity than FREM.
 % Because $Y$ does not depend on $S$, the dependence near $s_0$ can be removed without giving up prediction performance, and the left panel shows that supIPM-FRL does remove it: its curve runs horizontally before it turns downward. The right panel shows what each penalty leaves behind.
 % For each method, the circled point is the model with the smallest worst-case disparity among those that retain the performance of the model trained without a penalty.  
-The right panel shows $\widehat{\Delta}_{\hat{f}_1}(s)$ of models at the circled points of left panel. For FREM, it has a peak at $s_0$, whereas for supIPM-FRL, it is markedly smaller there.
-This is the limitation of averaging over the sensitive attribute shown in Figure~\ref{fig:motivation}. 
-Only a small proportion of the sensitive values lie in the narrow interval around $s_0$. Even a large discrepancy in this interval can have little effect on the EIPM in (\ref{eq:eipm}).
-Thus, reducing the EIPM need not make the conditional and marginal distributions close at every sensitive value.
-supIPM penalizes instead the largest discrepancy over $s$ in (\ref{eq:supipm}), which the right panel reflects near $s_0$.
-
+% The right panel shows $\widehat{\Delta}_{\hat{f}_1}(s)$ of models at the circled points of left panel. For FREM, it has a peak at $s_0$, whereas for supIPM-FRL, it is markedly smaller there.
+% This is the limitation of averaging over the sensitive attribute shown in Figure~\ref{fig:motivation}. 
+% Only a small proportion of the sensitive values lie in the narrow interval around $s_0$. Even a large discrepancy in this interval can have little effect on the EIPM in (\ref{eq:eipm}).
+% Thus, reducing the EIPM need not make the conditional and marginal distributions close at every sensitive value.
+% supIPM penalizes instead the largest discrepancy over $s$ in (\ref{eq:supipm}), which the right panel reflects near $s_0$.
+The right panel shows $\widehat{\Delta}_{\hat{f}_1}(s)$ of the models at the circled points in the left panel.
+For FREM, it has a peak at $s_0$, whereas for supIPM-FRL, it is markedly smaller there.
+This is the limitation of averaging the discrepancy over the sensitive attribute, shown in Figure~\ref{fig:motivation}. Since only a small proportion of the sensitive values lie in the narrow interval around $s_0$, even a large discrepancy in this interval has little effect on the EIPM in (\ref{eq:eipm}).
+% Thus, reducing the EIPM need not make the conditional and marginal distributions close at every sensitive value.
+In contrast, supIPM-FRL penalizes the largest discrepancy over $s$ in (\ref{eq:supipm}), and thus controls such a worst-case fairness violation.
 
 
 \subsection{Real data analysis}
@@ -729,9 +746,12 @@ The baselines do not directly control disparity at every sensitive value, so wor
 In contrast, supIPM-FRL controls the largest ReLU-IPM between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ over the sensitive domain, and Corollary~\ref{cor:certificate} bounds $\Delta_f(s)$ on $\mathcal{S}_n$ for every head $f$ of bounded H\"older norm in terms of the empirical supIPM.
 Figure~\ref{fig:profile-adult} plots $\widehat{\Delta}_{\hat{f}_1}(s)$ on Adult for supIPM-FRL and FREM at a test accuracy within $0.004$ of the model trained without a fairness penalty.
 % For each method, we take the setting with the smallest worst-case disparity among these settings.
-It is small over the whole sensitive domain for supIPM-FRL, whereas for FREM it is substantially larger over most of it.
+It is small over the whole sensitive domain for supIPM-FRL, whereas for FREM, it is substantially larger over most of it.
 
   % on Adult for the configurations with the smallest worst-case disparity among those whose test accuracy is within $0.004$ of the model trained without a penalty. the worst-case head of FREM attains a disparity many times larger than that of supIPM-FRL, whose disparity is small at every $s$.  Accordingly, the empirical supIPM on the test data in Appendix~\ref{app:real-measures} is smallest for supIPM-FRL on Adult and Crime at a matched level of prediction performance, although FREM attains a smaller value on ACSIncome.
+
+\subsection{Additional results and ablation studies}
+We compare the methods under five further fairness measures and on the graph datasets in Appendix \ref{app:real-additional}, and the computational cost of supIPM-FRL and FREM in Appendix \ref{app:real-cost}. Appendix \ref{app:ablation-studies} examines (i) the effects of the kernel $K$ in (\ref{eq:supipm-estimators}), (ii) the discriminator class $\mathcal{V}$ and (iii) the number $T$ of initial values of $s$.
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -743,10 +763,11 @@ It is small over the whole sensitive domain for supIPM-FRL, whereas for FREM it 
 % Two directions remain: extending supIPM to a multivariate or mixed sensitive attribute, for which the supremum ranges over a multidimensional domain, and finding a discriminator class that controls H\"older heads with an exponent closer to one than $\alpha_{d,\beta}$ in (\ref{eq:relu-holder}) while remaining computable.
 
 
-We proposed supIPM, which measures the worst-case fairness violation of a representation for a continuous sensitive attribute by the supremum over the sensitive domain of the IPM between the conditional and the marginal distributions, and supIPM-FRL, which uses the empirical supIPM as a fairness penalty.
-We established a uniform convergence rate of the empirical supIPM over a class of encoders and showed that it bounds the $\operatorname{GDP}_{\infty}$ of every prediction head of bounded H\"older norm over the interior region $\mathcal{S}_n$.
-With the ReLU discriminator class, supIPM-FRL admits a mini-batch formulation with unbiased gradients for fixed inner variables.
+We proposed supIPM, which measures the worst-case fairness violation of a representation for a continuous sensitive attribute. We then proposed supIPM-FRL, which uses the empirical supIPM as a fairness penalty.
+We established a uniform convergence rate of the empirical supIPM, which yields a bound of the $\operatorname{GDP}_{\infty}$ for every  H\"older smooth prediction head.
+% With the ReLU discriminator class, supIPM-FRL admits a mini-batch formulation with unbiased gradients for fixed inner variables.
 On simulated and real data, supIPM-FRL attains a markedly smaller worst-case downstream disparity than existing methods at comparable prediction performance.
+Future work includes extending supIPM to fairness criteria conditional on the outcome, such as equalized odds and equal opportunity.
 
 % Future work includes extending supIPM-FRL to multivariate sensitive attributes.
 % We also aim to support training when sensitive attributes are observed for only some samples.
@@ -1646,8 +1667,8 @@ where $\varepsilon_1,\varepsilon_2\sim N(0,1)$, and $S$, $\mathbf{X}_{\mathrm{ta
 The function $\omega$ is a Gaussian kernel centered at $s_0=0.5$.  Since $S$ is uniform on $[0,1]$, the interval $[s_0-\tau,\,s_0+\tau]$ has probability $2\tau=0.086$, so the dependence of $X_{\mathrm{loc}}$ on $S$ introduced through $\omega$ is concentrated in a small part of the sensitive domain.  Let $\mathbf{u}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function of Section~\ref{sec:experiments}.  The outcome and the input are
 \begin{equation}
 \begin{aligned}
-  Y &:= \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}}: + 0.3\,\varepsilon_2\right), \\
-  \mathbf{X} &:= (\mathbf{X}_{\mathrm{task}},\, X_{\mathrm{loc}},\, \mathbf{X}_{\mathrm{noise}}) \in \mathbb{R}^{8}.
+  Y &:= \sigma\!\left(\mathbf{u}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}} + 0.3\,\varepsilon_2\right), \\
+  \mathbf{X} &:= (\mathbf{X}_{\mathrm{task}},\, \, \mathbf{X}_{\mathrm{noise}}, S) \in \mathbb{R}^{8}.
 \end{aligned}
 \label{eq:synth-linear}
 \end{equation}
@@ -1968,7 +1989,7 @@ Figures~\ref{fig:app-graph-gdp-kernel} and~\ref{fig:app-graph-mi} compare the me
 \subsection{Computational Cost}
 \label{app:real-cost}
 
-Appendix~\ref{app:mini-batch} shows that, for fixed inner variables, the mini-batch objective of supIPM-FRL and its gradient are unbiased for their counterparts on the whole training sample.  The MMD penalty of FREM has no such mini-batch formulation \citep{lee2026fair}, so its penalty is defined on the whole training sample.  Table~\ref{tab:cost} compares the cost of one gradient step on Adult for supIPM-FRL with a mini-batch and for FREM and sup-MMD with a single batch of $32{,}561$ observations, where sup-MMD is the variant of Appendix~\ref{app:ablation-ipm-class} with the MMD in place of the ReLU discriminators.
+Appendix~\ref{app:mini-batch} shows that, for fixed inner variables, the mini-batch objective of supIPM-FRL and its gradient are unbiased for their counterparts on the whole training sample.  The MMD penalty of FREM has no such mini-batch formulation \citep{lee2026fair}, so its penalty is defined on the whole training sample.  Table~\ref{tab:cost} compares the cost of one gradient step on Adult for supIPM-FRL with a mini-batch and for FREM and supMMD-FRL with a single batch of $32{,}561$ observations, where supMMD-FRL replaces the ReLU-IPM in supIPM-FRL by the MMD.
 
 \begin{table}[H]
 \centering
@@ -1981,12 +2002,12 @@ Method & learning & seconds & peak memory (MB) \\
 \midrule
 supIPM-FRL & mini-batch ($1{,}024$) & 0.086 & 33 \\
 FREM       & batch ($32{,}561$) & \multicolumn{2}{c}{out of memory} \\
-sup-MMD    & batch ($32{,}561$) & \multicolumn{2}{c}{out of memory} \\
+supMMD-FRL    & batch ($32{,}561$) & \multicolumn{2}{c}{out of memory} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The MMD evaluates the kernel at every pair of representations, so its cost grows quadratically with the number of observations, and on the whole training sample it exceeds the $24$ GB of the GPU.  FREM and sup-MMD are therefore trained with mini-batches, whose penalty is biased for the penalty on the whole sample, as noted in Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} reports the time and the peak memory per step as the mini-batch grows, and the cross marks the first size that exceeds the memory of the GPU.  FREM already needs $8.5$ GB at $1{,}024$ observations.  The memory of supIPM-FRL grows linearly and the whole training sample takes $129$ MB, while its time per step is almost the same as with the mini-batch.
+The MMD evaluates the kernel at every pair of representations, so its cost grows quadratically with the number of observations, and on the whole training sample it exceeds the $24$ GB of the GPU.  FREM and supMMD-FRL are therefore trained with mini-batches, whose penalty is biased for the penalty on the whole sample, as noted in Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} reports the time and the peak memory per step as the mini-batch grows, and the cross marks the first size that exceeds the memory of the GPU.  FREM already needs $8.5$ GB at $1{,}024$ observations.  The memory of supIPM-FRL grows linearly and the whole training sample takes $129$ MB, while its time per step is almost the same as with the mini-batch.
 
 \begin{figure}[H]
   \centering
@@ -2000,7 +2021,7 @@ The linear cost of supIPM-FRL, together with the unbiased mini-batch gradients o
 \section{Ablation Studies}
 \label{app:ablation-studies}
 
-This appendix examines three choices in the penalty of supIPM-FRL on the tabular datasets: the kernel in estimator of distribution, the class of the discriminators and the number $T$ of candidate sensitive values. 
+This appendix examines three choices in the supIPM-FRL on the tabular datasets: the kernel in estimator of distribution, the class of the discriminators and the number $T$ of candidate sensitive values. 
 % Section~\ref{sec:exp-real} uses the Gaussian kernel, the ReLU class $\mathcal{V}_{\mathrm{R}}$ and $T=17$. 
 Each ablation varies one choice and keeps the architecture and the training settings of Appendix~\ref{app:real-settings} and the measures of Appendix~\ref{app:worst-case} unchanged, except that the penalty values are chosen separately for each discriminator class in Appendix~\ref{app:ablation-ipm-class}.  In each figure the columns are Adult, Crime and ACSIncome from left to right, the top row reports the prediction-level disparity and the bottom row the worst-case downstream disparity over $\mathcal{F}_1$.
 
@@ -2037,7 +2058,8 @@ The kernel $K_{\gamma}$ of (\ref{eq:supipm-estimators}) determines how the sensi
 \subsection{IPM Class}
 \label{app:ablation-ipm-class}
 
-The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in (\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  We replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of (\ref{eq:relu-class}) by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ used by sIPM-LFR \citep{kim2022learning} and by the unit ball of the Gaussian RKHS, whose IPM is the MMD used by FREM \citep{kong2025fair}. Appendix~\ref{app:real-cost} refers to the latter variant as sup-MMD.  Both variants retain the supremum over $s$, which the baselines sIPM-LFR and FREM do not. 
+The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in (\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  We replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of (\ref{eq:relu-class}) by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ used by sIPM-LFR \citep{kim2022learning} and by the unit ball of the Gaussian RKHS, whose IPM is the MMD used by FREM \citep{kong2025fair}. 
+% Appendix~\ref{app:real-cost} refers to the latter variant as sup-MMD.  Both variants retain the supremum over $s$, which the baselines sIPM-LFR and FREM do not. 
 % The grid of penalty values is chosen separately for each class, since the three IPMs are not on a common scale, and the classes are compared at comparable prediction performance.
 
 \begin{figure}[H]
