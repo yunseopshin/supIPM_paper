@@ -367,11 +367,15 @@ that $\operatorname{GDP}_{\infty}(f\circ h)$ for a H\"{o}lder smooth $f$ is boun
 under regularity conditions.
 
  % The H\"older-IPM cannot be computed directly, so we take $\mathcal{V}=\mathcal{V}_{\mathrm{R}}$, the ReLU discriminator class of Section~\ref{sec:relu-ipm}, for which the inner IPM in (\ref{eq:supipm}) is the ReLU-IPM.  
-The ReLU-IPM is better than MMD from computational point of view.  
+ReLU-IPM has several advantages for supIPM compared to MMD. 
 Computing supIPM with MMD requires $O(n^2)$ computation at each update.
-In contrast, $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ only needs $O(n)$ computation at each update.
+In contrast, $\operatorname{supIPM}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)$ only requires $O(n)$ computation at each update
+even though adversarial training is needed.
 Moreover, a mini-batch learning is not possible for supIPM with MMD \citep{lee2026fair}, and thus  
-$O(n^2)$ memory is required. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM-FRL with the ReLU-IPM admits a mini-batch learning.
+$O(n^2)$ memory is required. In contrast, we show in Appendix~\ref{app:mini-batch} that supIPM with the ReLU-IPM admits a mini-batch learning.
+
+Theoretically, the class of discriminators for ReLU-IPM is much larger that that of MMD, Thus, controlling supIPM with $\operatorname{IPM}_{\mathcal{V}_{\mathrm{R}}}$
+can guarantee the level of fairness violation for large class of prediction heads. Empirical studies in Section \ref{sec:experiments} confirm this advantage.
 
 \subsection{Estimation of supIPM}
 \label{sec:supipm-estimation}
@@ -585,7 +589,7 @@ are defined in Appendix~\ref{app:worst-case}.
   \widehat{\operatorname{GDP}}_{\infty}(f_{\mathbf{w},b}\circ h_\phi)
   \label{eq:worst-case-estimate}
 \end{equation}
-over $\lVert\mathbf{w}\rVert_2\le c$ and $b\in\mathbb{R}$, with $\lambda_h=10^{3}$ so that the disparity term dominates.  The minimizer $\hat{f}_c$ approximates the head attaining the supremum in Equation~(\ref{eq:worst-case-gdp}), and the worst-case disparity is estimated on the test data by $\widehat{\operatorname{GDP}}_{\infty}(h_\phi;\mathcal{F}_c):=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h_\phi)$.
+over $\lVert\mathbf{w}\rVert_2\le c$ and $b\in\mathbb{R}$, with $\lambda_h=10^{3}$ so that the fairness regularization term dominates.  The minimizer $\hat{f}_c$ approximates the head attaining the supremum in Equation~(\ref{eq:worst-case-gdp}), and the worst-case disparity is estimated by $\widehat{\operatorname{GDP}}_{\infty}(h_\phi;\mathcal{F}_c):=\widehat{\operatorname{GDP}}_{\infty}(\hat{f}_c\circ h_\phi)$.
 
 \subsection{Simulation study}
 \label{sec:exp-simulation}
@@ -660,7 +664,8 @@ All methods share the architecture of Appendix~\ref{app:real-settings} and are t
 Figure~\ref{fig:adult} shows the prediction-level disparity and Figure~\ref{fig:worst-case} the worst-case downstream disparity over $\mathcal{F}_1$ on the three datasets.
 % the results with $S$ discretized at its mean and the worst-case curves over $\mathcal{F}_4$ and $\mathcal{F}_8$ are given in Appendix~\ref{app:real-tabular}.  
 At the prediction level, supIPM-FRL is comparable to the other methods.  Under the worst-case downstream disparity, supIPM-FRL attains a markedly smaller disparity than every other method at the same prediction performance on all three datasets.  
-Table~\ref{tab:matched-adult} shows the methods on Adult at a common test accuracy, chosen as described in Appendix~\ref{app:real-additional}, where the worst-case disparity of supIPM-FRL is smaller than that of every baseline.
+Table~\ref{tab:matched-adult} compares prediction-level and worst-case disparities on Adult at test accuracy $0.838$--$0.846$, following the procedure described in Appendix~\ref{app:real-additional}.
+supIPM-FRL achieves lower worst-case disparity than every baseline.
 % , where the methods that use $S$ directly coincide with it.
 
 \begin{figure}[!htb]
@@ -676,14 +681,14 @@ Table~\ref{tab:matched-adult} shows the methods on Adult at a common test accura
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
-\caption{The two disparities on Adult at test accuracy $0.842$.}
+\caption{Prediction-level and worst-case disparities on Adult.}
 \label{tab:matched-adult}
 \begin{tabular}{lrrrrrrrr}
 \toprule
  & supIPM-FRL & FREM & Reg-GDP & Reg-HGR & ADV & LAFTR & MMD & sIPM-LFR \\
 \midrule
 prediction-level & $\mathbf{0.0350}$ & 0.0529 & 0.0639 & 0.0706 & 0.0855 & 0.0822 & 0.0541 & 0.0601 \\
-worst-case ($c=1$) & $\mathbf{0.0014}$ & 0.0086 & 0.0339 & 0.0192 & 0.0388 & 0.0403 & 0.0186 & 0.0197 \\
+worst-case & $\mathbf{0.0014}$ & 0.0086 & 0.0339 & 0.0192 & 0.0388 & 0.0403 & 0.0186 & 0.0197 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -704,8 +709,11 @@ Another downstream head can exploit that dependence, which raises the worst-case
   \vspace{-10pt}
 \end{wrapfigure}
 
-In contrast, supIPM-FRL controls the largest ReLU-IPM between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ over the sensitive domain, and Corollary~\ref{cor:certificate} bounds $\Delta_f(s)$ at every $s$ in the interior region $\mathcal{S}_n$ for every head $f$ of bounded H\"older norm in terms of the empirical supIPM.
-Figure~\ref{fig:profile-adult} shows $\widehat{\Delta}_{\hat{f}_1}(s)$ of supIPM-FRL and FREM on Adult. We consider settings with test accuracy within $0.004$ of the baseline accuracy at $\lambda=0$. For each method, we take the setting with the smallest worst-case disparity among these settings. At comparable test accuracy, $\widehat{\Delta}_{\hat{f}_1}(s)$ of supIPM-FRL is small across the sensitive domain, whereas that of FREM is substantially larger.
+In contrast, supIPM-FRL controls the largest ReLU-IPM between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ over the sensitive domain.
+Therefore, The disparity $\Delta_f(s)$ is controlled over all sensitive domain $\mathcal{S}$ for every H\"older smooth prediction head $f$. 
+Figure~\ref{fig:profile-adult} shows $\widehat{\Delta}_{\hat{f}_1}(s)$ of supIPM-FRL and FREM on Adult. We consider settings with test accuracy within $0.004$ of the baseline accuracy at $\lambda=0$. 
+% For each method, we take the setting with the smallest worst-case disparity among these settings.
+At comparable test accuracy, $\widehat{\Delta}_{\hat{f}_1}(s)$ of supIPM-FRL is small across the sensitive domain, whereas that of FREM is substantially larger.
   
   % on Adult for the configurations with the smallest worst-case disparity among those whose test accuracy is within $0.004$ of the model trained without a penalty. the worst-case head of FREM attains a disparity many times larger than that of supIPM-FRL, whose disparity is small at every $s$.  Accordingly, the empirical supIPM on the test data in Appendix~\ref{app:real-measures} is smallest for supIPM-FRL on Adult and Crime at a matched level of prediction performance, although FREM attains a smaller value on ACSIncome.
 
@@ -1771,7 +1779,7 @@ This subsection collects the results omitted from Section~\ref{sec:exp-real}.  O
 
 \paragraph{Prediction-level disparity.}
 \label{app:real-tabular}
-Figure~\ref{fig:app-prediction-level} repeats the comparison of Figure~\ref{fig:adult} on the three tabular datasets.  On Crime and ACSIncome, supIPM-FRL, FREM and Reg-GDP have nearly the same curve, and the binary-$S$ methods are close to them.  As on Adult, the prediction-level disparity separates the methods little.
+Figure~\ref{fig:app-prediction-level} repeats the comparison of Figure~\ref{fig:adult} on the three tabular datasets.  On Crime and ACSIncome, supIPM-FRL, FREM and Reg-GDP have nearly the same curve, and the binary-$S$ methods are close to them. 
 
 \begin{figure}[!htb]
   \centering
@@ -1783,7 +1791,7 @@ Figure~\ref{fig:app-prediction-level} repeats the comparison of Figure~\ref{fig:
 \end{figure}
 
 \paragraph{Worst-case downstream disparity.}
-Figure~\ref{fig:app-c1} repeats the comparison of Figure~\ref{fig:worst-case} on the same datasets.  At a matched level of prediction performance, supIPM-FRL attains the lowest worst-case disparity on the three datasets, and the methods that coincide at the prediction level separate here.  The supremum over $s$ and over the discriminators constrains the representation at every sensitive value, whereas an average over $S$, or a penalty on the fitted head, leaves a dependence on $S$ that another head can exploit.
+Figure~\ref{fig:app-c1} repeats the comparison of Figure~\ref{fig:worst-case} on the same datasets.  At a matched level of prediction performance, supIPM-FRL attains the lowest worst-case disparity on the three datasets.  The supremum over $s$ and over the discriminators constrains the representation at every sensitive value, whereas an average over $S$, or a penalty on the fitted head, leaves a dependence on $S$ that another head can exploit.
 
 \begin{figure}[!htb]
   \centering
@@ -1814,11 +1822,11 @@ Figure~\ref{fig:app-c1} repeats the comparison of Figure~\ref{fig:worst-case} on
   \label{fig:app-c8}
 \end{figure}
 
-\paragraph{Two-layer heads.}  The heads of $\mathcal{F}_c$ are linear in the representation.  Writing
+\paragraph{Two-layer mlp heads.}  We denote
 \begin{equation*}
   \mathcal{F}'_c:=\bigl\{\sigma(\mathbf{w}_2^{\top}\operatorname{relu}(\mathbf{W}_1\mathbf{z}+\mathbf{b}_1)+b_2):\ \lVert\mathbf{W}_1\rVert_2\le1,\ \lVert\mathbf{w}_2\rVert_2\le c\bigr\}
 \end{equation*}
-for the two-layer heads of the same Lipschitz bound, we repeat the comparison over $\mathcal{F}'_1$ in Figure~\ref{fig:app-mlp-head}; the heads are fitted as in Appendix~\ref{app:worst-case} with $16$ hidden units, projecting $\mathbf{W}_1$ onto the spectral-norm ball and $\mathbf{w}_2$ onto the ball of radius $c$ after every step.  At a matched level of prediction performance, the values over $\mathcal{F}'_1$ are close to those over $\mathcal{F}_1$, the ordering is the one of Section~\ref{sec:exp-real} on the three datasets, and supIPM-FRL remains the lowest, so the comparison does not rest on the heads being linear.
+for the two-layer mlp heads of the same Lipschitz bound, we repeat the comparison over $\mathcal{F}'_1$ in Figure~\ref{fig:app-mlp-head}; the heads are fitted as in Appendix~\ref{app:worst-case} with $16$ hidden units, projecting $\mathbf{W}_1$ onto the spectral-norm ball and $\mathbf{w}_2$ onto the ball of radius $c$ after every step.  At a matched level of prediction performance, the values over $\mathcal{F}'_1$ are close to those over $\mathcal{F}_1$.
 
 \begin{figure}[!htb]
   \centering
@@ -1831,7 +1839,7 @@ for the two-layer heads of the same Lipschitz bound, we repeat the comparison ov
 
 \paragraph{Matched prediction performance.}
 \label{app:real-matched}
-Table~\ref{tab:matched} fixes one level of prediction performance per tabular dataset and compares the methods there.  An entry is the smallest disparity among the configurations of that method whose prediction performance lies within $0.004$ of the level, a dash marks a method with no such configuration, and the smallest value in each row is in bold.  supIPM-FRL attains the smallest value in every row except the prediction-level disparity on Crime, where Reg-HGR is smaller by $0.001$.  Under the worst-case disparity its value is at least three times smaller than that of every baseline on the three datasets.
+Table~\ref{tab:matched} fixes one level of prediction performance per tabular dataset and compares the methods there.  An entry is the smallest disparity among the configurations of that method whose prediction performance lies within $0.004$ of the level, a dash marks a method with no such configuration, and the smallest value in each row is in bold.  supIPM-FRL attains the smallest value in every row except the prediction-level disparity on Crime.  Under the worst-case disparity its value is at least three times smaller than that of every baseline on the three datasets.
 
 \begin{table}[!htbp]
 \centering
@@ -1952,7 +1960,7 @@ Appendix~\ref{app:mini-batch} shows that supIPM-FRL admits mini-batch learning w
 \begin{table}[H]
 \centering
 \footnotesize
-\caption{One gradient step on Adult.}
+\caption{Computational cost on Adult.}
 \label{tab:cost}
 \begin{tabular}{llrr}
 \toprule
@@ -1970,7 +1978,7 @@ The MMD evaluates the kernel at every pair of representations, so its cost grows
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.92\textwidth]{appendix/figAC_cost.pdf}
-  \caption{One gradient step on Adult as the mini-batch grows.  The cross marks the first size that exceeds the memory of the GPU.}
+  \caption{Computational cost on Adult as the mini-batch grows.}
   \label{fig:cost}
 \end{figure}
 
@@ -1979,7 +1987,9 @@ The linear cost of supIPM-FRL, together with the unbiased mini-batch gradients o
 \section{Ablation Studies}
 \label{app:ablation-studies}
 
-This appendix examines three choices in the penalty of supIPM-FRL on the tabular datasets: the shape of the smoothing kernel, the class of the discriminators and the number $T$ of candidate sensitive values.  Section~\ref{sec:exp-real} uses the Gaussian kernel, the ReLU class $\mathcal{V}_{\mathrm{R}}$ and $T=17$.  Each ablation varies one choice, holds every other setting of Appendix~\ref{app:real-settings} fixed, and leaves the measures of Appendix~\ref{app:worst-case} unchanged.  In each figure the columns are the datasets, the top row reports the prediction-level disparity and the bottom row the worst-case downstream disparity over $\mathcal{F}_1$.
+This appendix examines three choices in the penalty of supIPM-FRL on the tabular datasets: the shape of the smoothing kernel, the class of the discriminators and the number $T$ of candidate sensitive values. 
+% Section~\ref{sec:exp-real} uses the Gaussian kernel, the ReLU class $\mathcal{V}_{\mathrm{R}}$ and $T=17$. 
+Each ablation varies one choice, holds every other setting of Appendix~\ref{app:real-settings} fixed, and leaves the measures of Appendix~\ref{app:worst-case} unchanged.  In each figure the columns are the datasets, the top row reports the prediction-level disparity and the bottom row the worst-case downstream disparity over $\mathcal{F}_1$.
 
 % The bandwidth ablation is commented out for now.
 % \subsection{Bandwidth}
