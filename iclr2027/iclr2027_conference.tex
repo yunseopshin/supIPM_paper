@@ -2027,7 +2027,7 @@ Figures~\ref{fig:app-graph-gdp-kernel} and~\ref{fig:app-graph-mi} compare the me
 \subsection{Computational Cost}
 \label{app:real-cost}
 
-Appendix~\ref{app:mini-batch} shows that, for fixed inner variables, the mini-batch objective of $\mathrm{FR}_{\sup}$ and its gradient are unbiased for their counterparts on the whole training sample.  The MMD penalty of FREM is biased on mini-batches, so it should, in principle, be computed on the whole training sample. Table~\ref{tab:cost} compares the cost of one gradient step on Adult for $\mathrm{FR}_{\sup}$ with a mini-batch and for FREM and supMMD-FRL with a single batch of $32{,}561$ observations, where supMMD-FRL replaces the ReLU-IPM in $\mathrm{FR}_{\sup}$ by the MMD.
+Appendix~\ref{app:mini-batch} shows that, for fixed inner variables, the mini-batch objective of $\mathrm{FR}_{\sup}$ and its gradient are unbiased for their counterparts on the whole training sample.  The MMD penalty of FREM is biased on mini-batches, so it should, in principle, be computed on the whole training sample. Table~\ref{tab:cost} compares the cost of one gradient step on Adult for $\mathrm{FR}_{\sup}$ with a mini-batch and for FREM and $\mathrm{FR}_{\sup\mathrm{MMD}}$ with a single batch of $32{,}561$ observations, where $\mathrm{FR}_{\sup\mathrm{MMD}}$ denotes the variant of $\mathrm{FR}_{\sup}$ in which the ReLU-IPM is replaced by the MMD.
 
 \begin{table}[H]
 \centering
@@ -2040,12 +2040,12 @@ Method & learning & seconds & peak memory (MB) \\
 \midrule
 $\mathrm{FR}_{\sup}$ & mini-batch ($1{,}024$) & 0.086 & 33 \\
 FREM       & batch ($32{,}561$) & \multicolumn{2}{c}{out of memory} \\
-supMMD-FRL    & batch ($32{,}561$) & \multicolumn{2}{c}{out of memory} \\
+$\mathrm{FR}_{\sup\mathrm{MMD}}$ & batch ($32{,}561$) & \multicolumn{2}{c}{out of memory} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The MMD evaluates the kernel at every pair of representations, so its cost grows quadratically with the number of observations, and on the whole training sample it exceeds the $24$ GB of the GPU.  FREM and supMMD-FRL are therefore trained with mini-batches, whose penalty is biased for the penalty on the whole sample, as noted in Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} reports the time and the peak memory per step as the mini-batch grows, and the cross marks the first size that exceeds the memory of the GPU.  FREM already needs $8.5$ GB at $1{,}024$ observations.  The memory of $\mathrm{FR}_{\sup}$ grows linearly and the whole training sample takes $129$ MB, while its time per step is almost the same as with the mini-batch.
+The MMD evaluates the kernel at every pair of representations, so its cost grows quadratically with the number of observations, and on the whole training sample it exceeds the $24$ GB of the GPU.  FREM and $\mathrm{FR}_{\sup\mathrm{MMD}}$ are therefore trained with mini-batches, whose penalty is biased for the penalty on the whole sample, as noted in Appendix~\ref{app:mini-batch}.  Figure~\ref{fig:cost} reports the time and the peak memory per step as the mini-batch grows, and the cross marks the first size that exceeds the memory of the GPU.  FREM already needs $8.5$ GB at $1{,}024$ observations.  The memory of $\mathrm{FR}_{\sup}$ grows linearly and the whole training sample takes $129$ MB, while its time per step is almost the same as with the mini-batch.
 
 \begin{figure}[H]
   \centering
@@ -2059,7 +2059,7 @@ The linear cost of $\mathrm{FR}_{\sup}$, together with the unbiased mini-batch g
 \subsection{Effect of IPM class}
 \label{app:ablation-ipm-class}
 
-The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in (\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  To examine its effect on $\mathrm{FR}_{\sup}$, we replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of (\ref{eq:relu-class}) either by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ of sIPM-LFR \citep{kim2022learning} or by the unit ball of the Gaussian RKHS, whose IPM is the MMD used by FREM \citep{kong2025fair}.  Both variants retain the supremum over $s$ in (\ref{eq:supipm}) and differ from $\mathrm{FR}_{\sup}$ only in the discriminator class, whereas sIPM-LFR and FREM do not take this supremum.  We write $\mathrm{FR}_{\sup\mathrm{MMD}}$ for the variant with the MMD; Appendix~\ref{app:real-cost} denotes the same variant by supMMD-FRL.  The architecture, the training settings of Appendix~\ref{app:real-settings} and the measures of Appendix~\ref{app:worst-case} are unchanged, and the penalty values are chosen separately for each discriminator class.
+The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in (\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  To examine its effect on $\mathrm{FR}_{\sup}$, we replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of (\ref{eq:relu-class}) either by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ of sIPM-LFR \citep{kim2022learning} or by the unit ball of the Gaussian RKHS, whose IPM is the MMD used by FREM \citep{kong2025fair}; the latter variant is $\mathrm{FR}_{\sup\mathrm{MMD}}$ of Appendix~\ref{app:real-cost}.  Both variants retain the supremum over $s$ in (\ref{eq:supipm}) and differ from $\mathrm{FR}_{\sup}$ only in the discriminator class, whereas sIPM-LFR and FREM do not take this supremum.  The architecture, the training settings of Appendix~\ref{app:real-settings} and the measures of Appendix~\ref{app:worst-case} are unchanged, and the penalty values are chosen separately for each discriminator class.
 % Appendix~\ref{app:real-cost} refers to the latter variant as sup-MMD.  Both variants retain the supremum over $s$, which the baselines sIPM-LFR and FREM do not. 
 % The grid of penalty values is chosen separately for each class, since the three IPMs are not on a common scale, and the classes are compared at comparable prediction performance.
 
@@ -2075,7 +2075,7 @@ Figure~\ref{fig:app-ablation-ipm-class} compares the three classes on the tabula
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.78\textwidth]{appendix/app_Delta(S)_adult.png}
-  \caption{Left: test accuracy against $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$ on Adult for $\mathrm{FR}_{\sup}$, FREM and $\mathrm{FR}_{\sup\mathrm{MMD}}$ (sup-MMD in the legend).  Right: $\widehat{\Delta}_{\hat{f}_1}(s)$ for the three models circled in the left panel, chosen at matched test accuracy.}
+  \caption{Left: test accuracy against $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$ on Adult for $\mathrm{FR}_{\sup}$, FREM and $\mathrm{FR}_{\sup\mathrm{MMD}}$.  Right: $\widehat{\Delta}_{\hat{f}_1}(s)$ for the three models circled in the left panel, chosen at matched test accuracy.}
   \label{fig:app-ablation-ipm-class-Delta}
 \end{figure}
 
