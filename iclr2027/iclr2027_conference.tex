@@ -142,7 +142,7 @@ For this purpose, we propose a measure for the worst-case fairness violation of 
 develop an algorithm to learn a representation while controlling  
 the worst-case fairness violation. Our proposed measure is the supremum of the IPM$_s$ with respect to $s,$
 where IPM$_s$ is the IPM between the distribution of a representation when the sensitive attribute $S$ is equal to $s$
-and the marginal distribution, which we call {\bf supIPM}.
+and the marginal distribution, which we call \emph{supIPM}.
 For the choice of IPM,
 we consider ReLU-IPM of \citet{park2026relu} since  
 computation of supIPM can be done without much hamper and the worst-case fairness violations for a large class
@@ -765,9 +765,9 @@ near the left boundary and $s \approx 0.52$.
 
 \begin{remark}
     \label{rem:sup-mmd}
-    Unlike the worst-case disparity shown in \ref{fig:simulation}, FREM exhibits high $\widehat{\Delta}_{\hat{f}_1}(s)$ across the sensitive domain in Figure~\ref{fig:profile-adult}.
+    Unlike the worst-case disparity shown in Figure \ref{fig:simulation}, FREM exhibits high $\widehat{\Delta}_{\hat{f}_1}(s)$ across the sensitive domain in Figure~\ref{fig:profile-adult}.
 A possible explanation is that the discriminator class of MMD used in FREM is smaller than that of ReLU-IPM, as discussed in Section~\ref{sec:discriminator-choice}.
-We further examine the effect of the discriminator class in Appendix~\ref{app:ablation-ipm-class}.
+We further examine the effect of the choice of a discriminator class in Appendix~\ref{app:ablation-ipm-class}.
 \end{remark}
 
 
