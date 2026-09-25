@@ -797,16 +797,23 @@ Future work includes extending supIPM to fairness criteria conditional on the ou
 
 \section*{AI Use Statement}
 
-In this work, we used generative AI tools to assist with writing and reviewing the manuscript, synthesizing and organizing experimental results, and searching for relevant literature and research materials.
-We reviewed and verified all AI-assisted content before including it in the paper.
-We take responsibility for the final content of this work, including text, claims, or artifacts produced with the aid of generative AI.
+In this work, we used generative AI tools to assist in the writing of proofs: the tools suggested intermediate steps and explicit constants for the proofs in Appendix~\ref{app:proofs}, which we checked line by line and rewrote where necessary.
+The definitions, the assumptions, the statements of Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate}, and the overall proof strategy are our own.
+We also used generative AI tools to edit the manuscript for readability and to draft parts of the text from our notes, and to identify and retrieve relevant literature; every cited work was read and checked against the original source by the authors.
+% The following paragraph lists AI-assisted tasks beyond the three items checked in the submission form; delete or edit it if it does not reflect the authors' use.
+In addition, we used generative AI tools to write and edit parts of the software that implements supFR and the experimental pipeline, to create the scientific figures from our experimental results, to obtain feedback on the design of the experiments, to formulate and verify auxiliary statements in the appendices, and to organize and interpret the experimental results.
+All code was reviewed and tested by the authors, every figure was checked against the underlying results, and every interpretation and auxiliary statement was verified by us.
+We have not used generative AI tools to generate data sets, to propose the research question or the hypotheses, to translate, or to clean or reformat data.
+We have reviewed all AI-assisted work and take responsibility for the final content of this work, including text, claims, and artifacts produced with the aid of generative AI.
 
 \section*{Reproducibility Statement}
 
-We provide the details needed to reproduce our method and experiments in the Appendix. 
-Appendix~\ref{app:mixture-em} provides the details of MoDGF, including its initialization, structured mean-field E-step, generalized M-step, and overall training algorithm. 
-Appendix~\ref{app:experimental-details} provides the experimental settings, including the datasets and evaluation metrics, model architectures, SGLD sampling procedure, baseline implementations, specialist inference methods, and OOD detection setup.
-Additional analyses of computational costs and the main design choices of MoDGF are provided in Appendices~\ref{app:computational-costs} and~\ref{app:ablation}, respectively.
+The assumptions and the complete proofs of Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate} are given in Appendix~\ref{app:proofs}.
+Appendix~\ref{app:algorithm} describes the optimization procedure of supFR, its mini-batch formulation, and the full training procedures in Algorithms~\ref{alg:supipm-frl} and~\ref{alg:supipm-frl-mb}.
+Appendix~\ref{app:synth-experiments} specifies the data-generating process and the training settings of the simulation study.
+Appendix~\ref{app:real-experiments} gives the datasets and their preprocessing, the architectures and training settings, the baselines and the ranges of their penalty parameters, and the definitions of all evaluation measures, including the estimation of the worst-case downstream disparity.
+Every reported point is the mean over five random seeds, with one standard deviation shown as error bars.
+The computational cost and the sensitivity of supFR to the discriminator class, the kernel, and the number of candidate sensitive values are reported in Appendices~\ref{app:real-cost}, \ref{app:ablation-ipm-class}, and~\ref{app:ablation-studies}.
 
 
 
