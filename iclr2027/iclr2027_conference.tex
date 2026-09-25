@@ -609,7 +609,7 @@ over $\lVert\mathbf{w}\rVert_2\le c$ and $b\in\mathbb{R}$, with $\lambda_h=10^{3
 % The value of $\boldsymbol{\upsilon}$, the sample sizes and the training settings are given in Appendix~\ref{app:synth-experiments}.
 % We compare supFR with FREM by varying the penalty parameter $\lambda$ of their training objectives, (\ref{eq:supipm-penalized-objective}) and (\ref{eq:frem-objective}) respectively, and measure fairness violation by the worst-case downstream disparity over $\mathcal{F}_1$.
 % Each curve joins the configurations in increasing order of the penalty parameter.
-We generate an input $\mathbf{X}:=(\mathbf{X}_{\mathrm{task}},\mathbf{X}_{\mathrm{noise}}, S+\varepsilon_{1})$ and an outcome $Y$ as follows.
+We generate an input $\mathbf{X}:=(\mathbf{X}_{\mathrm{task}},\mathbf{X}_{\mathrm{noise}},X_{\mathrm{loc}})$ and an outcome $Y$ as follows.
 We independently draw $S$ on $[0,1]$ with density
 $p(s) \propto 1-0.9\exp\{-(s-s_0)^2/(2\tau^2)\}$, $\mathbf{X}_{\mathrm{task}}\sim N(\mathbf{0},\mathbf{I}_4)$, $\mathbf{X}_{\mathrm{noise}}\sim N(\mathbf{0},\mathbf{I}_3)$ and $\varepsilon_1,\varepsilon_2, \varepsilon_{3}\sim N(0,1)$, and set
 \begin{equation*}
@@ -1712,7 +1712,7 @@ $[s_0-\tau,\,s_0+\tau]$ has probability approximately $0.022$, so the dependence
 \begin{equation}
 \begin{aligned}
   Y &:= \sigma\!\left(\boldsymbol{\upsilon}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}} + 0.3\,\varepsilon_3\right), \\
-  \mathbf{X} &:= (\mathbf{X}_{\mathrm{task}},\, \, \mathbf{X}_{\mathrm{noise}}, S+\varepsilon_1) \in \mathbb{R}^{8}.
+  \mathbf{X} &:= (\mathbf{X}_{\mathrm{task}},\, \, \mathbf{X}_{\mathrm{noise}}, X_{\mathrm{loc}}) \in \mathbb{R}^{8}.
 \end{aligned}
 \label{eq:synth-linear}
 \end{equation}
@@ -2030,7 +2030,7 @@ Figures~\ref{fig:app-graph-gdp-kernel} and~\ref{fig:app-graph-mi} compare the me
 \end{figure}
 
 
-\subsection{Computational Cost}
+\section{Computational Cost}
 \label{app:real-cost}
 
 Appendix~\ref{app:mini-batch} shows that, for fixed inner variables, the mini-batch objective of supFR and its gradient are unbiased for their counterparts on the whole training sample.  The MMD penalty of FREM is biased on mini-batches, so it should, in principle, be computed on the whole training sample. Table~\ref{tab:cost} compares the cost of one gradient step on Adult for supFR with a mini-batch and for FREM and $\mathrm{supFR}_{\mathrm{MMD}}$ with a single batch of $32{,}561$ observations, where $\mathrm{supFR}_{\mathrm{MMD}}$ denotes the variant of supFR in which the ReLU-IPM is replaced by the MMD.
@@ -2062,7 +2062,7 @@ The MMD evaluates the kernel at every pair of representations, so its cost grows
 
 The linear cost of supFR, together with the unbiased mini-batch gradients of Appendix~\ref{app:mini-batch}, is the main reason for the ReLU discriminators of Section~\ref{sec:discriminator-choice}.
 
-\subsection{Effect of IPM class}
+\section{Effect of IPM class}
 \label{app:ablation-ipm-class}
 
 The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in (\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  To examine its effect on supFR, we replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of (\ref{eq:relu-class}) either by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ of sIPM-LFR \citep{kim2022learning} or by the unit ball of the Gaussian RKHS, whose IPM is the MMD used by FREM \citep{kong2025fair}; the latter variant is $\mathrm{supFR}_{\mathrm{MMD}}$ of Appendix~\ref{app:real-cost}.  Both variants retain the supremum over $s$ in (\ref{eq:supipm}) and differ from supFR only in the discriminator class. The architecture, the training settings of Appendix~\ref{app:real-settings} and the measures of Appendix~\ref{app:worst-case} are unchanged, and the penalty values are chosen separately for each discriminator class.
@@ -2087,7 +2087,9 @@ Figure~\ref{fig:app-ablation-ipm-class} compares the three classes on the tabula
 
 \paragraph{Results.}  In Figure~\ref{fig:app-ablation-ipm-class}, the three discriminator classes yield similar prediction-level curves.  The ReLU and the sigmoid discriminators attain comparable worst-case downstream disparities, and their ordering varies with the dataset and with $\lambda$.  Both attain a markedly lower worst-case disparity than the MMD at comparable prediction performance on the three datasets.
 
-In the right panel of Figure~\ref{fig:app-ablation-ipm-class-Delta}, $\widehat{\Delta}_{\hat{f}_1}(s)$ of supFR is small over the whole sensitive domain, whereas that of $\mathrm{supFR}_{\mathrm{MMD}}$ is substantial near the left boundary and around $s\approx0.5$, with a profile close to that of FREM.  Since $\mathrm{supFR}_{\mathrm{MMD}}$ shares the discriminator class with FREM, this comparison suggests that the advantage of supFR over FREM in Figure~\ref{fig:profile-adult} is attributable largely to the ReLU discriminator class rather than to the replacement of the average by the supremum.  This observation is consistent with Section~\ref{sec:discriminator-choice}: the ReLU class controls the fairness violation of H\"older smooth prediction heads through (\ref{eq:relu-holder}), whereas the Gaussian RKHS unit ball contains only infinitely differentiable functions.  The comparison leaves the case for supIPM intact.  Computing the empirical EIPM with $\mathcal{V}_{\mathrm{R}}$ requires adversarial learning at each $S_i$ , whereas the empirical supIPM in (\ref{eq:empirical-supipm}) requires a single maximization over $(s,\theta,\mu)$, so the supremum over $s$ makes the ReLU discriminator class computationally tractable for a continuous sensitive attribute.
+In the right panel of Figure~\ref{fig:app-ablation-ipm-class-Delta}, $\widehat{\Delta}_{\hat{f}_1}(s)$ of supFR is small over the whole sensitive domain, whereas that of $\mathrm{supFR}_{\mathrm{MMD}}$ is substantial near the left boundary and around $s\approx0.5$, with a profile close to that of FREM.  Since $\mathrm{supFR}_{\mathrm{MMD}}$ shares the discriminator class with FREM, this comparison suggests that the advantage of supFR over FREM in Figure~\ref{fig:profile-adult} is attributable to the ReLU discriminator class.  This observation is consistent with Section~\ref{sec:discriminator-choice}. The ReLU class controls the fairness violation of H\"older smooth prediction heads through (\ref{eq:relu-holder}), whereas the Gaussian RKHS unit ball contains only infinitely differentiable functions.  
+These results do not undermine the motivation of supIPM.
+Computing the empirical EIPM with $\mathcal{V}_{\mathrm{R}}$ requires adversarial learning at each $S_i$ , whereas the empirical supIPM in (\ref{eq:empirical-supipm}) requires a single maximization over $(s,\theta,\mu)$, so the supremum over $s$ makes the ReLU discriminator class computationally tractable for a continuous sensitive attribute.
 
 
 % \subsection{Outcome Proportions and Local Disparity on Adult}
@@ -2150,7 +2152,7 @@ The kernel $K_{\gamma}$ of (\ref{eq:supipm-estimators}) determines how the sensi
   \label{fig:app-ablation-kernel}
 \end{figure}
 
-\paragraph{Results.}  In Figure~\ref{fig:app-ablation-kernel}, over the range of prediction performance shared by the four kernels, their curves are close on the three datasets, and no kernel attains the lowest disparity on every dataset.  For the three compactly supported kernels, the prediction performance falls to that of a constant predictor at a smaller value of $\lambda$ than for the Gaussian kernel, so their curves end at a larger disparity, whereas the curve of the Gaussian kernel extends to a lower disparity.
+\paragraph{Results.}  In Figure~\ref{fig:app-ablation-kernel}, over the range of prediction performance shared by the four kernels, their curves are almost close on the three datasets, and no kernel attains the lowest disparity on every dataset.  For the three compactly supported kernels, the prediction performance falls to that of a constant predictor at a smaller value of $\lambda$ than for the Gaussian kernel, so their curves end at a larger disparity, whereas the curve of the Gaussian kernel extends to a lower disparity.
 
 
 \subsection{Candidate Sensitive Values}
@@ -2165,7 +2167,7 @@ The compass search over $s$ of Appendix~\ref{app:ascent} starts from $T$ candida
   \label{fig:app-ablation-T}
 \end{figure}
 
-\paragraph{Results.}  In Figure~\ref{fig:app-ablation-T}, the seven values of $T$ yield similar curves: on Crime the curves overlap, and on Adult and ACSIncome the differences between them lie within one standard deviation over the seeds and show no trend in $T$.  Within the evaluated range of $T$, the results are therefore insensitive to the number of starting points of the search.
+\paragraph{Results.}  In Figure~\ref{fig:app-ablation-T}, the seven values of $T$ yield similar curves: on Crime the curves overlap, and on Adult and ACSIncome the differences between them lie within one standard deviation over the seeds and show no trend in $T$.  Within the evaluated range of $T$, the results are therefore insensitive to the number of starting points of the compass search.
 
 \end{document}
 
