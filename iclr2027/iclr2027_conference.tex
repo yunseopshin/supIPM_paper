@@ -801,12 +801,10 @@ We used generative AI tools to aid and polish the writing, for retrieval and dis
 
 \section*{Reproducibility Statement}
 
-The assumptions and the complete proofs of Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate} are given in Appendix~\ref{app:proofs}.
-Appendix~\ref{app:algorithm} describes the optimization procedure of supFR, its mini-batch formulation, and the full training procedures in Algorithms~\ref{alg:supipm-frl} and~\ref{alg:supipm-frl-mb}.
-Appendix~\ref{app:synth-experiments} specifies the data-generating process and the training settings of the simulation study.
-Appendix~\ref{app:real-experiments} gives the datasets and their preprocessing, the architectures and training settings, the baselines and the ranges of their penalty parameters, and the definitions of all evaluation measures, including the estimation of the worst-case downstream disparity.
-Every reported point is the mean over five random seeds, with one standard deviation shown as error bars.
-The computational cost and the sensitivity of supFR to the discriminator class, the kernel, and the number of candidate sensitive values are reported in Appendices~\ref{app:real-cost}, \ref{app:ablation-ipm-class}, and~\ref{app:ablation-studies}.
+We provide the details needed to reproduce our method and experiments in the Appendix.
+Appendix~\ref{app:proofs} provides the assumptions and the proofs of Theorem~\ref{thm:uniform} and Corollary~\ref{cor:certificate}, and Appendix~\ref{app:algorithm} provides the details of supFR, including the optimization procedure, the mini-batch formulation, and the training algorithms.
+Appendices~\ref{app:synth-experiments} and~\ref{app:real-experiments} provide the experimental settings, including the data-generating process of the simulation, the datasets, model architectures, training settings, baselines, and evaluation measures.
+Additional analyses of the computational cost and of the main design choices of supFR are provided in Appendices~\ref{app:real-cost}, \ref{app:ablation-ipm-class}, and~\ref{app:ablation-studies}.
 
 
 
