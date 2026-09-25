@@ -611,11 +611,11 @@ over $\lVert\mathbf{w}\rVert_2\le c$ and $b\in\mathbb{R}$, with $\lambda_h=10^{3
 % Each curve joins the configurations in increasing order of the penalty parameter.
 We generate an input $\mathbf{X}:=(\mathbf{X}_{\mathrm{task}},\mathbf{X}_{\mathrm{noise}},X_{\mathrm{loc}})$ and an outcome $Y$ as follows.
 We independently draw $S$ on $[0,1]$ with density
-$p(s) \propto 1-0.9\exp\{-(s-s_0)^2/(2\tau^2)\}$, $\mathbf{X}_{\mathrm{task}}\sim N(\mathbf{0},\mathbf{I}_4)$, $\mathbf{X}_{\mathrm{noise}}\sim N(\mathbf{0},\mathbf{I}_3)$ and $\varepsilon_2, \varepsilon_{3}\sim N(0,1)$, and set
+$p(s) \propto 1-0.9 \omega(s)$, $\mathbf{X}_{\mathrm{task}}\sim N(\mathbf{0},\mathbf{I}_4)$, $\mathbf{X}_{\mathrm{noise}}\sim N(\mathbf{0},\mathbf{I}_3)$ and $\varepsilon_1, \varepsilon_{2}\sim N(0,1)$ where $\omega(s) = \exp\{-(s-s_0)^2/(2\tau^2)\}$, and set
 \begin{equation*}
-X_{\mathrm{loc}}:=3\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}+0.5\,\varepsilon_2,
+X_{\mathrm{loc}}:=3\omega(S)+0.5\,\varepsilon_1,
 \qquad
-Y:=\sigma\!\left(\boldsymbol{\upsilon}^\top\mathbf{X}_{\mathrm{task}}+\exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}+0.3\,\varepsilon_3\right),
+Y:=\sigma\!\left(\boldsymbol{\upsilon}^\top\mathbf{X}_{\mathrm{task}}+\omega(S) +0.3\,\varepsilon_2\right),
 \end{equation*}
 where $s_0=0.8$, $\tau=0.043$ and $\boldsymbol{\upsilon}\in\mathbb{R}^4$ is a fixed vector.
 Since $\tau$ is small and so $S$ affects $Y$ only near $s_0$, the worst-case fairness violation can occur near $s_0$ where only a small proportion of observations fall in this narrow interval. Thus, EIPM may ignore unfairness around $s_0.$
