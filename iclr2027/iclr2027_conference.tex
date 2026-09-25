@@ -795,6 +795,21 @@ Future work includes extending supIPM to fairness criteria conditional on the ou
 % Future work includes extending supFR to multivariate sensitive attributes.
 % We also aim to support training when sensitive attributes are observed for only some samples.
 
+\section*{AI Use Statement}
+
+In this work, we used generative AI tools to assist with writing and reviewing the manuscript, synthesizing and organizing experimental results, and searching for relevant literature and research materials.
+We reviewed and verified all AI-assisted content before including it in the paper.
+We take responsibility for the final content of this work, including text, claims, or artifacts produced with the aid of generative AI.
+
+\section*{Reproducibility Statement}
+
+We provide the details needed to reproduce our method and experiments in the Appendix. 
+Appendix~\ref{app:mixture-em} provides the details of MoDGF, including its initialization, structured mean-field E-step, generalized M-step, and overall training algorithm. 
+Appendix~\ref{app:experimental-details} provides the experimental settings, including the datasets and evaluation metrics, model architectures, SGLD sampling procedure, baseline implementations, specialist inference methods, and OOD detection setup.
+Additional analyses of computational costs and the main design choices of MoDGF are provided in Appendices~\ref{app:computational-costs} and~\ref{app:ablation}, respectively.
+
+
+
 \newpage
 
 \bibliographystyle{iclr2027_conference}
@@ -1677,15 +1692,7 @@ This appendix gives the data-generating process, the training settings and the d
 \label{app:synth-generative}
 
 The data are generated as
-\begin{equation}
-\begin{aligned}
-  S &\sim \mathrm{Uniform}(0,1), \\
-  \mathbf{X}_{\mathrm{task}} &\sim N(\mathbf{0},\mathbf{I}_4), &\qquad \mathbf{X}_{\mathrm{noise}} &\sim N(\mathbf{0},\mathbf{I}_3), \\
-  \omega(S) &:= \exp\!\left\{-\frac{(S-s_0)^2}{2\tau^2}\right\}, &\qquad s_0 &= 0.5, \quad \tau = 0.043, \\
-  X_{\mathrm{loc}} &:= 3\,\omega(S) + 0.5\,\varepsilon_1,
-\end{aligned}
-\label{eq:synth-common}
-\end{equation}
+
 \begin{equation}
 \begin{alignedat}{2}
   &\omega(s):=\exp\!\left\{-\frac{(s-s_0)^2}{2\tau^2}\right\},
@@ -1702,7 +1709,8 @@ The data are generated as
 \label{eq:synth-common}
 \end{equation}
 where $\varepsilon_1,\varepsilon_2\sim N(0,1)$, and $S$, $\mathbf{X}_{\mathrm{task}}$, $\mathbf{X}_{\mathrm{noise}}$, $\varepsilon_1$ and $\varepsilon_2$ are mutually independent.
-The function $\omega$ is a Gaussian kernel centered at $s_0=0.5$.  Since $S$ is uniform on $[0,1]$, the interval $[s_0-\tau,\,s_0+\tau]$ has probability $2\tau=0.086$, so the dependence of $X_{\mathrm{loc}}$ on $S$ introduced through $\omega$ is concentrated in a small part of the sensitive domain.  Let $\boldsymbol{\upsilon}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function of Section~\ref{sec:experiments}.  The outcome and the input are
+The function $\omega$ is a Gaussian kernel centered at $s_0=0.5$.  Since the density of $S$ is smallest around $s_0$, the interval
+$[s_0-\tau,\,s_0+\tau]$ has probability approximately $0.022$, so the dependence of $X_{\mathrm{loc}}$ on $S$ introduced through $\omega$ is concentrated in a small part of the sensitive domain.  Let $\boldsymbol{\upsilon}:=(0.8,-0.6,0.4,0.5)^\top$ and let $\sigma$ be the logistic function of Section~\ref{sec:experiments}.  The outcome and the input are
 \begin{equation}
 \begin{aligned}
   Y &:= \sigma\!\left(\boldsymbol{\upsilon}^\top\mathbf{X}_{\mathrm{task}}+X_{\mathrm{loc}} + 0.3\,\varepsilon_2\right), \\
