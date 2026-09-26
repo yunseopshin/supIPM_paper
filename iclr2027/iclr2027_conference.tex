@@ -92,15 +92,10 @@ Address \\
 \maketitle
 \begin{abstract}
 Fair representation learning (FRL) seeks a representation that is informative for downstream prediction yet independent of a sensitive attribute. For a continuous sensitive attribute, existing methods measure the discrepancy between conditional and marginal distributions at each sensitive value and \emph{average} it over the distribution of the sensitive attribute. Such an average can be small even when a fairness violation is confined to a low-probability range of sensitive values, and thus provides no uniform guarantee over the sensitive domain. 
-We therefore propose the supremum integral probability metric (supIPM) to measure the worst-case discrepancy between the conditional and marginal distributions of the representation over sensitive values.
+We therefore propose the \emph{supremum integral probability metric} (\textbf{supIPM}) to measure the worst-case discrepancy between the conditional and marginal distributions of the representation over sensitive values.
 supIPM controls the worst-case disparity of predictions, which we call $L_\infty$-generalized demographic parity.
-We then propose supFR, an algorithm for learning representations that control worst-case fairness violations in downstream predictions.
-% Such a discriminator is determined by a direction and a bias alone, so each discrepancy is maximized over the discriminator class by gradient ascent. 
-% We prove that the empirical supIPM is a uniformly consistent estimator, and bounds downstream disparity for heads of bounded Hölder norm.
-% We establish a uniform convergence rate of the empirical supIPM over a class of encoders and show that it yields a bound on downstream disparity for heads of bounded Hölder norm.
+We then propose \textbf{supFR}, an algorithm for learning representations that control worst-case fairness violations in downstream predictions.
 We establish a uniform convergence rate of the empirical supIPM and show that it yields a bound on downstream disparity for prediction heads of bounded Hölder norm.
-%so the fairness level attained on the sample transfers to the population. 
-% The transfer is uniform over the sensitive domain and over prediction heads of bounded H\"older norm. 
 Experiments on tabular and graph benchmarks show that supFR attains prediction performance comparable to existing methods while substantially reducing the worst-case fairness violation.
 \end{abstract}
 
@@ -799,6 +794,9 @@ Future work includes extending the fairness guarantees provided by supIPM to fai
 \section*{AI Use Statement}
 
 We used generative AI tools to aid and polish the writing, for retrieval and discovery of related work, and for assistance in proving the mathematical claims in Appendix~\ref{app:proofs}; all AI-assisted content was reviewed by the authors.
+
+\subsection*{Ethics statement}
+This work aims to reduce fairness violations affecting under-represented populations defined by continuous sensitive attributes. Our guarantees concern the statistical fairness criteria and prediction-head classes specified in the paper, under the stated assumptions, and do not ensure the absence of all forms of discrimination. Practical applications should consider the appropriateness of the fairness criterion in the deployment context, potential biases in the data, and privacy when collecting and using sensitive attributes.
 
 \section*{Reproducibility Statement}
 
