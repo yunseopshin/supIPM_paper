@@ -2100,7 +2100,7 @@ Computing the empirical EIPM with $\mathcal{V}_{\mathrm{R}}$ requires adversaria
 \subsection{Simulation Data Analysis}
 \label{ipm-class-simul}
 
-To supplement Appendix~\ref{ipm-class-real}, we also compare supFR, $\mathrm{supFR}_{\mathrm{MMD}}$ and FREM on the simulation in Section~\ref{sec:exp-simulation}, with the settings of Appendix~\ref{app:synth-experiments} unchanged.  Figure~\ref{fig:app-ablation-ipm-class-sim} shows the prediction performance against the worst-case downstream disparity over $\mathcal{F}_1$ and $\widehat{\Delta}_{\hat{f}_1}(s)$ of the circled models, as in Figure~\ref{fig:simulation}.
+To further discuss Appendix~\ref{ipm-class-real}, we also compare supFR, $\mathrm{supFR}_{\mathrm{MMD}}$ and FREM on the simulation in Section~\ref{sec:exp-simulation}, with the settings of Appendix~\ref{app:synth-experiments}.  Figure~\ref{fig:app-ablation-ipm-class-sim} shows the prediction performance against the worst-case downstream disparity over $\mathcal{F}_1$ and $\widehat{\Delta}_{\hat{f}_1}(s)$ of the circled models, as in Figure~\ref{fig:simulation}.
 
 \begin{figure}[H]
   \centering
@@ -2109,13 +2109,13 @@ To supplement Appendix~\ref{ipm-class-real}, we also compare supFR, $\mathrm{sup
   \label{fig:app-ablation-ipm-class-sim}
 \end{figure}
 
-\paragraph{Results.}  At comparable prediction performance, supFR attains the lowest worst-case downstream disparity in the left panel, and its $\widehat{\Delta}_{\hat{f}_1}(s)$ is the smallest over the whole sensitive domain in the right panel.  $\widehat{\Delta}_{\hat{f}_1}(s)$ of $\mathrm{supFR}_{\mathrm{MMD}}$ has a profile close to that of FREM away from $s_0$, whereas at $s_0$ its peak is about half of that of FREM.  Since the two share the discriminator class $\mathcal{V}$ and differ only in taking the supremum instead of the average over $s$, this difference is due to the supremum: for every $f\in\mathcal{V}$ and $s\in\mathcal{S}$,
+\paragraph{Results.}  At comparable prediction performance, supFR attains the lowest worst-case downstream disparity in the left panel, and its $\widehat{\Delta}_{\hat{f}_1}(s)$ is the smallest over the whole sensitive domain in the right panel.  $\widehat{\Delta}_{\hat{f}_1}(s)$ of $\mathrm{supFR}_{\mathrm{MMD}}$ has $\widehat{\Delta}_{\hat{f}_1}$ close to that of FREM away from $s_0$, whereas at $s_0$ its peak is about half of that of FREM.  Since the two share the discriminator class $\mathcal{V}$ and differ only in taking the supremum instead of the average over $s$, this difference is due to the supremum: for every $f\in\mathcal{V}$ and $s\in\mathcal{S}$,
 \begin{equation*}
   \Delta_{f}(s)
   \le\operatorname{IPM}_{\mathcal{V}}\left(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}}\right)
   \le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S),
 \end{equation*}
-whereas the EIPM in (\ref{eq:eipm}) bounds only the average of $\Delta_f(S)$ over $\mathbb{P}_S$, to which the interval of small $\mathbb{P}_S$-probability around $s_0$ contributes little.  Thus the advantage of supFR over $\mathrm{supFR}_{\mathrm{MMD}}$ across the sensitive domain is attributable to the ReLU discriminator class, as in Appendix~\ref{ipm-class-real}, whereas the supremum over $s$ further reduces the fairness violation at $s_0$.
+whereas the EIPM in (\ref{eq:eipm}) bounds only the average of $\Delta_f(S)$ over $\mathbb{P}_S$, to which the interval of small $\mathbb{P}_S$-probability around $s_0$ contributes little.  Thus, the advantage of supFR over $\mathrm{supFR}_{\mathrm{MMD}}$ across the sensitive domain is attributable to the ReLU discriminator class, as in Appendix~\ref{ipm-class-real}, whereas the supremum over $s$ further reduces the fairness violation at $s_0$.
 
 
 
