@@ -111,7 +111,7 @@ could be fruitfully used to construct prediction models in multiple downstream t
 To ensure that downstream prediction models are fair, 
 %This transferability makes the fairness requirement more difficult to satisfy because constraining one prediction head does not prevent another from exploiting sensitive information retained in the representation \citep{madras2018learning,shui2022fair}.  
 Fair representation learning (FRL) seeks a representation that is independent of a given sensitive attribute, but yet informative for downstream prediction tasks 
-\citep{zemel2013learning,moyer2018invariant,creager2019flexibly,song2019learning,balunovic2021fair,jovanovic2023fare}.
+\citep{zemel2013learning,moyer2018invariant,creager2019flexibly,song2019learning,balunovic2021fair,gitiaux2021learning,jovanovic2023fare}.
 %, so that every measurable function of the representation is again independent of $S$
 
 Most existing FRL methods have mainly focused on categorical sensitive attributes,
@@ -133,7 +133,7 @@ an extension of these methods to FRL has been proposed by \citet{kong2025fair}. 
 is to control the average fairness violation of a given model or representation with respect to 
 a continuous sensitive attribute. 
 % A critical limitation, however, in controlling the average fairness violation is that under-represented sensitive groups could be highly discriminated.
-A critical limitation, however, in controlling the average fairness violation is that  under-represented sensitive groups could be highly discriminated against.
+A critical limitation, however, in controlling the average fairness violation is that  under-represented sensitive groups could be highly discriminated against \citep{kearns2018preventing, hashimoto2018fairness}.
 % Criteria that report a worst value over the sensitive domain have appeared for the fitted predictor, through a probable segmentation of $S$ \citep{kim202} and through the maximal local disparity of a classifier \citep{jin2024maximal}.
 
 The aim of this paper is to develop an FRL algorithm for continuous sensitive attributes which
@@ -437,7 +437,7 @@ For $s\in\mathcal{S}$, $\theta\in\mathbb{S}^{d-1}$ and $\mu\in[-1,1]$, let
   \right|,
   \label{eq:supipm-penalized-objective}
 \end{equation}
-where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off.  
+where $\ell$ is the supervised loss of Section~\ref{sec:frem} and $\lambda\ge0$ controls the accuracy--fairness trade-off \citep{zhao2022inherent}.  
 We jointly train the encoder and the prediction head by solving $\min_{\phi,\psi}\mathcal{L}(\phi,\psi)$ with $\mathcal{L}(\phi,\psi):=\sup_{s,\theta,\mu}\mathcal{L}(\phi,\psi;s,\theta,\mu)$.
 % Equation~(\ref{eq:supipm-penalized-objective}) is the Lagrangian relaxation of minimizing the empirical supervised risk subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)\le\rho$, as in Section~\ref{sec:supipm-criterion}.
 Note that this problem is a Lagrangian formulation of  the empirical supervised risk minimization subject to $\widehat{\operatorname{supIPM}}^{\gamma}_{\mathcal{V}_{\mathrm{R}}}(\mathbf{Z};S)\le\rho$.
@@ -462,8 +462,9 @@ For $S\in\mathcal{S}\subset\mathbb{R}^r$ with $r>1$, we use a multivariate kerne
 where $K(\cdot)$ is a univariate kernel in (\ref{eq:supipm-estimators}).
 We approximate the supremum in (\ref{eq:empirical-supipm}) by compass search over $\mathcal{S}$  along each coordinate, together with projected gradient ascent over $(\theta,\mu)$.
 With $T$ initial candidate vectors, each compass search iteration evaluates at most $T(2r+1)$ sensitive values \citep{kolda2003optimization}.
-Thus, for fixed $T$, the number of evaluations per iteration grows linearly with $r$, allowing supFR to be extended to
-multivariate sensitive attributes without much increase of computation.
+% Thus, for fixed $T$, the number of evaluations per iteration grows linearly with $r$, allowing supFR to be extended to
+% multivariate sensitive attributes without much increase of computation.
+Thus, supFR can be extended to multivariate sensitive attributes, with evaluations per iteration increasing linearly with $r$ for fixed $T$.
 \end{remark}
 
 
@@ -567,7 +568,7 @@ Experimental details are given in Appendices~\ref{app:synth-experiments} and~\re
 
 \paragraph{Measures.}  Prediction performance is measured by the test accuracy for classification and the test $1-\mathrm{MAE}$ for regression.  Fairness violation of a prediction head $f$ on the representation $\mathbf{Z}=h_{\phi}(\mathbf{X})$ is measured through the disparity $\Delta_{f}(s):=|\mathbb{E}[f(\mathbf{Z})\mid S=s]-\mathbb{E}[f(\mathbf{Z})]|$ at each sensitive value $s$.
 % whose supremum over $s$ is $\operatorname{GDP}_{\infty}(f\circ h)$ of (\ref{eq:linfty-gdp}).
-The prediction-level disparity $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi}) = \sup_{s} \Delta_{f_{\psi}}(s)$ evaluates the prediction head $f_{\psi}$ trained jointly with the encoder.  Since a representation may later serve other prediction heads \citep{coston2021characterizing,jovanovic2023fare,luo2026fair}, we also measure the largest disparity that a downstream prediction head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the class of prediction heads with weight norm at most $c$, where $\sigma(t):=(1+e^{-t})^{-1}.$ The worst-case downstream disparity over $\mathcal{F}_c$ is
+The prediction-level disparity $\operatorname{GDP}_{\infty}(f_{\psi}\circ h_{\phi}) = \sup_{s} \Delta_{f_{\psi}}(s)$ evaluates the prediction head $f_{\psi}$ trained jointly with the encoder.  Since a representation may later serve other prediction heads \citep{coston2021characterizing,gupta2021controllable,jovanovic2023fare,luo2026fair}, we also measure the largest disparity that a downstream prediction head can attain.  For $c>0$, let $\mathcal{F}_c:=\{\sigma(\mathbf{w}^\top\mathbf{z}+b):\lVert\mathbf{w}\rVert_2\le c,\ b\in\mathbb{R}\}$ be the class of prediction heads with weight norm at most $c$, where $\sigma(t):=(1+e^{-t})^{-1}.$ The worst-case downstream disparity over $\mathcal{F}_c$ is
 \begin{equation}
   \operatorname{GDP}_{\infty}(h_{\phi};\mathcal{F}_c):=\sup_{f\in\mathcal{F}_c}\operatorname{GDP}_{\infty}(f\circ h_{\phi}) = \sup_{f\in\mathcal{F}_c} \sup_{s \in \mathcal{S}} \Delta_{f}(s).
   \label{eq:worst-case-gdp}
@@ -2065,11 +2066,16 @@ The linear cost of supFR, together with the unbiased mini-batch gradients of App
 \section{Effect of IPM class}
 \label{app:ablation-ipm-class}
 
-The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in (\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  To examine its effect on supFR, we replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of (\ref{eq:relu-class}) either by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ of sIPM-LFR \citep{kim2022learning} or by the unit ball of the Gaussian RKHS, whose IPM is the MMD used by FREM \citep{kong2025fair}; the latter variant is $\mathrm{supFR}_{\mathrm{MMD}}$ of Appendix~\ref{app:real-cost}.  Both variants retain the supremum over $s$ in (\ref{eq:supipm}) and differ from supFR only in the discriminator class. The architecture, the training settings of Appendix~\ref{app:real-settings} and the measures of Appendix~\ref{app:worst-case} are unchanged, and the penalty values are chosen separately for each discriminator class.
+The discriminator class $\mathcal{V}$ determines which discrepancies between $\mathbb{P}_{\mathbf{Z}\mid S=s}$ and $\mathbb{P}_{\mathbf{Z}}$ the supremum in (\ref{eq:supipm}) detects, and hence which downstream heads the penalty controls.  To examine its effect on supFR, we replace the ReLU class $\mathcal{V}_{\mathrm{R}}$ of (\ref{eq:relu-class}) either by the sigmoid discriminators $\sigma(\theta^{\top}\mathbf{z}+\mu)$ of sIPM-LFR \citep{kim2022learning} or by the unit ball of the Gaussian RKHS, whose IPM is the MMD used by FREM \citep{kong2025fair}; the latter variant is $\mathrm{supFR}_{\mathrm{MMD}}$ of Appendix~\ref{app:real-cost}.  Both variants retain the supremum over $s$ in (\ref{eq:supipm}) and differ from supFR only in the discriminator class. 
+
+\subsection{Real Data Analysis}
+\label{ipm-class-real}
+Figure~\ref{fig:app-ablation-ipm-class} compares the three classes on the tabular datasets; the columns are Adult, Crime and ACSIncome from left to right, the top row reports the prediction-level disparity and the bottom row the worst-case downstream disparity over $\mathcal{F}_1$.
+The architecture, the training settings of Appendix~\ref{app:real-settings} and the measures of Appendix~\ref{app:worst-case} are unchanged, and the penalty values are chosen separately for each discriminator class.
 % Appendix~\ref{app:real-cost} refers to the latter variant as sup-MMD.  Both variants retain the supremum over $s$, which the baselines sIPM-LFR and FREM do not. 
 % The grid of penalty values is chosen separately for each class, since the three IPMs are not on a common scale, and the classes are compared at comparable prediction performance.
 
-Figure~\ref{fig:app-ablation-ipm-class} compares the three classes on the tabular datasets; the columns are Adult, Crime and ACSIncome from left to right, the top row reports the prediction-level disparity and the bottom row the worst-case downstream disparity over $\mathcal{F}_1$.  Figure~\ref{fig:app-ablation-ipm-class-Delta} compares supFR, FREM and $\mathrm{supFR}_{\mathrm{MMD}}$ on Adult.  Its left panel shows the test accuracy against the worst-case downstream disparity over $\mathcal{F}_1$, and the circles mark the model of each method chosen at matched test accuracy as in Figure~\ref{fig:profile-adult}.  Its right panel shows $\widehat{\Delta}_{\hat{f}_1}(s)$ of the three circled models over the sensitive domain.
+  Figure~\ref{fig:app-ablation-ipm-class-Delta} compares supFR, FREM and $\mathrm{supFR}_{\mathrm{MMD}}$ on Adult.  Its left panel shows the test accuracy against the worst-case downstream disparity over $\mathcal{F}_1$, and the circles mark the model of each method chosen at matched test accuracy as in Figure~\ref{fig:profile-adult}.  Its right panel shows $\widehat{\Delta}_{\hat{f}_1}(s)$ of the three circled models over the sensitive domain.
 
 \begin{figure}[H]
   \centering
@@ -2090,6 +2096,22 @@ Figure~\ref{fig:app-ablation-ipm-class} compares the three classes on the tabula
 In the right panel of Figure~\ref{fig:app-ablation-ipm-class-Delta}, $\widehat{\Delta}_{\hat{f}_1}(s)$ of supFR is small over the whole sensitive domain, whereas that of $\mathrm{supFR}_{\mathrm{MMD}}$ is substantial near the left boundary and around $s\approx0.5$, with a profile close to that of FREM.  Since $\mathrm{supFR}_{\mathrm{MMD}}$ shares the discriminator class with FREM, this comparison suggests that the advantage of supFR over FREM in Figure~\ref{fig:profile-adult} is attributable to the ReLU discriminator class.  This observation is consistent with Section~\ref{sec:discriminator-choice}. The ReLU class controls the fairness violation of H\"older smooth prediction heads through (\ref{eq:relu-holder}), whereas the Gaussian RKHS unit ball contains only infinitely differentiable functions.  
 These results do not undermine the motivation of supIPM.
 Computing the empirical EIPM with $\mathcal{V}_{\mathrm{R}}$ requires adversarial learning at each $S_i$ , whereas the empirical supIPM in (\ref{eq:empirical-supipm}) requires a single maximization over $(s,\theta,\mu)$, so the supremum over $s$ makes the ReLU discriminator class computationally tractable for a continuous sensitive attribute.
+
+\subsection{Simulation data Analysis}
+\label{ipm-class-simul}
+\ref{ipm-class-real}의 결과를 further 분석하기 위해서 simulation study에서도 supFR, $\mathrm{supFR}_{\mathrm{MMD}}$ 그리고 FREM을 비교했다. 
+(simulation 세팅과 같음을 설명)
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.78\textwidth]{appendix/fig_sim_supfr_mmd.pdf}
+  \caption{Left: test accuracy against $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$ on simulation data for supFR, FREM and $\mathrm{supFR}_{\mathrm{MMD}}$.  Right: $\widehat{\Delta}_{\hat{f}_1}(s)$ for the three models circled in the left panel, chosen at matched test accuracy.}
+  \label{fig:app-ablation-ipm-class-Delta}
+\end{figure}
+
+\paragraph{Results} supFR이 전반적으로 disparity가 항상 제일 낮고, $\mathrm{supFR}_{\mathrm{MMD}}$과 FREM은 전반적으로 비슷하게 나오나, $s_0$에서 차이가 난다고 설명. sup을 control하기에 더 sup(disparity)(수식으로 설명)이 더 낮게 나올수있음을 설명한다.
+이를 통해서 worst-case prediction head에서 Relu가 큰영향을 끼치면서도, sup역시 $s_0$에서 fairness violation을 완와함을 설명함.
+
 
 
 % \subsection{Outcome Proportions and Local Disparity on Adult}
@@ -2155,7 +2177,7 @@ The kernel $K_{\gamma}$ of (\ref{eq:supipm-estimators}) determines how the sensi
 \paragraph{Results.}  In Figure~\ref{fig:app-ablation-kernel}, over the range of prediction performance shared by the four kernels, their curves are almost close on the three datasets, and no kernel attains the lowest disparity on every dataset.  For the three compactly supported kernels, the prediction performance falls to that of a constant predictor at a smaller value of $\lambda$ than for the Gaussian kernel, so their curves end at a larger disparity, whereas the curve of the Gaussian kernel extends to a lower disparity.
 
 
-\subsection{Candidate Sensitive Values}
+\subsection{Number $T$ of initial values of $s$.}
 \label{app:ablation-T}
 
 The compass search over $s$ of Appendix~\ref{app:ascent} starts from $T$ candidate sensitive values.  We train supFR with $T\in\{5,10,15,20,25,30\}$ in addition to $T=17$ of Table~\ref{tab:hyperparameters}, using the same random seeds and the same penalty values for every $T$.
