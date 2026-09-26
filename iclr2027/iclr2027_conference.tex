@@ -2097,20 +2097,25 @@ In the right panel of Figure~\ref{fig:app-ablation-ipm-class-Delta}, $\widehat{\
 These results do not undermine the motivation of supIPM.
 Computing the empirical EIPM with $\mathcal{V}_{\mathrm{R}}$ requires adversarial learning at each $S_i$ , whereas the empirical supIPM in (\ref{eq:empirical-supipm}) requires a single maximization over $(s,\theta,\mu)$, so the supremum over $s$ makes the ReLU discriminator class computationally tractable for a continuous sensitive attribute.
 
-\subsection{Simulation data Analysis}
+\subsection{Simulation Data Analysis}
 \label{ipm-class-simul}
-\ref{ipm-class-real}의 결과를 further 분석하기 위해서 simulation study에서도 supFR, $\mathrm{supFR}_{\mathrm{MMD}}$ 그리고 FREM을 비교했다. 
-(simulation 세팅과 같음을 설명)
+
+To examine further the comparison of Appendix~\ref{ipm-class-real}, we also compare supFR, $\mathrm{supFR}_{\mathrm{MMD}}$ and FREM on the simulation of Section~\ref{sec:exp-simulation}, with the settings of Appendix~\ref{app:synth-experiments} unchanged.  Figure~\ref{fig:app-ablation-ipm-class-sim} shows the prediction performance against the worst-case downstream disparity over $\mathcal{F}_1$ and $\widehat{\Delta}_{\hat{f}_1}(s)$ of the circled models, as in Figure~\ref{fig:simulation}.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.78\textwidth]{appendix/fig_sim_supfr_mmd.pdf}
-  \caption{Left: test accuracy against $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$ on simulation data for supFR, FREM and $\mathrm{supFR}_{\mathrm{MMD}}$.  Right: $\widehat{\Delta}_{\hat{f}_1}(s)$ for the three models circled in the left panel, chosen at matched test accuracy.}
-  \label{fig:app-ablation-ipm-class-Delta}
+  \caption{Left: prediction performance against $\widehat{\operatorname{GDP}}_{\infty}(h_{\phi};\mathcal{F}_1)$ on the simulation data for supFR, FREM and $\mathrm{supFR}_{\mathrm{MMD}}$.  Right: $\widehat{\Delta}_{\hat{f}_1}(s)$ for the three models circled in the left panel.}
+  \label{fig:app-ablation-ipm-class-sim}
 \end{figure}
 
-\paragraph{Results} supFR이 전반적으로 disparity가 항상 제일 낮고, $\mathrm{supFR}_{\mathrm{MMD}}$과 FREM은 전반적으로 비슷하게 나오나, $s_0$에서 차이가 난다고 설명. sup을 control하기에 더 sup(disparity)(수식으로 설명)이 더 낮게 나올수있음을 설명한다.
-이를 통해서 worst-case prediction head에서 Relu가 큰영향을 끼치면서도, sup역시 $s_0$에서 fairness violation을 완와함을 설명함.
+\paragraph{Results.}  supFR attains the lowest worst-case downstream disparity in the left panel and the smallest $\widehat{\Delta}_{\hat{f}_1}(s)$ at every $s$ in the right panel.  $\mathrm{supFR}_{\mathrm{MMD}}$ and FREM almost coincide away from $s_0$, whereas at $s_0$ the peak of $\mathrm{supFR}_{\mathrm{MMD}}$ is about half of that of FREM.  Since the two share the discriminator class $\mathcal{V}$ and differ only in taking the supremum instead of the average over $s$, this difference is due to the supremum: for every $f\in\mathcal{V}$ and $s\in\mathcal{S}$,
+\begin{equation*}
+  \Delta_{f}(s)
+  \le\operatorname{IPM}_{\mathcal{V}}\left(\mathbb{P}_{\mathbf{Z}\mid S=s},\mathbb{P}_{\mathbf{Z}}\right)
+  \le\operatorname{supIPM}_{\mathcal{V}}(\mathbf{Z};S),
+\end{equation*}
+whereas the EIPM in (\ref{eq:eipm}) bounds only the average of $\Delta_f(S)$ over $\mathbb{P}_S$, to which the interval of small $\mathbb{P}_S$-probability around $s_0$ contributes little.  Thus the ReLU discriminator class determines the worst-case downstream disparity over the whole sensitive domain, as in Appendix~\ref{ipm-class-real}, and the supremum over $s$ additionally reduces the fairness violation at $s_0$.
 
 
 
